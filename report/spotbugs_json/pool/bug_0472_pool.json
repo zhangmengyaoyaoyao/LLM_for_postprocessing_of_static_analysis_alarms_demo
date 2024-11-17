@@ -1,0 +1,9 @@
+{
+    "category": "PERFORMANCE",
+    "vtype": "WMI_WRONG_MAP_ITERATOR",
+    "priority": "2",
+    "rank": "18",
+    "project": "pool",
+    "warning_line": "final ObjectDeque<T> deque = poolMap.get(k);\n",
+    "warning_method": "private void reuseCapacity() {\nfinal int maxTotalPerKey = getMaxTotalPerKey();\nint maxQueueLength = 0;\nLinkedBlockingDeque<PooledObject<T>> mostLoaded = null;\nK loadedKey = null;\nfor (K k : poolMap.keySet()) {\nfinal ObjectDeque<T> deque = poolMap.get(k);\nif (deque != null) {\nfinal LinkedBlockingDeque<PooledObject<T>> pool = deque.getIdleObjects();\nfinal int queueLength = pool.getTakeQueueLength();\nif (getNumActive(k) < maxTotalPerKey && queueLength > maxQueueLength) {\nmaxQueueLength = queueLength;\nmostLoaded = pool;\nloadedKey = k;\n}\n}\n}\nif (mostLoaded != null) {\nregister(loadedKey);\ntry {\nPooledObject<T> p = create(loadedKey);\nif (p != null) {\naddIdleObject(loadedKey, p);\n}\n} catch (Exception e) {\nswallowException(e);\n} finally {\nderegister(loadedKey);\n}\n}\n}"
+}

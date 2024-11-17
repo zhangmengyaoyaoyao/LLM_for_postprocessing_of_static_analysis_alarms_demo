@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "\t\ttmp[i] = n;",
+    "Code_function": "concat_args(CMDARG *arg, int count)\n{\n\tNODE *n;\n\tNODE **tmp;\n\tchar *str, *subsep, *p;\n\tlong len, subseplen;\n\tint i;\n\n\tif (count == 1) {\n\t\tn = force_string(arg->a_node);\n\t\treturn dupnode(n);\n\t}\n\n\temalloc(tmp, NODE **, count * sizeof(NODE *), \"concat_args\");\n\tsubseplen = SUBSEP_node->var_value->stlen;\n\tsubsep = SUBSEP_node->var_value->stptr;\n\tlen = -subseplen;\n\n\tfor (i = 0; i < count; i++) {\n\t\tn = force_string(arg->a_node);\n\t\tlen += n->stlen + subseplen;\n\t\ttmp[i] = n;\n\t\targ = arg->next;\n\t}\n\n\temalloc(str, char *, len + 2, \"concat_args\");\n\tn = tmp[0];\n\tmemcpy(str, n->stptr, n->stlen);\n\tp = str + n->stlen;\n\tfor (i = 1; i < count; i++) {\n\t\tif (subseplen == 1)\n\t\t\t*p++ = *subsep;\n\t\telse if (subseplen > 0) {\n\t\t\tmemcpy(p, subsep, subseplen);\n\t\t\tp += subseplen;\n\t\t}\n\n\t\tn = tmp[i];\n\t\tmemcpy(p, n->stptr, n->stlen);\n\t\tp += n->stlen;\n\t}\n\tstr[len] = '\\0';\n\tefree(tmp);\n\treturn make_str_node(str, len, ALREADY_MALLOCED);\n}"
+}

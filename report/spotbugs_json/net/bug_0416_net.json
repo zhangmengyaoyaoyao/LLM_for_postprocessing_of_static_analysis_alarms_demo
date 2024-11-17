@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "UW_UNCOND_WAIT",
+    "priority": "3",
+    "rank": "17",
+    "project": "net",
+    "warning_line": "__queue.wait(100);\n",
+    "warning_method": "@Override\npublic void run() {\nint ch;\ntry {\n_outerLoop: while (!__isClosed) {\ntry {\nif ((ch = __read(true)) < 0) {\nbreak;\n}\n} catch (InterruptedIOException e) {\nsynchronized (__queue) {\n__ioException = e;\n__queue.notifyAll();\ntry {\n__queue.wait(100);\n} catch (InterruptedException interrupted) {\nif (__isClosed) {\nbreak _outerLoop;\n}\n}\ncontinue;\n}\n} catch (RuntimeException re) {\nsuper.close();\nbreak _outerLoop;\n}\nboolean notify = false;\ntry {\nnotify = __processChar(ch);\n} catch (InterruptedException e) {\nif (__isClosed) {\nbreak _outerLoop;\n}\n}\nif (notify) {\n__client.notifyInputListener();\n}\n}\n} catch (IOException ioe) {\nsynchronized (__queue) {\n__ioException = ioe;\n}\n__client.notifyInputListener();\n}\nsynchronized (__queue) {\n__isClosed = true;\n__hasReachedEOF = true;\n__queue.notify();\n}\n__threaded = false;\n}"
+}

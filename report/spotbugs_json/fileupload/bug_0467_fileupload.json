@@ -1,0 +1,9 @@
+{
+    "category": "I18N",
+    "vtype": "DM_DEFAULT_ENCODING",
+    "priority": "1",
+    "rank": "19",
+    "project": "fileupload",
+    "warning_line": "headers = baos.toString();\n",
+    "warning_method": "public String readHeaders() throws MalformedStreamException {\nint i = 0;\nbyte[] b = new byte[1];\nByteArrayOutputStream baos = new ByteArrayOutputStream();\nint sizeMax = HEADER_PART_SIZE_MAX;\nint size = 0;\nwhile (i < HEADER_SEPARATOR.length) {\ntry {\nb[0] = readByte();\n} catch (IOException e) {\nthrow new MalformedStreamException(\"Stream ended unexpectedly\");\n}\nsize++;\nif (b[0] == HEADER_SEPARATOR[i]) {\ni++;\n} else {\ni = 0;\n}\nif (size <= sizeMax) {\nbaos.write(b[0]);\n}\n}\nString headers = null;\nif (headerEncoding != null) {\ntry {\nheaders = baos.toString(headerEncoding);\n} catch (UnsupportedEncodingException e) {\nheaders = baos.toString();\n}\n} else {\nheaders = baos.toString();\n}\nreturn headers;\n}"
+}

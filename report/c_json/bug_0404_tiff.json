@@ -1,0 +1,7 @@
+{
+    "Project": "tiff",
+    "Tool": "Infer",
+    "Bug Type": "UNINITIALIZED_VALUE",
+    "Code_line": "\t\t\tscanline = TIFFhowmany(td->td_imagewidth,",
+    "Code_function": "TIFFScanlineSize(TIFF* tif)\n{\n\tTIFFDirectory *td = &tif->tif_dir;\n\ttsize_t scanline;\n\n\tif (td->td_planarconfig == PLANARCONFIG_CONTIG) {\n\t\tif (td->td_photometric == PHOTOMETRIC_YCBCR\n\t\t    && !isUpSampled(tif)) {\n\t\t\tuint16 ycbcrsubsampling[2];\n\n\t\t\tTIFFGetFieldDefaulted(tif, TIFFTAG_YCBCRSUBSAMPLING,\n\t\t\t\t\t      ycbcrsubsampling + 0,\n\t\t\t\t\t      ycbcrsubsampling + 1);\n\n\t\t\tif (ycbcrsubsampling[0]*ycbcrsubsampling[1] == 0) {\n\t\t\t\tTIFFErrorExt(tif->tif_clientdata, tif->tif_name,\n\t\t\t\t\t     \"Invalid YCbCr subsampling\");\n\t\t\t\treturn 0;\n\t\t\t}\n\n\t\t\t/* number of sample clumps per line */\n\t\t\tscanline = TIFFhowmany(td->td_imagewidth,\n\t\t\t\t\t       ycbcrsubsampling[0]);\n\t\t\t/* number of samples per line */\n\t\t\tscanline = multiply(tif, scanline,\n\t\t\t\t\t    ycbcrsubsampling[0]*ycbcrsubsampling[1] + 2,\n\t\t\t\t\t    \"TIFFScanlineSize\");\n\t\t} else {\n\t\t\tscanline = multiply(tif, td->td_imagewidth,\n\t\t\t\t\t    td->td_samplesperpixel,\n\t\t\t\t\t    \"TIFFScanlineSize\");\n\t\t}\n\t} else\n\t\tscanline = td->td_imagewidth;\n\treturn ((tsize_t) TIFFhowmany8(multiply(tif, scanline,\n\t\t\t\t\t\ttd->td_bitspersample,\n\t\t\t\t\t\t\"TIFFScanlineSize\")));\n}"
+}

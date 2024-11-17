@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "      if (! append_type (info, \"bitsize \")",
+    "Code_function": "pr_struct_field (void *p, const char *name, bfd_vma bitpos, bfd_vma bitsize,\n\t\t enum debug_visibility visibility)\n{\n  struct pr_handle *info = (struct pr_handle *) p;\n  char ab[20];\n  char *t;\n\n  if (! substitute_type (info, name))\n    return FALSE;\n\n  if (! append_type (info, \"; /* \"))\n    return FALSE;\n\n  if (bitsize != 0)\n    {\n      print_vma (bitsize, ab, TRUE, FALSE);\n      if (! append_type (info, \"bitsize \")\n\t  || ! append_type (info, ab)\n\t  || ! append_type (info, \", \"))\n\treturn FALSE;\n    }\n\n  print_vma (bitpos, ab, TRUE, FALSE);\n  if (! append_type (info, \"bitpos \")\n      || ! append_type (info, ab)\n      || ! append_type (info, \" */\\n\")\n      || ! indent_type (info))\n    return FALSE;\n\n  t = pop_type (info);\n  if (t == NULL)\n    return FALSE;\n\n  if (! pr_fix_visibility (info, visibility))\n    return FALSE;\n\n  return append_type (info, t);\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "CORRECTNESS",
+    "vtype": "RCN_REDUNDANT_NULLCHECK_WOULD_HAVE_BEEN_A_NPE",
+    "priority": "2",
+    "rank": "11",
+    "project": "mavendp",
+    "warning_line": "logArtifacts( usedUndeclared, true );\n",
+    "warning_method": "private boolean checkDependencies() throws MojoExecutionException {\nboolean result = false;\ntry {\nProjectDependencyAnalysis analysis = analyzer.analyze(project);\nif (this.displayUsed) {\ngetLog().info(\"Used declared dependencies:\");\nlogArtifacts(analysis.getUsedDeclaredArtifacts(), false);\n}\ngetLog().info(\"Used undeclared dependencies:\");\nSet usedUndeclared = analysis.getUsedUndeclaredArtifacts();\nlogArtifacts(usedUndeclared, true);\ngetLog().info(\"Unused declared dependencies:\");\nSet unusedDeclared = analysis.getUnusedDeclaredArtifacts();\nif (ignoreNonCompile) {\nIterator iter = unusedDeclared.iterator();\nwhile (iter.hasNext()) {\nArtifact artifact = (Artifact) iter.next();\nif (!artifact.getScope().equals(Artifact.SCOPE_COMPILE)) {\niter.remove();\n}\n}\n}\nlogArtifacts(unusedDeclared, false);\nif (outputXML) {\nwriteDependencyXML(usedUndeclared);\n}\nif (scriptableOutput) {\nwriteScriptableOutput(usedUndeclared);\n}\nif ((usedUndeclared != null && !usedUndeclared.isEmpty()) || unusedDeclared != null && !unusedDeclared.isEmpty()) {\ngetLog().warn(\"Potential problems discovered.\");\nresult = true;\n}\n} catch (ProjectDependencyAnalyzerException exception) {\nthrow new MojoExecutionException(\"Cannot analyze dependencies\", exception);\n}\nreturn result;\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "REC_CATCH_EXCEPTION",
+    "priority": "3",
+    "rank": "20",
+    "project": "configuration",
+    "warning_line": "catch (final Exception e)\n",
+    "warning_method": "@Override\npublic void read(final Reader in) throws ConfigurationException {\nfinal EntityResolver resolver = new EntityResolver() {\n@Override\npublic InputSource resolveEntity(final String publicId, final String systemId) {\nreturn new InputSource(getClass().getClassLoader().getResourceAsStream(\"PropertyList-1.0.dtd\"));\n}\n};\nfinal XMLPropertyListHandler handler = new XMLPropertyListHandler();\ntry {\nfinal SAXParserFactory factory = SAXParserFactory.newInstance();\nfactory.setValidating(true);\nfinal SAXParser parser = factory.newSAXParser();\nparser.getXMLReader().setEntityResolver(resolver);\nparser.getXMLReader().setContentHandler(handler);\nparser.getXMLReader().parse(new InputSource(in));\ngetNodeModel().mergeRoot(handler.getResultBuilder().createNode(), null, null, null, this);\n} catch (final Exception e) {\nthrow new ConfigurationException(\"Unable to parse the configuration file\", e);\n}\n}"
+}

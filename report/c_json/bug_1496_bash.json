@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "CSA",
+    "Bug Type": "core.NullDereference",
+    "Code_line": "  cs->refcount++;",
+    "Code_function": "progcomp_insert (cmd, cs)\n      char *cmd;\n      COMPSPEC *cs;\n{\n  register BUCKET_CONTENTS *item;\n\n  if (cs == NULL)\n    programming_error (_(\"progcomp_insert: %s: NULL COMPSPEC\"), cmd);\n\n  if (prog_completes == 0)\n    progcomp_create ();\n\n  cs->refcount++;\n  item = hash_insert (cmd, prog_completes, 0);\n  if (item->data)\n    free_progcomp (item->data);\n  else\n    item->key = savestring (cmd);\n  item->data = cs;\n\n  return 1;\n}"
+}

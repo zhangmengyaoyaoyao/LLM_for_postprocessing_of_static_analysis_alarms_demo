@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch(Exception e) {\n",
+    "warning_method": "private void addObjectToPool(K key, V obj, boolean decrementNumActive) throws Exception {\nboolean success = true;\nif (_testOnReturn && !_factory.validateObject(key, obj)) {\nsuccess = false;\n} else {\n_factory.passivateObject(key, obj);\n}\nboolean shouldDestroy = !success;\nObjectQueue pool;\nboolean doAllocate = false;\nsynchronized (this) {\npool = _poolMap.get(key);\nif (null == pool) {\npool = new ObjectQueue();\n_poolMap.put(key, pool);\n_poolList.add(key);\n}\nif (isClosed()) {\nshouldDestroy = true;\n} else {\nif (_maxIdle >= 0 && (pool.queue.size() >= _maxIdle)) {\nshouldDestroy = true;\n} else if (success) {\nif (_lifo) {\npool.queue.addFirst(new ObjectTimestampPair<V>(obj));\n} else {\npool.queue.addLast(new ObjectTimestampPair<V>(obj));\n}\n_totalIdle++;\nif (decrementNumActive) {\npool.decrementActiveCount();\n}\ndoAllocate = true;\n}\n}\n}\nif (doAllocate) {\nallocate();\n}\nif (shouldDestroy) {\ntry {\n_factory.destroyObject(key, obj);\n} catch (Exception e) {\n}\nif (decrementNumActive) {\nsynchronized (this) {\npool.decrementActiveCount();\nif (pool.queue.isEmpty() && pool.activeCount == 0 && pool.internalProcessingCount == 0) {\n_poolMap.remove(key);\n_poolList.remove(key);\n}\n}\nallocate();\n}\n}\n}"
+}

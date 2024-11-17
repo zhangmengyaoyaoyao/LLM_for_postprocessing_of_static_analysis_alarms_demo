@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch(Exception e) {\n",
+    "warning_method": "public void evict() throws Exception {\nassertOpen();\nsynchronized (this) {\nif (_pool.isEmpty()) {\nreturn;\n}\nif (null == _evictionCursor) {\n_evictionCursor = (_pool.cursor(this.lifo ? _pool.size() : 0));\n}\n}\nfor (int i = 0, m = getNumTests(); i < m; i++) {\nfinal ObjectTimestampPair<T> pair;\nsynchronized (this) {\nif ((this.lifo && !_evictionCursor.hasPrevious()) || !this.lifo && !_evictionCursor.hasNext()) {\n_evictionCursor.close();\n_evictionCursor = _pool.cursor(this.lifo ? _pool.size() : 0);\n}\npair = this.lifo ? _evictionCursor.previous() : _evictionCursor.next();\n_evictionCursor.remove();\n_numInternalProcessing++;\n}\nboolean removeObject = false;\nfinal long idleTimeMilis = System.currentTimeMillis() - pair.getTstamp();\nif ((getMinEvictableIdleTimeMillis() > 0) && (idleTimeMilis > getMinEvictableIdleTimeMillis())) {\nremoveObject = true;\n} else if ((getSoftMinEvictableIdleTimeMillis() > 0) && (idleTimeMilis > getSoftMinEvictableIdleTimeMillis()) && ((getNumIdle() + 1) > getMinIdle())) {\nremoveObject = true;\n}\nif (getTestWhileIdle() && !removeObject) {\nboolean active = false;\ntry {\n_factory.activateObject(pair.getValue());\nactive = true;\n} catch (Exception e) {\nremoveObject = true;\n}\nif (active) {\nif (!_factory.validateObject(pair.getValue())) {\nremoveObject = true;\n} else {\ntry {\n_factory.passivateObject(pair.getValue());\n} catch (Exception e) {\nremoveObject = true;\n}\n}\n}\n}\nif (removeObject) {\ntry {\n_factory.destroyObject(pair.getValue());\n} catch (Exception e) {\n}\n}\nsynchronized (this) {\nif (!removeObject) {\n_evictionCursor.add(pair);\nif (this.lifo) {\n_evictionCursor.previous();\n}\n}\n_numInternalProcessing--;\n}\n}\nallocate();\n}"
+}

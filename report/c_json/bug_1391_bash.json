@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "Bug Type": "UNINITIALIZED_VALUE",
+    "Code_line": "\tADVANCE_CHAR (string, slen, i);",
+    "Code_function": "char_is_quoted (string, eindex)\n     char *string;\n     int eindex;\n{\n  int i, pass_next, c;\n  size_t slen;\n  DECLARE_MBSTATE;\n\n  slen = strlen (string);\n  no_longjmp_on_fatal_error = 1;\n  i = pass_next = 0;\n  while (i <= eindex)\n    {\n      c = string[i];\n\n      if (pass_next)\n\t{\n\t  pass_next = 0;\n\t  if (i >= eindex)\t/* XXX was if (i >= eindex - 1) */\n\t    CQ_RETURN(1);\n\t  ADVANCE_CHAR (string, slen, i);\n\t  continue;\n\t}\n      else if (c == '\\\\')\n\t{\n\t  pass_next = 1;\n\t  i++;\n\t  continue;\n\t}\n      else if (c == '\\'' || c == '\"')\n\t{\n\t  i = (c == '\\'') ? skip_single_quoted (string, slen, ++i)\n\t\t\t  : skip_double_quoted (string, slen, ++i);\n\t  if (i > eindex)\n\t    CQ_RETURN(1);\n\t  /* no increment, the skip_xxx functions go one past end */\n\t}\n      else\n\tADVANCE_CHAR (string, slen, i);\n    }\n\n  CQ_RETURN(0);\n}"
+}

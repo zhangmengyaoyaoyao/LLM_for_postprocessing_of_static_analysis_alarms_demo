@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "DL_SYNCHRONIZATION_ON_SHARED_CONSTANT",
+    "priority": "2",
+    "rank": "14",
+    "project": "configuration",
+    "warning_line": "synchronized (INIT_GATE)\n",
+    "warning_method": "public void init() {\nif (configuration.getURL() == null && configuration.getFileName() == null) {\nreturn;\n}\nif (this.configuration == null) {\nthrow new IllegalStateException(\"No configuration has been set for this strategy\");\n}\nFileObject file;\ntry {\nFileSystemManager fsManager = VFS.getManager();\nFileSystem fs = ((FileSystemBased) configuration).getFileSystem();\nString uri = fs.getPath(null, configuration.getURL(), configuration.getBasePath(), configuration.getFileName());\nif (uri == null) {\nthrow new ConfigurationRuntimeException(\"Unable to determine file to monitor\");\n}\nfile = fsManager.resolveFile(uri);\n} catch (FileSystemException fse) {\nString msg = \"Unable to monitor \" + configuration.getURL().toString();\nthrow new ConfigurationRuntimeException(msg, fse);\n}\nsynchronized (INIT_GATE) {\nif (fm == null) {\nfm = new DefaultFileMonitor(null);\nlong delayTime = (delay > DEFAULT_DELAY) ? delay : DEFAULT_DELAY;\nfm.setDelay(delayTime);\nfm.start();\n} else {\nlong delayTime = fm.getDelay();\nif (delay > delayTime) {\nfm.setDelay(delay);\n}\n}\nfile.getFileSystem().addListener(file, this);\nfm.addFile(file);\nstrategies.put(file, this);\n}\n}"
+}

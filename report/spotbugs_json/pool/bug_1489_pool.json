@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch (Exception e2) {\n",
+    "warning_method": "public synchronized void addObject(Object key) throws Exception {\nassertOpen();\nif (_factory == null) {\nthrow new IllegalStateException(\"Cannot add objects without a factory.\");\n}\nObject obj = _factory.makeObject(key);\ntry {\nif (!_factory.validateObject(key, obj)) {\nreturn;\n}\n} catch (Exception e) {\ntry {\n_factory.destroyObject(key, obj);\n} catch (Exception e2) {\n}\nreturn;\n}\n_factory.passivateObject(key, obj);\nStack stack = (Stack) _pools.get(key);\nif (null == stack) {\nstack = new Stack();\nstack.ensureCapacity(_initSleepingCapacity > _maxSleeping ? _maxSleeping : _initSleepingCapacity);\n_pools.put(key, stack);\n}\nfinal int stackSize = stack.size();\nif (stackSize >= _maxSleeping) {\nfinal Object staleObj;\nif (stackSize > 0) {\nstaleObj = stack.remove(0);\n_totIdle--;\n} else {\nstaleObj = obj;\n}\ntry {\n_factory.destroyObject(key, staleObj);\n} catch (Exception e) {\nif (obj == staleObj) {\nthrow e;\n}\n}\n} else {\nstack.push(obj);\n_totIdle++;\n}\n}"
+}

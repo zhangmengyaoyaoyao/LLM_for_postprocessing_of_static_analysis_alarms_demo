@@ -1,0 +1,9 @@
+{
+    "category": "PERFORMANCE",
+    "vtype": "WMI_WRONG_MAP_ITERATOR",
+    "priority": "2",
+    "rank": "18",
+    "project": "pool",
+    "warning_line": "final CursorableLinkedList list = ((ObjectQueue)_poolMap.get(key)).queue;\n",
+    "warning_method": "public void clearOldest() {\nfinal Map toDestroy = new HashMap();\nfinal Map map = new TreeMap();\nsynchronized (this) {\nfor (Iterator keyiter = _poolMap.keySet().iterator(); keyiter.hasNext(); ) {\nfinal Object key = keyiter.next();\nfinal CursorableLinkedList list = ((ObjectQueue) _poolMap.get(key)).queue;\nfor (Iterator it = list.iterator(); it.hasNext(); ) {\nmap.put(it.next(), key);\n}\n}\nSet setPairKeys = map.entrySet();\nint itemsToRemove = ((int) (map.size() * 0.15)) + 1;\nIterator iter = setPairKeys.iterator();\nwhile (iter.hasNext() && itemsToRemove > 0) {\nMap.Entry entry = (Map.Entry) iter.next();\nObject key = entry.getValue();\nObjectTimestampPair pairTimeStamp = (ObjectTimestampPair) entry.getKey();\nfinal CursorableLinkedList list = ((ObjectQueue) (_poolMap.get(key))).queue;\nlist.remove(pairTimeStamp);\nif (toDestroy.containsKey(key)) {\n((List) toDestroy.get(key)).add(pairTimeStamp);\n} else {\nList listForKey = new ArrayList();\nlistForKey.add(pairTimeStamp);\ntoDestroy.put(key, listForKey);\n}\nif (list.isEmpty()) {\n_poolMap.remove(key);\n_poolList.remove(key);\n}\n_totalIdle--;\n_totalInternalProcessing++;\nitemsToRemove--;\n}\n}\ndestroy(toDestroy);\n}"
+}

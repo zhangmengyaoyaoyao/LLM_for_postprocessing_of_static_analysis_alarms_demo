@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch(Exception e) {\n",
+    "warning_method": "private void addObjectToPool(Object obj, boolean decrementNumActive) throws Exception {\nboolean success = true;\nif (_testOnReturn && !(_factory.validateObject(obj))) {\nsuccess = false;\n} else {\n_factory.passivateObject(obj);\n}\nboolean shouldDestroy = false;\nsynchronized (this) {\nif (decrementNumActive) {\n_numActive--;\n}\nif (isClosed()) {\nshouldDestroy = true;\n} else {\nif ((_maxIdle >= 0) && (_pool.size() >= _maxIdle)) {\nshouldDestroy = true;\n} else if (success) {\nif (_lifo) {\n_pool.addFirst(new ObjectTimestampPair(obj));\n} else {\n_pool.addLast(new ObjectTimestampPair(obj));\n}\n}\n}\nnotifyAll();\n}\nif (shouldDestroy) {\ntry {\n_factory.destroyObject(obj);\n} catch (Exception e) {\n}\n}\n}"
+}

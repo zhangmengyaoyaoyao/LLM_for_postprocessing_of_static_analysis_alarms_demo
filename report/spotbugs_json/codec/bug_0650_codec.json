@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "SF_SWITCH_FALLTHROUGH",
+    "priority": "2",
+    "rank": "17",
+    "project": "codec",
+    "warning_line": "x = x << 6;\ncase 0:\nbuf[pos++] = (byte) ((x >> 16) & MASK_8BITS);\n",
+    "warning_method": "void decode(byte[] in, int inPos, int inAvail) {\nif (eof) {\nreturn;\n}\nif (inAvail < 0) {\neof = true;\n}\nfor (int i = 0; i < inAvail; i++) {\nif (buf == null || buf.length - pos < decodeSize) {\nresizeBuf();\n}\nbyte b = in[inPos++];\nif (b == PAD) {\nmodulus = (++modulus) % 4;\nx = x << 6;\nswitch(modulus) {\ncase 3:\nx = x << 6;\ncase 0:\nbuf[pos++] = (byte) ((x >> 16) & MASK_8BITS);\nif (modulus == 0) {\nbuf[pos++] = (byte) ((x >> 8) & MASK_8BITS);\n}\ndefault:\neof = true;\nreturn;\n}\n} else {\nif (b >= 0 && b < base64ToInt.length) {\nint result = base64ToInt[b];\nif (result >= 0) {\nmodulus = (++modulus) % 4;\nx = (x << 6) + result;\nif (modulus == 0) {\nbuf[pos++] = (byte) ((x >> 16) & MASK_8BITS);\nbuf[pos++] = (byte) ((x >> 8) & MASK_8BITS);\nbuf[pos++] = (byte) (x & MASK_8BITS);\n}\n}\n}\n}\n}\n}"
+}

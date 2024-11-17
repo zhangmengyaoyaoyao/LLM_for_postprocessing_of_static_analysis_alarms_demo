@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "  if (!bfd_get_section_contents (abfd, sec, uncompressed_buffer,",
+    "Code_function": "bfd_init_section_compress_status (bfd *abfd ATTRIBUTE_UNUSED,\n\t\t\t\t  sec_ptr sec ATTRIBUTE_UNUSED)\n{\n#ifndef HAVE_ZLIB_H\n  bfd_set_error (bfd_error_invalid_operation);\n  return FALSE;\n#else\n  bfd_size_type uncompressed_size;\n  bfd_byte *uncompressed_buffer;\n  bfd_boolean ret;\n\n  /* Error if not opened for read.  */\n  if (abfd->direction != read_direction\n      || sec->size == 0\n      || sec->rawsize != 0\n      || sec->contents != NULL\n      || sec->compress_status != COMPRESS_SECTION_NONE)\n    {\n      bfd_set_error (bfd_error_invalid_operation);\n      return FALSE;\n    }\n\n  /* Read in the full section contents and compress it.  */\n  uncompressed_size = sec->size;\n  uncompressed_buffer = (bfd_byte *) bfd_malloc (uncompressed_size);\n  if (!bfd_get_section_contents (abfd, sec, uncompressed_buffer,\n\t\t\t\t 0, uncompressed_size))\n    ret = FALSE;\n  else\n    ret = bfd_compress_section_contents (abfd, sec,\n\t\t\t\t\t uncompressed_buffer,\n\t\t\t\t\t uncompressed_size);\n\n  free (uncompressed_buffer);\n  return ret;\n#endif\n}"
+}

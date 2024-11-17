@@ -1,0 +1,9 @@
+{
+    "category": "PERFORMANCE",
+    "vtype": "SBSC_USE_STRINGBUFFER_CONCATENATION",
+    "priority": "2",
+    "rank": "18",
+    "project": "mavendp",
+    "warning_line": "message += \"  \" + missingArtifact.getId() + \"\\n\";\n",
+    "warning_method": "private void reResolveArtifacts(MavenProject project, Set<Artifact> artifacts, ArtifactFilter filter) throws ArtifactResolutionException, ArtifactNotFoundException {\nfor (Artifact artifact : artifacts) {\ntry {\nArtifact pomArtifact = factory.createArtifact(artifact.getGroupId(), artifact.getArtifactId(), artifact.getVersion(), null, \"pom\");\nresolver.resolveAlways(pomArtifact, remoteRepositories, localRepository);\n} catch (ArtifactResolutionException e) {\nverbose(e.getMessage());\n} catch (ArtifactNotFoundException e) {\nverbose(e.getMessage());\n}\n}\nList<Artifact> missingArtifacts = new ArrayList<Artifact>();\nfor (Artifact artifact : artifacts) {\nverbose(\"Resolving artifact: \" + artifact.getId());\ntry {\nresolver.resolveAlways(artifact, project.getRemoteArtifactRepositories(), localRepository);\n} catch (ArtifactResolutionException e) {\nverbose(e.getMessage());\nmissingArtifacts.add(artifact);\n} catch (ArtifactNotFoundException e) {\nverbose(e.getMessage());\nmissingArtifacts.add(artifact);\n}\n}\nif (missingArtifacts.size() > 0) {\nString message = \"required artifacts missing:\\n\";\nfor (Artifact missingArtifact : missingArtifacts) {\nmessage += \"  \" + missingArtifact.getId() + \"\\n\";\n}\nmessage += \"\\nfor the artifact:\";\nthrow new ArtifactResolutionException(message, project.getArtifact(), project.getRemoteArtifactRepositories());\n}\n}"
+}

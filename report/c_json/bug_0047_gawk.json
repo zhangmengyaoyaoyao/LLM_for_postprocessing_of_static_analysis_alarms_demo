@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "\t\tret = load_old_ext(s, init_func, fini_func, obj);",
+    "Code_function": "do_ext(int nargs)\n{\n\tNODE *obj, *init = NULL, *fini = NULL, *ret = NULL;\n\tSRCFILE *s;\n\tchar *init_func = NULL;\n\tchar *fini_func = NULL;\n\n\tif (nargs == 3) {\n\t\tfini = POP_STRING();\n\t\tfini_func = fini->stptr;\n\t}\n\tif (nargs >= 2) {\n\t\tinit = POP_STRING();\n\t\tinit_func = init->stptr;\n\t}\n\tobj = POP_STRING();\n\n\ts = add_srcfile(SRC_EXTLIB, obj->stptr, srcfiles, NULL, NULL);\n\tif (s != NULL)\n\t\tret = load_old_ext(s, init_func, fini_func, obj);\n\n\tDEREF(obj);\n\tif (fini != NULL)\n\t\tDEREF(fini);\n\tif (init != NULL)\n\t\tDEREF(init);\n\tif (ret == NULL)\n\t\tret = dupnode(Nnull_string);\n\treturn ret;\n}"
+}

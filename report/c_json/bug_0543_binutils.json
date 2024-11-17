@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "      struct output_elf_obj_tdata *o = bfd_zalloc (abfd, sizeof *o);",
+    "Code_function": "bfd_elf_allocate_object (bfd *abfd,\n\t\t\t size_t object_size,\n\t\t\t enum elf_target_id object_id)\n{\n  BFD_ASSERT (object_size >= sizeof (struct elf_obj_tdata));\n  abfd->tdata.any = bfd_zalloc (abfd, object_size);\n  if (abfd->tdata.any == NULL)\n    return FALSE;\n\n  elf_object_id (abfd) = object_id;\n  if (abfd->direction != read_direction)\n    {\n      struct output_elf_obj_tdata *o = bfd_zalloc (abfd, sizeof *o);\n      if (o == NULL)\n\treturn FALSE;\n      elf_tdata (abfd)->o = o;\n      elf_program_header_size (abfd) = (bfd_size_type) -1;\n    }\n  return TRUE;\n}"
+}

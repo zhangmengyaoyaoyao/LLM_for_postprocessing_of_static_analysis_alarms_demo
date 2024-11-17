@@ -1,0 +1,9 @@
+{
+    "category": "PERFORMANCE",
+    "vtype": "SBSC_USE_STRINGBUFFER_CONCATENATION",
+    "priority": "2",
+    "rank": "18",
+    "project": "codec",
+    "warning_line": "for (; salt.length() < 2; salt = salt + \"A\") {\n",
+    "warning_method": "public static String crypt(byte[] original, String salt) {\nif (salt == null) {\nRandom randomGenerator = new Random();\nint numSaltChars = SALT_CHARS.length;\nsalt = \"\" + SALT_CHARS[Math.abs(randomGenerator.nextInt()) % numSaltChars] + SALT_CHARS[Math.abs(randomGenerator.nextInt()) % numSaltChars];\n} else if (!salt.matches(\"^[\" + B64.B64T + \"]{2,}$\")) {\nthrow new IllegalArgumentException(\"Invalid salt value: \" + salt);\n}\nfor (; salt.length() < 2; salt = salt + \"A\") {\n}\nStringBuilder buffer = new StringBuilder(\"             \");\nchar charZero = salt.charAt(0);\nchar charOne = salt.charAt(1);\nbuffer.setCharAt(0, charZero);\nbuffer.setCharAt(1, charOne);\nint eSwap0 = CON_SALT[charZero];\nint eSwap1 = CON_SALT[charOne] << 4;\nbyte[] key = new byte[8];\nfor (int i = 0; i < key.length; i++) {\nkey[i] = 0;\n}\nfor (int i = 0; i < key.length && i < original.length; i++) {\nint iChar = original[i];\nkey[i] = (byte) (iChar << 1);\n}\nint[] schedule = desSetKey(key);\nint[] out = body(schedule, eSwap0, eSwap1);\nbyte[] b = new byte[9];\nintToFourBytes(out[0], b, 0);\nintToFourBytes(out[1], b, 4);\nb[8] = 0;\nint i = 2;\nint y = 0;\nint u = 128;\nfor (; i < 13; i++) {\nint j = 0;\nint c = 0;\nfor (; j < 6; j++) {\nc <<= 1;\nif ((b[y] & u) != 0) {\nc |= 0x1;\n}\nu >>>= 1;\nif (u == 0) {\ny++;\nu = 128;\n}\nbuffer.setCharAt(i, (char) COV2CHAR[c]);\n}\n}\nreturn buffer.toString();\n}"
+}

@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "  cache = (struct ar_cache *) bfd_zalloc (arch_bfd, sizeof (struct ar_cache));",
+    "Code_function": "_bfd_add_bfd_to_archive_cache (bfd *arch_bfd, file_ptr filepos, bfd *new_elt)\n{\n  struct ar_cache *cache;\n  htab_t hash_table = bfd_ardata (arch_bfd)->cache;\n\n  /* If the hash table hasn't been created, create it.  */\n  if (hash_table == NULL)\n    {\n      hash_table = htab_create_alloc (16, hash_file_ptr, eq_file_ptr,\n\t\t\t\t      NULL, _bfd_calloc_wrapper, free);\n      if (hash_table == NULL)\n\treturn FALSE;\n      bfd_ardata (arch_bfd)->cache = hash_table;\n    }\n\n  /* Insert new_elt into the hash table by filepos.  */\n  cache = (struct ar_cache *) bfd_zalloc (arch_bfd, sizeof (struct ar_cache));\n  cache->ptr = filepos;\n  cache->arbfd = new_elt;\n  *htab_find_slot (hash_table, (const void *) cache, INSERT) = cache;\n\n  /* Provide a means of accessing this from child.  */\n  arch_eltdata (new_elt)->parent_cache = hash_table;\n  arch_eltdata (new_elt)->key = filepos;\n\n  return TRUE;\n}"
+}

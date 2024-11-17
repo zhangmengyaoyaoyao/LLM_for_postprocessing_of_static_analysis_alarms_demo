@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "VO_VOLATILE_INCREMENT",
+    "priority": "2",
+    "rank": "14",
+    "project": "pool",
+    "warning_line": "_numActive--;\n",
+    "warning_method": "@Override\npublic synchronized void returnObject(T obj) throws Exception {\nboolean success = !isClosed();\nif (null != _factory) {\nif (!_factory.validateObject(obj)) {\nsuccess = false;\n} else {\ntry {\n_factory.passivateObject(obj);\n} catch (Exception e) {\nsuccess = false;\n}\n}\n}\nboolean shouldDestroy = !success;\n_numActive--;\nif (success) {\nT toBeDestroyed = null;\nif (_pool.size() >= this.maxSleeping) {\nshouldDestroy = true;\ntoBeDestroyed = _pool.remove(0);\n}\n_pool.push(obj);\nobj = toBeDestroyed;\n}\nnotifyAll();\nif (shouldDestroy) {\ntry {\n_factory.destroyObject(obj);\n} catch (Exception e) {\n}\n}\n}"
+}

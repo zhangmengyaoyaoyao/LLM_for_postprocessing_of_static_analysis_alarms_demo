@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "NO_NOTIFY_NOT_NOTIFYALL",
+    "priority": "3",
+    "rank": "17",
+    "project": "pool",
+    "warning_line": "latch.notify();\n",
+    "warning_method": "private synchronized void allocate() {\nif (isClosed())\nreturn;\nfor (; ; ) {\nif (!_allocationQueue.isEmpty()) {\nLatch latch = (Latch) _allocationQueue.getFirst();\nObjectQueue pool = (ObjectQueue) (_poolMap.get(latch.getkey()));\nif (null == pool) {\npool = new ObjectQueue();\n_poolMap.put(latch.getkey(), pool);\n_poolList.add(latch.getkey());\n}\nlatch.setPool(pool);\nif (!pool.queue.isEmpty()) {\n_allocationQueue.removeFirst();\nlatch.setPair((ObjectTimestampPair) pool.queue.removeFirst());\npool.incrementInternalProcessingCount();\n_totalIdle--;\nsynchronized (latch) {\nlatch.notify();\n}\ncontinue;\n}\nif ((_maxTotal > 0) && (_totalActive + _totalIdle + _totalInternalProcessing >= _maxTotal)) {\nclearOldest();\n}\nif ((_maxActive < 0 || pool.activeCount + pool.internalProcessingCount < _maxActive) && (_maxTotal < 0 || _totalActive + _totalIdle + _totalInternalProcessing < _maxTotal)) {\n_allocationQueue.removeFirst();\nlatch.setMayCreate(true);\npool.incrementInternalProcessingCount();\nsynchronized (latch) {\nlatch.notify();\n}\ncontinue;\n}\n}\nbreak;\n}\n}"
+}

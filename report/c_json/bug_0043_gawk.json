@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "\tmemset(text, '\\0', sbuf->st_size + 2);",
+    "Code_function": "read_file_to_buffer(int fd, const struct stat *sbuf)\n{\n\tchar *text = NULL;\n\tint ret;\n\n\tif ((sbuf->st_mode & S_IFMT) != S_IFREG) {\n\t\terrno = EINVAL;\n\t\tupdate_ERRNO_int(errno);\n\t\tgoto done;\n\t}\n\n\temalloc(text, char *, sbuf->st_size + 2, \"do_readfile\");\n\tmemset(text, '\\0', sbuf->st_size + 2);\n\n\tif ((ret = read(fd, text, sbuf->st_size)) != sbuf->st_size) {\n\t\tupdate_ERRNO_int(errno);\n\t\tgawk_free(text);\n\t\ttext = NULL;\n\t\t/* fall through to return */\n\t}\ndone:\n\treturn text;\n}"
+}

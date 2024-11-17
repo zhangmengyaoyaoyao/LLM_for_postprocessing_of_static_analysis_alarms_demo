@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_S2",
+    "Code_line": "  return stab_write_symbol (info, N_RBRAC, 0, addr - info->fnaddr,",
+    "Code_function": "stab_end_block (void *p, bfd_vma addr)\n{\n  struct stab_write_handle *info = (struct stab_write_handle *) p;\n\n  if (addr > info->last_text_address)\n    info->last_text_address = addr;\n\n  /* If we have postponed an LBRAC, output it now.  */\n  if (info->pending_lbrac != (bfd_vma) -1)\n    {\n      if (! stab_write_symbol (info, N_LBRAC, 0, info->pending_lbrac,\n\t\t\t       (const char *) NULL))\n\treturn FALSE;\n      info->pending_lbrac = (bfd_vma) -1;\n    }\n\n  assert (info->nesting > 0);\n\n  --info->nesting;\n\n  /* We ignore the outermost block.  */\n  if (info->nesting == 0)\n    return TRUE;\n\n  return stab_write_symbol (info, N_RBRAC, 0, addr - info->fnaddr,\n\t\t\t    (const char *) NULL);\n}"
+}

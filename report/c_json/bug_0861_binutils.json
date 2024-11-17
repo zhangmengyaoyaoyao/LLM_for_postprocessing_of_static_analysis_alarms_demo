@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "  new_lo = (struct bfd_link_order *) bfd_zalloc (abfd, amt);",
+    "Code_function": "bfd_new_link_order (bfd *abfd, asection *section)\n{\n  bfd_size_type amt = sizeof (struct bfd_link_order);\n  struct bfd_link_order *new_lo;\n\n  new_lo = (struct bfd_link_order *) bfd_zalloc (abfd, amt);\n  if (!new_lo)\n    return NULL;\n\n  new_lo->type = bfd_undefined_link_order;\n\n  if (section->map_tail.link_order != NULL)\n    section->map_tail.link_order->next = new_lo;\n  else\n    section->map_head.link_order = new_lo;\n  section->map_tail.link_order = new_lo;\n\n  return new_lo;\n}"
+}

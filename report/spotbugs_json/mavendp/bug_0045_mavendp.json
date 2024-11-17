@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "DLS_DEAD_LOCAL_STORE",
+    "priority": "2",
+    "rank": "17",
+    "project": "mavendp",
+    "warning_line": "TreeTokens treeTokens = toTreeTokens( tokens );\n",
+    "warning_method": "private String serialiseDependencyTree(DependencyNode rootNode) {\nStringWriter writer = new StringWriter();\nTreeTokens treeTokens = toTreeTokens(tokens);\nDependencyNodeVisitor visitor = getSerializingDependencyNodeVisitor(writer);\n// TODO: remove the need for this when the serializer can calculate last nodes from visitor calls only\nvisitor = new BuildingDependencyNodeVisitor(visitor);\nDependencyNodeFilter filter = createDependencyNodeFilter();\nif (filter != null) {\nCollectingDependencyNodeVisitor collectingVisitor = new CollectingDependencyNodeVisitor();\nDependencyNodeVisitor firstPassVisitor = new FilteringDependencyNodeVisitor(collectingVisitor, filter);\nrootNode.accept(firstPassVisitor);\nDependencyNodeFilter secondPassFilter = new AncestorOrSelfDependencyNodeFilter(collectingVisitor.getNodes());\nvisitor = new FilteringDependencyNodeVisitor(visitor, secondPassFilter);\n}\nrootNode.accept(visitor);\nreturn writer.toString();\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "dbcp",
+    "warning_line": "} catch (final Exception ie) {\n",
+    "warning_method": "@Override\npublic synchronized void close() throws SQLException {\nif (isClosedInternal()) {\nreturn;\n}\nboolean isUnderlyingConnectionClosed;\ntry {\nisUnderlyingConnectionClosed = getDelegateInternal().isClosed();\n} catch (final SQLException e) {\ntry {\npool.invalidateObject(this);\n} catch (final IllegalStateException ise) {\npassivate();\ngetInnermostDelegate().close();\n} catch (final Exception ie) {\n}\nthrow new SQLException(\"Cannot close connection (isClosed check failed)\", e);\n}\nif (isUnderlyingConnectionClosed) {\n// Abnormal close: underlying connection closed unexpectedly, so we\ntry {\npool.invalidateObject(this);\n} catch (final IllegalStateException e) {\npassivate();\ngetInnermostDelegate().close();\n} catch (final Exception e) {\nthrow new SQLException(\"Cannot close connection (invalidating pooled object failed)\", e);\n}\n} else {\n// Normal close: underlying connection is still open, so we\ntry {\npool.returnObject(this);\n} catch (final IllegalStateException e) {\npassivate();\ngetInnermostDelegate().close();\n} catch (final SQLException | RuntimeException e) {\nthrow e;\n} catch (final Exception e) {\nthrow new SQLException(\"Cannot close connection (return to pool failed)\", e);\n}\n}\n}"
+}

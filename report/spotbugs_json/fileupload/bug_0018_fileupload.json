@@ -1,0 +1,9 @@
+{
+    "category": "MALICIOUS_CODE",
+    "vtype": "EI_EXPOSE_REP2",
+    "priority": "2",
+    "rank": "18",
+    "project": "fileupload",
+    "warning_line": "this.chars = charArray;\n",
+    "warning_method": "public Map<String, String> parse(final char[] charArray, final int offset, final int length, final char separator) {\nif (charArray == null) {\nreturn new HashMap<>();\n}\nfinal HashMap<String, String> params = new HashMap<>();\nthis.chars = charArray;\nthis.pos = offset;\nthis.len = length;\nString paramName;\nString paramValue;\nwhile (hasChar()) {\nparamName = parseToken(new char[] { '=', separator });\nparamValue = null;\nif (hasChar() && (charArray[pos] == '=')) {\npos++;\nparamValue = parseQuotedToken(new char[] { separator });\nif (paramValue != null) {\ntry {\nparamValue = RFC2231Utility.hasEncodedValue(paramName) ? RFC2231Utility.decodeText(paramValue) : MimeUtility.decodeText(paramValue);\n} catch (final UnsupportedEncodingException e) {\n}\n}\n}\nif (hasChar() && (charArray[pos] == separator)) {\npos++;\n}\nif ((paramName != null) && !paramName.isEmpty()) {\nparamName = RFC2231Utility.stripDelimiter(paramName);\nif (this.lowerCaseNames) {\nparamName = paramName.toLowerCase(Locale.ENGLISH);\n}\nparams.put(paramName, paramValue);\n}\n}\nreturn params;\n}"
+}

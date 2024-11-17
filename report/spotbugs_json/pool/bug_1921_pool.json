@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "RI_REDUNDANT_INTERFACES",
+    "priority": "3",
+    "rank": "20",
+    "project": "pool",
+    "warning_line": "boolean _valid = false;\nCursor(int index) {\nsuper(index);\n_valid = true;\nregisterCursor(this);\n}\npublic int previousIndex() {\nthrow new UnsupportedOperationException();\n}\npublic int nextIndex() {\nthrow new UnsupportedOperationException();\n}\npublic void add(Object o) {\ncheckForComod();\nListable elt = insertListable(_cur.prev(),_cur.next(),o);\n_cur.setPrev(elt);\n_cur.setNext(elt.next());\n_lastReturned = null;\n_nextIndex++;\n_expectedModCount++;\n}\nprotected void listableRemoved(Listable elt) {\nif(null == _head.prev()) {\n_cur.setNext(null);\n} else if(_cur.next() == elt) {\n_cur.setNext(elt.next());\n}\nif(null == _head.next()) {\n_cur.setPrev(null);\n} else if(_cur.prev() == elt) {\n_cur.setPrev(elt.prev());\n}\nif(_lastReturned == elt) {\n_lastReturned = null;\n}\n}\nprotected void listableInserted(Listable elt) {\nif(null == _cur.next() && null == _cur.prev()) {\n_cur.setNext(elt);\n} else if(_cur.prev() == elt.prev()) {\n_cur.setNext(elt);\n}\nif(_cur.next() == elt.next()) {\n_cur.setPrev(elt);\n}\nif(_lastReturned == elt) {\n_lastReturned = null;\n}\n}\nprotected void listableChanged(Listable elt) {\nif(_lastReturned == elt) {\n_lastReturned = null;\n}\n}\nprotected void checkForComod() {\nif(!_valid) {\nthrow new ConcurrentModificationException();\n}\n}\nprotected void invalidate() {\n_valid = false;\n}\npublic void close() {\nif(_valid) {\n_valid = false;\nunregisterCursor(this);\n}\n}\n",
+    "warning_method": "protected void listableInserted(Listable elt) {\nif (null == _cur.next() && null == _cur.prev()) {\n_cur.setNext(elt);\n} else if (_cur.prev() == elt.prev()) {\n_cur.setNext(elt);\n}\nif (_cur.next() == elt.next()) {\n_cur.setPrev(elt);\n}\nif (_lastReturned == elt) {\n_lastReturned = null;\n}\n}"
+}

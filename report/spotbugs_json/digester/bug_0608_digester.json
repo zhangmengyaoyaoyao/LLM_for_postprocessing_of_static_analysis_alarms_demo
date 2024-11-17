@@ -1,0 +1,9 @@
+{
+    "category": "CORRECTNESS",
+    "vtype": "NP_GUARANTEED_DEREF",
+    "priority": "2",
+    "rank": "8",
+    "project": "digester",
+    "warning_line": "invokeMethod( parent, methodName, new Object[] { child }, paramTypes );\n",
+    "warning_method": "private void invoke() throws Exception {\nfinal Object child = getChild();\nfinal Object parent = getParent();\nif (getDigester().getLogger().isDebugEnabled()) {\nif (parent == null) {\ngetDigester().getLogger().debug(format(\"[%s]{%s} Call [NULL PARENT].%s(%s)\", getClass().getSimpleName(), getDigester().getMatch(), methodName, child));\n} else {\ngetDigester().getLogger().debug(format(\"[%s]{%s} Call %s.%s(%s)\", getClass().getSimpleName(), getDigester().getMatch(), parent.getClass().getName(), methodName, child));\n}\n}\nfinal Class<?>[] paramTypes = new Class<?>[1];\nif (paramType != null) {\nparamTypes[0] = getDigester().getClassLoader().loadClass(paramTypeName);\n} else {\nparamTypes[0] = child.getClass();\n}\nif (useExactMatch) {\ninvokeExactMethod(parent, methodName, new Object[] { child }, paramTypes);\n} else {\ninvokeMethod(parent, methodName, new Object[] { child }, paramTypes);\n}\n}"
+}

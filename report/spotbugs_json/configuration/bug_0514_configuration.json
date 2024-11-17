@@ -1,0 +1,9 @@
+{
+    "category": "SECURITY",
+    "vtype": "SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING",
+    "priority": "3",
+    "rank": "15",
+    "project": "configuration",
+    "warning_line": "pstmt = conn.prepareStatement(query.toString());\n",
+    "warning_method": "public Iterator getKeys() {\nCollection keys = new ArrayList();\nStringBuffer query = new StringBuffer(\"SELECT DISTINCT \" + keyColumn + \" FROM \" + table);\nif (nameColumn != null) {\nquery.append(\" WHERE \" + nameColumn + \"=?\");\n}\nConnection conn = null;\nPreparedStatement pstmt = null;\ntry {\nconn = getConnection();\npstmt = conn.prepareStatement(query.toString());\nif (nameColumn != null) {\npstmt.setString(1, name);\n}\nResultSet rs = pstmt.executeQuery();\nwhile (rs.next()) {\nkeys.add(rs.getString(1));\n}\n} catch (SQLException e) {\nfireError(EVENT_READ_PROPERTY, null, null, e);\n} finally {\nclose(conn, pstmt);\n}\nreturn keys.iterator();\n}"
+}

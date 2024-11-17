@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch (final Exception e) {\n",
+    "warning_method": "@Override\npublic synchronized void addObject() throws E {\nassertOpen();\nif (factory == null) {\nthrow new IllegalStateException(\"Cannot add objects without a factory.\");\n}\nfinal T obj = factory.makeObject().getObject();\ncreateCount++;\nfinal PooledSoftReference<T> ref = new PooledSoftReference<>(new SoftReference<>(obj, refQueue));\nallReferences.add(ref);\nboolean success = true;\nif (!factory.validateObject(ref)) {\nsuccess = false;\n} else {\nfactory.passivateObject(ref);\n}\nfinal boolean shouldDestroy = !success;\nif (success) {\nidleReferences.add(ref);\nnotifyAll();\n}\nif (shouldDestroy) {\ntry {\ndestroy(ref);\n} catch (final Exception e) {\n}\n}\n}"
+}

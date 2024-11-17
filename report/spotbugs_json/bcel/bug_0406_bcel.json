@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
+    "priority": "3",
+    "rank": "20",
+    "project": "bcel",
+    "warning_line": "final BranchHandle bh = (BranchHandle) branch_map.get(bi);\n",
+    "warning_method": "@Override\npublic void visitBranchInstruction(final BranchInstruction bi) {\nfinal BranchHandle bh = (BranchHandle) branch_map.get(bi);\nfinal int pos = bh.getPosition();\nfinal String name = bi.getName() + \"_\" + pos;\nif (bi instanceof Select) {\nfinal Select s = (Select) bi;\nbranches.add(bi);\nfinal StringBuilder args = new StringBuilder(\"new int[] { \");\nfinal int[] matchs = s.getMatchs();\nfor (int i = 0; i < matchs.length; i++) {\nargs.append(matchs[i]);\nif (i < matchs.length - 1) {\nargs.append(\", \");\n}\n}\nargs.append(\" }\");\n_out.print(\"Select \" + name + \" = new \" + bi.getName().toUpperCase(Locale.ENGLISH) + \"(\" + args + \", new InstructionHandle[] { \");\nfor (int i = 0; i < matchs.length; i++) {\n_out.print(\"null\");\nif (i < matchs.length - 1) {\n_out.print(\", \");\n}\n}\n_out.println(\" }, null);\");\n} else {\nfinal int t_pos = bh.getTarget().getPosition();\nString target;\nif (pos > t_pos) {\ntarget = \"ih_\" + t_pos;\n} else {\nbranches.add(bi);\ntarget = \"null\";\n}\n_out.println(\"    BranchInstruction \" + name + \" = _factory.createBranchInstruction(\" + CONSTANT_PREFIX + bi.getName().toUpperCase(Locale.ENGLISH) + \", \" + target + \");\");\n}\nif (bh.hasTargeters()) {\n_out.println(\"    ih_\" + pos + \" = il.append(\" + name + \");\");\n} else {\n_out.println(\"    il.append(\" + name + \");\");\n}\n}"
+}

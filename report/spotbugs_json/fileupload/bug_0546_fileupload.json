@@ -1,0 +1,9 @@
+{
+    "category": "I18N",
+    "vtype": "DM_CONVERT_CASE",
+    "priority": "3",
+    "rank": "20",
+    "project": "fileupload",
+    "warning_line": "String charset = word.substring(2, charsetPos).toLowerCase();\n",
+    "warning_method": "private static String decodeWord(String word) throws ParseException, UnsupportedEncodingException {\nif (!word.startsWith(ENCODED_TOKEN_MARKER)) {\nthrow new ParseException(\"Invalid RFC 2047 encoded-word: \" + word);\n}\nint charsetPos = word.indexOf('?', 2);\nif (charsetPos == -1) {\nthrow new ParseException(\"Missing charset in RFC 2047 encoded-word: \" + word);\n}\nString charset = word.substring(2, charsetPos).toLowerCase();\nint encodingPos = word.indexOf('?', charsetPos + 1);\nif (encodingPos == -1) {\nthrow new ParseException(\"Missing encoding in RFC 2047 encoded-word: \" + word);\n}\nString encoding = word.substring(charsetPos + 1, encodingPos);\nint encodedTextPos = word.indexOf(ENCODED_TOKEN_FINISHER, encodingPos + 1);\nif (encodedTextPos == -1) {\nthrow new ParseException(\"Missing encoded text in RFC 2047 encoded-word: \" + word);\n}\nString encodedText = word.substring(encodingPos + 1, encodedTextPos);\nif (encodedText.length() == 0) {\nreturn \"\";\n}\ntry {\nByteArrayOutputStream out = new ByteArrayOutputStream(encodedText.length());\nbyte[] encodedData = encodedText.getBytes(US_ASCII_CHARSET);\nif (encoding.equals(BASE64_ENCODING_MARKER)) {\nBase64Decoder.decode(encodedData, out);\n} else if (encoding.equals(QUOTEDPRINTABLE_ENCODING_MARKER)) {\nQuotedPrintableDecoder.decode(encodedData, out);\n} else {\nthrow new UnsupportedEncodingException(\"Unknown RFC 2047 encoding: \" + encoding);\n}\nbyte[] decodedData = out.toByteArray();\nreturn new String(decodedData, javaCharset(charset));\n} catch (IOException e) {\nthrow new UnsupportedEncodingException(\"Invalid RFC 2047 encoding\");\n}\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "SECURITY",
+    "vtype": "SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING",
+    "priority": "3",
+    "rank": "15",
+    "project": "dbcp",
+    "warning_line": "validationPreparedStatement = getInnermostDelegateInternal().prepareStatement(sql);\n",
+    "warning_method": "public void validate(final String sql, Duration timeoutDuration) throws SQLException {\nif (fastFailValidation && fatalSqlExceptionThrown) {\nthrow new SQLException(Utils.getMessage(\"poolableConnection.validate.fastFail\"));\n}\nif (sql == null || sql.isEmpty()) {\nif (timeoutDuration.isNegative()) {\ntimeoutDuration = Duration.ZERO;\n}\nif (!isValid(timeoutDuration)) {\nthrow new SQLException(\"isValid() returned false\");\n}\nreturn;\n}\nif (!sql.equals(lastValidationSql)) {\nlastValidationSql = sql;\nvalidationPreparedStatement = getInnermostDelegateInternal().prepareStatement(sql);\n}\nif (timeoutDuration.compareTo(Duration.ZERO) > 0) {\nvalidationPreparedStatement.setQueryTimeout((int) timeoutDuration.getSeconds());\n}\ntry (ResultSet rs = validationPreparedStatement.executeQuery()) {\nif (!rs.next()) {\nthrow new SQLException(\"validationQuery didn't return a row\");\n}\n} catch (final SQLException sqle) {\nthrow sqle;\n}\n}"
+}

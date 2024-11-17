@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch (Exception e) {\n",
+    "warning_method": "public synchronized Object borrowObject() throws Exception {\nassertOpen();\nObject obj = null;\nboolean newlyCreated = false;\nwhile (null == obj) {\nif (_pool.isEmpty()) {\nif (null == _factory) {\nthrow new NoSuchElementException();\n} else {\nnewlyCreated = true;\nobj = _factory.makeObject();\n}\n} else {\nSoftReference ref = (SoftReference) (_pool.remove(_pool.size() - 1));\nobj = ref.get();\nref.clear();\n}\nif (!newlyCreated && null != _factory && null != obj) {\ntry {\n_factory.activateObject(obj);\n} catch (Exception e) {\ntry {\n_factory.destroyObject(obj);\n} catch (Exception e2) {\n} finally {\nobj = null;\n}\n}\n}\nif (!newlyCreated && null != _factory && null != obj) {\nboolean validated = false;\ntry {\nvalidated = _factory.validateObject(obj);\n} catch (Exception e) {\n}\nif (!validated) {\ntry {\n_factory.destroyObject(obj);\n} catch (Exception e) {\n} finally {\nobj = null;\n}\n}\n}\n}\n_numActive++;\nreturn obj;\n}"
+}

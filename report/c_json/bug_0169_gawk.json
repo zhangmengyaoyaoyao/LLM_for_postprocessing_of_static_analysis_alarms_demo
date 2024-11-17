@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L1",
+    "Code_line": "\t\t\tnewfd = devopen(\"/dev/null\", opposite_mode[fd]);",
+    "Code_function": "init_fds()\n{\n\tstruct stat sbuf;\n\tint fd;\n\tint newfd;\n\tchar const *const opposite_mode[] = {\"w\", \"r\", \"r\"};\n\n\t/* maybe no stderr, don't bother with error mesg */\n\tfor (fd = 0; fd <= 2; fd++) {\n\t\tif (fstat(fd, &sbuf) < 0) {\n#if MAKE_A_HEROIC_EFFORT\n\t\t\tif (do_lint)\n\t\t\t\tlintwarn(_(\"no pre-opened fd %d\"), fd);\n#endif\n\t\t\tnewfd = devopen(\"/dev/null\", opposite_mode[fd]);\n\t\t\t/* turn off some compiler warnings \"set but not used\" */\n\t\t\tnewfd += 0;\n#ifdef MAKE_A_HEROIC_EFFORT\n\t\t\tif (do_lint && newfd < 0)\n\t\t\t\tlintwarn(_(\"could not pre-open /dev/null for fd %d\"), fd);\n#endif\n\t\t}\n\t}\n}"
+}

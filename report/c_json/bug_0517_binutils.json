@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "  seginfo = seg_info (secptr);",
+    "Code_function": "subseg_get (const char *segname, int force_new)\n{\n  segT secptr;\n  segment_info_type *seginfo;\n  const char *now_seg_name = (now_seg\n\t\t\t      ? bfd_get_section_name (stdoutput, now_seg)\n\t\t\t      : 0);\n\n  if (!force_new\n      && now_seg_name\n      && (now_seg_name == segname\n\t  || !strcmp (now_seg_name, segname)))\n    return now_seg;\n\n  if (!force_new)\n    secptr = bfd_make_section_old_way (stdoutput, segname);\n  else\n    secptr = bfd_make_section_anyway (stdoutput, segname);\n\n  seginfo = seg_info (secptr);\n  if (! seginfo)\n    {\n      secptr->output_section = secptr;\n      seginfo = (segment_info_type *) xcalloc (1, sizeof (*seginfo));\n      seginfo->bfd_section = secptr;\n      bfd_set_section_userdata (stdoutput, secptr, seginfo);\n    }\n  return secptr;\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "CORRECTNESS",
+    "vtype": "NP_NULL_PARAM_DEREF",
+    "priority": "2",
+    "rank": "8",
+    "project": "mavendp",
+    "warning_line": "List<Artifact> artList = new ArrayList<>( artifacts );\n",
+    "warning_method": "@Override\nprotected void doExecute() throws MojoExecutionException {\nboolean isFileSepSet = StringUtils.isNotEmpty(fileSeparator);\nboolean isPathSepSet = StringUtils.isNotEmpty(pathSeparator);\nif (attach && StringUtils.isEmpty(localRepoProperty)) {\nlocalRepoProperty = \"${M2_REPO}\";\n}\nSet<Artifact> artifacts = getResolvedDependencies(true);\nif (artifacts == null || artifacts.isEmpty()) {\ngetLog().info(\"No dependencies found.\");\n}\nList<Artifact> artList = new ArrayList<>(artifacts);\nStringBuilder sb = new StringBuilder();\nIterator<Artifact> i = artList.iterator();\nif (i.hasNext()) {\nappendArtifactPath(i.next(), sb);\nwhile (i.hasNext()) {\nsb.append(isPathSepSet ? this.pathSeparator : File.pathSeparator);\nappendArtifactPath(i.next(), sb);\n}\n}\nString cpString = sb.toString();\nif (isFileSepSet) {\nfinal String pattern = Pattern.quote(File.separator);\nfinal String replacement = Matcher.quoteReplacement(fileSeparator);\ncpString = cpString.replaceAll(pattern, replacement);\n}\nif (outputFilterFile) {\ncpString = \"classpath=\" + cpString;\n}\nif (outputProperty != null) {\ngetProject().getProperties().setProperty(outputProperty, cpString);\nif (getLog().isDebugEnabled()) {\ngetLog().debug(outputProperty + \" = \" + cpString);\n}\n}\nif (outputFile == null) {\ngetLog().info(\"Dependencies classpath:\" + System.lineSeparator() + cpString);\n} else {\nif (regenerateFile || !isUpdToDate(cpString)) {\nstoreClasspathFile(cpString, outputFile);\n} else {\nthis.getLog().info(\"Skipped writing classpath file '\" + outputFile + \"'.  No changes found.\");\n}\n}\nif (attach) {\nattachFile(cpString);\n}\n}"
+}

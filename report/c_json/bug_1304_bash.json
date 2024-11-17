@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "Bug Type": "UNINITIALIZED_VALUE",
+    "Code_line": "\t    ADVANCE_CHAR (string, slen, sindex);",
+    "Code_function": "unquoted_substring (substr, string)\n     char *substr, *string;\n{\n  size_t slen;\n  int sindex, c, sublen;\n  DECLARE_MBSTATE;\n\n  if (substr == 0 || *substr == '\\0')\n    return (0);\n\n  slen = strlen (string);\n  sublen = strlen (substr);\n  for (sindex = 0; c = string[sindex]; )\n    {\n      if (STREQN (string + sindex, substr, sublen))\n\treturn (1);\n\n      switch (c)\n\t{\n\tcase '\\\\':\n\t  sindex++;\n\t  if (string[sindex])\n\t    ADVANCE_CHAR (string, slen, sindex);\n\t  break;\n\n\tcase '\\'':\n\t  sindex = skip_single_quoted (string, slen, ++sindex);\n\t  break;\n\n\tcase '\"':\n\t  sindex = skip_double_quoted (string, slen, ++sindex);\n\t  break;\n\n\tdefault:\n\t  ADVANCE_CHAR (string, slen, sindex);\n\t  break;\n\t}\n    }\n  return (0);\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "PERFORMANCE",
+    "vtype": "SBSC_USE_STRINGBUFFER_CONCATENATION",
+    "priority": "2",
+    "rank": "18",
+    "project": "configuration",
+    "warning_line": "retval += \" \\\"\";\n",
+    "warning_method": "public String getMessage() {\nif (!specialConstructor) {\nreturn super.getMessage();\n}\nStringBuffer expected = new StringBuffer();\nint maxSize = 0;\nfor (int i = 0; i < expectedTokenSequences.length; i++) {\nif (maxSize < expectedTokenSequences[i].length) {\nmaxSize = expectedTokenSequences[i].length;\n}\nfor (int j = 0; j < expectedTokenSequences[i].length; j++) {\nexpected.append(tokenImage[expectedTokenSequences[i][j]]).append(' ');\n}\nif (expectedTokenSequences[i][expectedTokenSequences[i].length - 1] != 0) {\nexpected.append(\"...\");\n}\nexpected.append(eol).append(\"    \");\n}\nString retval = \"Encountered \\\"\";\nToken tok = currentToken.next;\nfor (int i = 0; i < maxSize; i++) {\nif (i != 0)\nretval += \" \";\nif (tok.kind == 0) {\nretval += tokenImage[0];\nbreak;\n}\nretval += \" \" + tokenImage[tok.kind];\nretval += \" \\\"\";\nretval += add_escapes(tok.image);\nretval += \" \\\"\";\ntok = tok.next;\n}\nretval += \"\\\" at line \" + currentToken.next.beginLine + \", column \" + currentToken.next.beginColumn;\nretval += \".\" + eol;\nif (expectedTokenSequences.length == 1) {\nretval += \"Was expecting:\" + eol + \"    \";\n} else {\nretval += \"Was expecting one of:\" + eol + \"    \";\n}\nretval += expected.toString();\nreturn retval;\n}"
+}

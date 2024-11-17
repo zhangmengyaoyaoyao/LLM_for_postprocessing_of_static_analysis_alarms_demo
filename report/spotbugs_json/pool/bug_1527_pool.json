@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch(Exception e) {\n",
+    "warning_method": "private void addObjectToPool(T obj, boolean decrementNumActive) throws Exception {\nboolean success = true;\nif (this.testOnReturn && !(_factory.validateObject(obj))) {\nsuccess = false;\n} else {\n_factory.passivateObject(obj);\n}\nboolean shouldDestroy = !success;\nboolean doAllocate = false;\nsynchronized (this) {\nif (isClosed()) {\nshouldDestroy = true;\n} else {\nif ((this.maxIdle >= 0) && (_pool.size() >= this.maxIdle)) {\nshouldDestroy = true;\n} else if (success) {\nif (this.getLifo()) {\n_pool.addFirst(new ObjectTimestampPair<T>(obj));\n} else {\n_pool.addLast(new ObjectTimestampPair<T>(obj));\n}\nif (decrementNumActive) {\n_numActive--;\n}\ndoAllocate = true;\n}\n}\n}\nif (doAllocate) {\nallocate();\n}\nif (shouldDestroy) {\ntry {\n_factory.destroyObject(obj);\n} catch (Exception e) {\n}\nif (decrementNumActive) {\nsynchronized (this) {\n_numActive--;\n}\nallocate();\n}\n}\n}"
+}

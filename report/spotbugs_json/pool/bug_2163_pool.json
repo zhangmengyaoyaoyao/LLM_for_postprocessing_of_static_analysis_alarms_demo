@@ -1,0 +1,9 @@
+{
+    "category": "PERFORMANCE",
+    "vtype": "WMI_WRONG_MAP_ITERATOR",
+    "priority": "2",
+    "rank": "18",
+    "project": "pool",
+    "warning_line": "ObjectDeque<T> queue = poolMap.get(k);\n",
+    "warning_method": "public void clearOldest() {\nfinal Map<PooledObject<T>, K> map = new TreeMap<PooledObject<T>, K>();\nfor (K k : poolMap.keySet()) {\nObjectDeque<T> queue = poolMap.get(k);\nif (queue != null) {\nfinal LinkedBlockingDeque<PooledObject<T>> idleObjects = queue.getIdleObjects();\nfor (PooledObject<T> p : idleObjects) {\nmap.put(p, k);\n}\n}\n}\nint itemsToRemove = ((int) (map.size() * 0.15)) + 1;\nIterator<Map.Entry<PooledObject<T>, K>> iter = map.entrySet().iterator();\nwhile (iter.hasNext() && itemsToRemove > 0) {\nMap.Entry<PooledObject<T>, K> entry = iter.next();\nK key = entry.getValue();\nPooledObject<T> p = entry.getKey();\nboolean destroyed = true;\ntry {\ndestroyed = destroy(key, p, false);\n} catch (Exception e) {\nswallowException(e);\n}\nif (destroyed) {\nitemsToRemove--;\n}\n}\n}"
+}

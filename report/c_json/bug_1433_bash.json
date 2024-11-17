@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "Bug Type": "UNINITIALIZED_VALUE",
+    "Code_line": "\t  COPY_CHAR_P (t, string, send);",
+    "Code_function": "quote_string (string)\n     char *string;\n{\n  register char *t;\n  size_t slen;\n  char *result, *send;\n\n  if (*string == 0)\n    {\n      result = (char *)xmalloc (2);\n      result[0] = CTLNUL;\n      result[1] = '\\0';\n    }\n  else\n    {\n      DECLARE_MBSTATE;\n\n      slen = strlen (string);\n      send = string + slen;\n\n      result = (char *)xmalloc ((slen * 2) + 1);\n\n      for (t = result; string < send; )\n\t{\n\t  *t++ = CTLESC;\n\t  COPY_CHAR_P (t, string, send);\n\t}\n      *t = '\\0';\n    }\n  return (result);\n}"
+}

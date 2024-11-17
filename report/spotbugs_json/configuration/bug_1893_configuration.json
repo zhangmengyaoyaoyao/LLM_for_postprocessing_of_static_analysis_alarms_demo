@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "SF_SWITCH_NO_DEFAULT",
+    "priority": "2",
+    "rank": "19",
+    "project": "configuration",
+    "warning_line": "switch (state)\n{\ncase 0:\nif (c == '\\\\')\n{\nstate = 1;\n}\nelse if (ArrayUtils.contains(WHITE_SPACE, c))\n{\nstate = 2;\n}\nelse if (ArrayUtils.contains(SEPARATORS, c))\n{\nstate = 3;\n}\nelse\n{\nkey.append(c);\n}\nbreak;\ncase 1:\nif (ArrayUtils.contains(SEPARATORS, c) || ArrayUtils.contains(WHITE_SPACE, c))\n{\nkey.append(c);\n}\nelse\n{\nkey.append('\\\\');\nkey.append(c);\n}\nstate = 0;\nbreak;\ncase 2:\nif (ArrayUtils.contains(WHITE_SPACE, c))\n{\nstate = 2;\n}\nelse if (ArrayUtils.contains(SEPARATORS, c))\n{\nstate = 3;\n}\nelse\n{\nvalue.append(c);\nstate = 3;\n}\nbreak;\ncase 3:\nvalue.append(c);\n",
+    "warning_method": "private static String[] doParseProperty(String line) {\nString[] result = new String[2];\nStringBuffer key = new StringBuffer();\nStringBuffer value = new StringBuffer();\n// state of the automaton:\nint state = 0;\nfor (int pos = 0; pos < line.length(); pos++) {\nchar c = line.charAt(pos);\nswitch(state) {\ncase 0:\nif (c == '\\\\') {\nstate = 1;\n} else if (ArrayUtils.contains(WHITE_SPACE, c)) {\nstate = 2;\n} else if (ArrayUtils.contains(SEPARATORS, c)) {\nstate = 3;\n} else {\nkey.append(c);\n}\nbreak;\ncase 1:\nif (ArrayUtils.contains(SEPARATORS, c) || ArrayUtils.contains(WHITE_SPACE, c)) {\nkey.append(c);\n} else {\nkey.append('\\\\');\nkey.append(c);\n}\nstate = 0;\nbreak;\ncase 2:\nif (ArrayUtils.contains(WHITE_SPACE, c)) {\nstate = 2;\n} else if (ArrayUtils.contains(SEPARATORS, c)) {\nstate = 3;\n} else {\nvalue.append(c);\nstate = 3;\n}\nbreak;\ncase 3:\nvalue.append(c);\nbreak;\n}\n}\nresult[0] = key.toString().trim();\nresult[1] = value.toString().trim();\nreturn result;\n}"
+}

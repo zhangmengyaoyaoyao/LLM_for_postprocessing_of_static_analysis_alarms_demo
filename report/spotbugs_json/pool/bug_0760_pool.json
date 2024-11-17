@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch (Exception e) {\n",
+    "warning_method": "@Override\npublic synchronized void returnObject(K key, V obj) throws Exception {\ndecrementActiveCount(key);\nif (null != _factory) {\nif (_factory.validateObject(key, obj)) {\ntry {\n_factory.passivateObject(key, obj);\n} catch (Exception ex) {\n_factory.destroyObject(key, obj);\nreturn;\n}\n} else {\nreturn;\n}\n}\nif (isClosed()) {\nif (null != _factory) {\ntry {\n_factory.destroyObject(key, obj);\n} catch (Exception e) {\n}\n}\nreturn;\n}\nStack<V> stack = _pools.get(key);\nif (null == stack) {\nstack = new Stack<V>();\nstack.ensureCapacity(_initSleepingCapacity > _maxSleeping ? _maxSleeping : _initSleepingCapacity);\n_pools.put(key, stack);\n}\nfinal int stackSize = stack.size();\nif (stackSize >= _maxSleeping) {\nfinal V staleObj;\nif (stackSize > 0) {\nstaleObj = stack.remove(0);\n_totIdle--;\n} else {\nstaleObj = obj;\n}\nif (null != _factory) {\ntry {\n_factory.destroyObject(key, staleObj);\n} catch (Exception e) {\n}\n}\n}\nstack.push(obj);\n_totIdle++;\n}"
+}

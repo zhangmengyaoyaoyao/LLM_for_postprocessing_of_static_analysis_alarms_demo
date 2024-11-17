@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "BC_UNCONFIRMED_CAST",
+    "priority": "3",
+    "rank": "20",
+    "project": "bcel",
+    "warning_line": "final ArrayType array = (ArrayType) type;\n",
+    "warning_method": "public ArrayType(final Type type, final int dimensions) {\nsuper(Const.T_ARRAY, \"<dummy>\");\nif ((dimensions < 1) || (dimensions > Const.MAX_BYTE)) {\nthrow new ClassGenException(\"Invalid number of dimensions: \" + dimensions);\n}\nswitch(type.getType()) {\ncase Const.T_ARRAY:\nfinal ArrayType array = (ArrayType) type;\nthis.dimensions = dimensions + array.dimensions;\nbasicType = array.basicType;\nbreak;\ncase Const.T_VOID:\nthrow new ClassGenException(\"Invalid type: void[]\");\ndefault:\n// Basic type or reference\nthis.dimensions = dimensions;\nbasicType = type;\nbreak;\n}\nfinal StringBuilder buf = new StringBuilder();\nfor (int i = 0; i < this.dimensions; i++) {\nbuf.append('[');\n}\nbuf.append(basicType.getSignature());\nsuper.setSignature(buf.toString());\n}"
+}

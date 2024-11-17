@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "\t\tlist = instruction(Op_list);",
+    "Code_function": "mk_expression_list(INSTRUCTION *list, INSTRUCTION *s1)\n{\n\tINSTRUCTION *r;\n\n\t/* we can't just combine all bytecodes, since we need to\n\t * process individual expressions for a few builtins in snode() (-:\n\t */\n\n\t/* -- list of lists     */\n\t/* [Op_list| ... ]------\n\t *                       |\n\t * [Op_list| ... ]   --  |\n\t *  ...               |  |\n\t *  ...       <-------   |\n\t * [Op_list| ... ]   --  |\n\t *  ...               |  |\n\t *  ...               |  |\n\t *  ...       <------- --\n\t */\n\n\tassert(s1 != NULL && s1->opcode == Op_list);\n\tif (list == NULL) {\n\t\tlist = instruction(Op_list);\n\t\tlist->nexti = s1;\n\t\tlist->lasti = s1->lasti;\n\t\treturn list;\n\t}\n\n\t/* append expression to the end of the list */\n\n\tr = list->lasti;\n\tr->nexti = s1;\n\tlist->lasti = s1->lasti;\n\treturn list;\n}"
+}

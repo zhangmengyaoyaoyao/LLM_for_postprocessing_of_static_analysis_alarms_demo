@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "NO_NOTIFY_NOT_NOTIFYALL",
+    "priority": "3",
+    "rank": "17",
+    "project": "pool",
+    "warning_line": "latch.notify();\n",
+    "warning_method": "private void allocate() {\nboolean clearOldest = false;\nsynchronized (this) {\nif (isClosed())\nreturn;\nIterator<Latch> allocationQueueIter = _allocationQueue.iterator();\nwhile (allocationQueueIter.hasNext()) {\nLatch latch = allocationQueueIter.next();\nObjectQueue pool = _poolMap.get(latch.getkey());\nif (null == pool) {\npool = new ObjectQueue();\n_poolMap.put(latch.getkey(), pool);\n_poolList.add(latch.getkey());\n}\nlatch.setPool(pool);\nif (!pool.queue.isEmpty()) {\nallocationQueueIter.remove();\nlatch.setPair(pool.queue.removeFirst());\npool.incrementInternalProcessingCount();\n_totalIdle--;\nsynchronized (latch) {\nlatch.notify();\n}\ncontinue;\n}\nif ((this.maxTotal > 0) && (_totalActive + _totalIdle + _totalInternalProcessing >= this.maxTotal)) {\nclearOldest = true;\nbreak;\n}\nif ((this.maxTotalPerKey < 0 || pool.activeCount + pool.internalProcessingCount < this.maxTotalPerKey) && (this.maxTotal < 0 || _totalActive + _totalIdle + _totalInternalProcessing < this.maxTotal)) {\nallocationQueueIter.remove();\nlatch.setMayCreate(true);\npool.incrementInternalProcessingCount();\nsynchronized (latch) {\nlatch.notify();\n}\ncontinue;\n}\nif (this.maxTotalPerKey < 0) {\nbreak;\n}\n}\n}\nif (clearOldest) {\nclearOldest();\n}\n}"
+}

@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "CSA",
+    "Bug Type": "core.NullDereference",
+    "Code_line": "\tif (elem->type == Node_var_array) {",
+    "Code_function": "api_set_array_element(awk_ext_id_t id, awk_array_t a_cookie,\n\t\t\t\t\tconst awk_value_t *const index,\n\t\t\t\t\tconst awk_value_t *const value)\n{\n\tNODE *array = (NODE *)a_cookie;\n\tNODE *tmp;\n\tNODE *elem;\n\tNODE **aptr;\n\n\t/* don't check for index len zero, null str is ok as index */\n\tif (   array == NULL\n\t    || array->type != Node_var_array\n\t    || (array->flags & NO_EXT_SET) != 0\n\t    || index == NULL\n\t    || value == NULL\n\t    || ! valid_subscript_type(index->val_type))\n\t\treturn awk_false;\n\n\ttmp = awk_value_to_node(index);\n\taptr = assoc_lookup(array, tmp);\n\tunref(tmp);\n\tunref(*aptr);\n\telem = *aptr = awk_value_to_node(value);\n\tif (elem->type == Node_var_array) {\n\t\telem->parent_array = array;\n\t\telem->vname = estrdup(index->str_value.str,\n\t\t\t\t\tindex->str_value.len);\n\t}\n\n\treturn awk_true;\n}"
+}

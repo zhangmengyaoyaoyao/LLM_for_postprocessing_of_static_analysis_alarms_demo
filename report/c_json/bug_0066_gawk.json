@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_S2",
+    "Code_line": "\tmemmove(sp->fts_path, p->fts_name, len + 1);",
+    "Code_function": "fts_load(FTS *sp, FTSENT *p)\n{\n\tsize_t len;\n\tchar *cp;\n\n\t_DIAGASSERT(sp != NULL);\n\t_DIAGASSERT(p != NULL);\n\n\t/*\n\t * Load the stream structure for the next traversal.  Since we don't\n\t * actually enter the directory until after the preorder visit, set\n\t * the fts_accpath field specially so the chdir gets done to the right\n\t * place and the user can access the first node.  From fts_open it's\n\t * known that the path will fit.\n\t */\n\tlen = p->fts_pathlen = p->fts_namelen;\n\tmemmove(sp->fts_path, p->fts_name, len + 1);\n\tif ((cp = strrchr(p->fts_name, '/')) && (cp != p->fts_name || cp[1])) {\n\t\tlen = strlen(++cp);\n\t\tmemmove(p->fts_name, cp, len + 1);\n\t\tp->fts_namelen = ftsent_namelen_truncate(len);\n\t}\n\tp->fts_accpath = p->fts_path = sp->fts_path;\n\tsp->fts_dev = p->fts_dev;\n}"
+}

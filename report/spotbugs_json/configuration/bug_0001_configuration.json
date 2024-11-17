@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "REC_CATCH_EXCEPTION",
+    "priority": "3",
+    "rank": "20",
+    "project": "configuration",
+    "warning_line": "catch (Exception e)\n",
+    "warning_method": "public InputSource resolveEntity(String publicId, String systemId) throws SAXException {\nString resolved = resolver.getResolvedEntity(publicId, systemId);\nif (resolved != null) {\nString badFilePrefix = \"file://\";\nString correctFilePrefix = \"file:///\";\nif (resolved.startsWith(badFilePrefix) && !resolved.startsWith(correctFilePrefix)) {\nresolved = correctFilePrefix + resolved.substring(badFilePrefix.length());\n}\ntry {\nInputSource iSource = new InputSource(resolved);\niSource.setPublicId(publicId);\nURL url = new URL(resolved);\nInputStream iStream = url.openStream();\niSource.setByteStream(iStream);\nreturn iSource;\n} catch (Exception e) {\nlog.debug(\"Failed to create InputSource for \" + resolved + \" (\" + e.toString() + \")\");\nreturn null;\n}\n}\nreturn null;\n}"
+}

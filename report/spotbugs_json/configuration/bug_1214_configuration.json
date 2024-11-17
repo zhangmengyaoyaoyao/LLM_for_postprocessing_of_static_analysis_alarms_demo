@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "BC_UNCONFIRMED_CAST",
+    "priority": "3",
+    "rank": "20",
+    "project": "configuration",
+    "warning_line": "ConfigurationDeclaration decl = (ConfigurationDeclaration) data;\n",
+    "warning_method": "public Object createBean(Class beanClass, BeanDeclaration data, Object param) throws Exception {\nConfigurationDeclaration decl = (ConfigurationDeclaration) data;\nString tagName = decl.getNode().getName();\nConfigurationProvider provider = decl.getConfigurationBuilder().providerForTag(tagName);\nif (provider == null) {\nthrow new ConfigurationRuntimeException(\"No ConfigurationProvider registered for tag \" + tagName);\n}\ntry {\nreturn provider.getConfiguration(decl);\n} catch (Exception ex) {\nif (!decl.isOptional()) {\nthrow ex;\n} else {\ndecl.getConfigurationBuilder().fireError(EVENT_ERR_LOAD_OPTIONAL, decl.getConfiguration().getString(ATTR_NAME), null, ex);\nif (decl.isForceCreate()) {\ntry {\nreturn provider.getEmptyConfiguration(decl);\n} catch (Exception ex2) {\n;\n}\n}\nreturn null;\n}\n}\n}"
+}

@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_S2",
+    "Code_line": "  return stab_write_symbol (info, N_SLINE, lineno, addr - info->fnaddr,",
+    "Code_function": "stab_lineno (void *p, const char *file, unsigned long lineno, bfd_vma addr)\n{\n  struct stab_write_handle *info = (struct stab_write_handle *) p;\n\n  assert (info->lineno_filename != NULL);\n\n  if (addr > info->last_text_address)\n    info->last_text_address = addr;\n\n  if (filename_cmp (file, info->lineno_filename) != 0)\n    {\n      if (! stab_write_symbol (info, N_SOL, 0, addr, file))\n\treturn FALSE;\n      info->lineno_filename = file;\n    }\n\n  return stab_write_symbol (info, N_SLINE, lineno, addr - info->fnaddr,\n\t\t\t    (const char *) NULL);\n}"
+}

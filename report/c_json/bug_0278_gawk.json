@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_S2",
+    "Code_line": "\ts = source_find(src);",
+    "Code_function": "unserialize_breakpoint(char **pstr, int *pstr_len, int field_cnt)\n{\n\tchar *src;\n\tint lineno;\n\tBREAKPOINT *b = NULL;\n\tINSTRUCTION *rp;\n\tSRCFILE *s;\n\n\t/* src source_line flags ignore_count hit_count number commands [condition] */\n\n\tsrc = estrdup(pstr[0], pstr_len[0]);\n\ts = source_find(src);\n\tefree(src);\n\tif (s == NULL)\n\t\treturn NULL;\n\tsrc = s->src;\n\tlineno = strtol(pstr[1], NULL, 0);\n\tif (lineno <= 0 || lineno > s->srclines)\n\t\treturn NULL;\n\trp = find_rule(src, lineno);\n\tif (rp == NULL\n\t\t\t||  (b = set_breakpoint_at(rp, lineno, true)) == NULL\n\t)\n\t\treturn NULL;\n\n\tb->flags =  strtol(pstr[2], NULL, 0);\n\tb->ignore_count = strtol(pstr[3], NULL, 0);\n\tb->hit_count = strtol(pstr[4], NULL, 0);\n\tb->number =  strtol(pstr[5], NULL, 0);\t/* same number as previous run */\n\n\tif (field_cnt > 6)\t/* unserialize breakpoint `commands' */\n\t\tunserialize_commands(pstr[6], pstr_len[6]);\n\n\tif (field_cnt > 7) {\t/* condition expression */\n\t\tchar *expr;\n\t\texpr = estrdup(pstr[7], pstr_len[7]);\n\t\tif (parse_condition(D_break, b->number, expr) != 0)\n\t\t\tefree(expr);\n\t}\n\n\tif (b->number > watch_list.number)  /* watch and break has same number counter */\n\t\twatch_list.number = b->number;  /* update counter */\n\treturn b;\n}"
+}

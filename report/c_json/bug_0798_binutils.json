@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "  if (! bfd_check_format_matches (arch, bfd_archive, &matching))",
+    "Code_function": "ranlib_touch (const char *archname)\n{\n#ifdef __GO32__\n  /* I don't think updating works on go32.  */\n  ranlib_only (archname);\n#else\n  int f;\n  bfd *arch;\n  char **matching;\n\n  if (get_file_size (archname) < 1)\n    return 1;\n  f = open (archname, O_RDWR | O_BINARY, 0);\n  if (f < 0)\n    {\n      bfd_set_error (bfd_error_system_call);\n      bfd_fatal (archname);\n    }\n\n  arch = bfd_fdopenr (archname, (const char *) NULL, f);\n  if (arch == NULL)\n    bfd_fatal (archname);\n  if (! bfd_check_format_matches (arch, bfd_archive, &matching))\n    {\n      bfd_nonfatal (archname);\n      if (bfd_get_error () == bfd_error_file_ambiguously_recognized)\n\t{\n\t  list_matching_formats (matching);\n\t  free (matching);\n\t}\n      xexit (1);\n    }\n\n  if (! bfd_has_map (arch))\n    /* xgettext:c-format */\n    fatal (_(\"%s: no archive map to update\"), archname);\n\n  if (deterministic)\n    arch->flags |= BFD_DETERMINISTIC_OUTPUT;\n\n  bfd_update_armap_timestamp (arch);\n\n  if (! bfd_close (arch))\n    bfd_fatal (archname);\n#endif\n  return 0;\n}"
+}

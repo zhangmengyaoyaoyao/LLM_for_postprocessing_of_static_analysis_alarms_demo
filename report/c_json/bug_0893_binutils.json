@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L1",
+    "Code_line": "\t  if (!(_bfd_generic_link_add_one_symbol",
+    "Code_function": "elf_x86_64_always_size_sections (bfd *output_bfd,\n\t\t\t\t struct bfd_link_info *info)\n{\n  asection *tls_sec = elf_hash_table (info)->tls_sec;\n\n  if (tls_sec)\n    {\n      struct elf_link_hash_entry *tlsbase;\n\n      tlsbase = elf_link_hash_lookup (elf_hash_table (info),\n\t\t\t\t      \"_TLS_MODULE_BASE_\",\n\t\t\t\t      FALSE, FALSE, FALSE);\n\n      if (tlsbase && tlsbase->type == STT_TLS)\n\t{\n\t  struct elf_x86_64_link_hash_table *htab;\n\t  struct bfd_link_hash_entry *bh = NULL;\n\t  const struct elf_backend_data *bed\n\t    = get_elf_backend_data (output_bfd);\n\n\t  htab = elf_x86_64_hash_table (info);\n\t  if (htab == NULL)\n\t    return FALSE;\n\n\t  if (!(_bfd_generic_link_add_one_symbol\n\t\t(info, output_bfd, \"_TLS_MODULE_BASE_\", BSF_LOCAL,\n\t\t tls_sec, 0, NULL, FALSE,\n\t\t bed->collect, &bh)))\n\t    return FALSE;\n\n\t  htab->tls_module_base = bh;\n\n\t  tlsbase = (struct elf_link_hash_entry *)bh;\n\t  tlsbase->def_regular = 1;\n\t  tlsbase->other = STV_HIDDEN;\n\t  (*bed->elf_backend_hide_symbol) (info, tlsbase, TRUE);\n\t}\n    }\n\n  return TRUE;\n}"
+}

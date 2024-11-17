@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch(Exception e) {\n",
+    "warning_method": "@Override\npublic synchronized void returnObject(T obj) throws Exception {\nboolean success = !isClosed();\nif (_factory != null) {\nif (!_factory.validateObject(obj)) {\nsuccess = false;\n} else {\ntry {\n_factory.passivateObject(obj);\n} catch (Exception e) {\nsuccess = false;\n}\n}\n}\nboolean shouldDestroy = !success;\n_numActive--;\nif (success) {\n_pool.add(new SoftReference<T>(obj, refQueue));\n}\nnotifyAll();\nif (shouldDestroy && _factory != null) {\ntry {\n_factory.destroyObject(obj);\n} catch (Exception e) {\n}\n}\n}"
+}

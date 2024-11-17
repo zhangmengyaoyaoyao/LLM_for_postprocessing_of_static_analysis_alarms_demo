@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "      *t = first_char;",
+    "Code_function": "hostname_completion_function (text, state)\n     const char *text;\n     int state;\n{\n  static char **list = (char **)NULL;\n  static int list_index = 0;\n  static int first_char, first_char_loc;\n\n  /* If we don't have any state, make some. */\n  if (state == 0)\n    {\n      FREE (list);\n\n      list = (char **)NULL;\n\n      first_char_loc = 0;\n      first_char = *text;\n\n      if (first_char == '@')\n\tfirst_char_loc++;\n\n      list = hostnames_matching ((char *)text+first_char_loc);\n      list_index = 0;\n    }\n\n  if (list && list[list_index])\n    {\n      char *t;\n\n      t = (char *)xmalloc (2 + strlen (list[list_index]));\n      *t = first_char;\n      strcpy (t + first_char_loc, list[list_index]);\n      list_index++;\n      return (t);\n    }\n\n  return ((char *)NULL);\n}"
+}

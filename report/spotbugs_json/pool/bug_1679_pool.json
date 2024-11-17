@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "VO_VOLATILE_INCREMENT",
+    "priority": "1",
+    "rank": "12",
+    "project": "pool",
+    "warning_line": "borrowedCount++;\n",
+    "warning_method": "@Override\npublic synchronized boolean allocate() {\nif (state == PooledObjectState.IDLE) {\nstate = PooledObjectState.ALLOCATED;\nlastBorrowTime = System.currentTimeMillis();\nlastUseTime = lastBorrowTime;\nborrowedCount++;\nif (logAbandoned) {\nborrowedBy = new AbandonedObjectCreatedException();\n}\nreturn true;\n} else if (state == PooledObjectState.EVICTION) {\nstate = PooledObjectState.EVICTION_RETURN_TO_HEAD;\nreturn false;\n}\nreturn false;\n}"
+}

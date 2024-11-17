@@ -1,0 +1,9 @@
+{
+    "category": "MALICIOUS_CODE",
+    "vtype": "EI_EXPOSE_REP2",
+    "priority": "2",
+    "rank": "18",
+    "project": "fileupload",
+    "warning_line": "this.chars = charArray;\n",
+    "warning_method": "public Map<String, String> parse(final char[] charArray, int offset, int length, char separator) {\nif (charArray == null) {\nreturn new HashMap<String, String>();\n}\nHashMap<String, String> params = new HashMap<String, String>();\nthis.chars = charArray;\nthis.pos = offset;\nthis.len = length;\nString paramName = null;\nString paramValue = null;\nwhile (hasChar()) {\nparamName = parseToken(new char[] { '=', separator });\nparamValue = null;\nif (hasChar() && (charArray[pos] == '=')) {\npos++;\nparamValue = parseQuotedToken(new char[] { separator });\nif (paramValue != null) {\ntry {\nparamValue = MimeUtility.decodeText(paramValue);\n} catch (UnsupportedEncodingException e) {\n}\n}\n}\nif (hasChar() && (charArray[pos] == separator)) {\npos++;\n}\nif ((paramName != null) && (paramName.length() > 0)) {\nif (this.lowerCaseNames) {\nparamName = paramName.toLowerCase(Locale.ENGLISH);\n}\nparams.put(paramName, paramValue);\n}\n}\nreturn params;\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
+    "priority": "3",
+    "rank": "20",
+    "project": "fileupload",
+    "warning_line": "throw (FileUploadException) e.getCause();\n",
+    "warning_method": "public List parseRequest(RequestContext ctx) throws FileUploadException {\ntry {\nFileItemIterator iter = getItemIterator(ctx);\nList items = new ArrayList();\nFileItemFactory fac = getFileItemFactory();\nfinal byte[] buffer = new byte[8192];\nwhile (iter.hasNext()) {\nFileItemStream item = iter.next();\nFileItem fileItem = fac.createItem(item.getFieldName(), item.getContentType(), item.isFormField(), item.getName());\ntry {\nStreams.copy(item.openStream(), fileItem.getOutputStream(), true, buffer);\n} catch (FileUploadIOException e) {\nthrow (FileUploadException) e.getCause();\n} catch (IOException e) {\nthrow new IOFileUploadException(\"Processing of \" + MULTIPART_FORM_DATA + \" request failed. \" + e.getMessage(), e);\n}\nitems.add(fileItem);\n}\nreturn items;\n} catch (FileUploadIOException e) {\nthrow (FileUploadException) e.getCause();\n} catch (IOException e) {\nthrow new FileUploadException(e.getMessage(), e);\n}\n}"
+}

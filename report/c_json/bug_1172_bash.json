@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "Bug Type": "UNINITIALIZED_VALUE",
+    "Code_line": "      ADVANCE_CHAR_P (string, send - string);",
+    "Code_function": "unquoted_glob_pattern_p (string)\n     register char *string;\n{\n  register int c;\n  char *send;\n  int open;\n\n  DECLARE_MBSTATE;\n\n  open = 0;\n  send = string + strlen (string);\n\n  while (c = *string++)\n    {\n      switch (c)\n\t{\n\tcase '?':\n\tcase '*':\n\t  return (1);\n\n\tcase '[':\n\t  open++;\n\t  continue;\n\n\tcase ']':\n\t  if (open)\n\t    return (1);\n\t  continue;\n\n\tcase '+':\n\tcase '@':\n\tcase '!':\n\t  if (*string == '(')\t/*)*/\n\t    return (1);\n\t  continue;\n\n\tcase CTLESC:\n\tcase '\\\\':\n\t  if (*string++ == '\\0')\n\t    return (0);\n\t}\n\n      /* Advance one fewer byte than an entire multibyte character to\n\t account for the auto-increment in the loop above. */\n#ifdef HANDLE_MULTIBYTE\n      string--;\n      ADVANCE_CHAR_P (string, send - string);\n      string++;\n#else\n      ADVANCE_CHAR_P (string, send - string);\n#endif\n    }\n  return (0);\n}"
+}

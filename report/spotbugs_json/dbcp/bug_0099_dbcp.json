@@ -1,0 +1,9 @@
+{
+    "category": "PERFORMANCE",
+    "vtype": "WMI_WRONG_MAP_ITERATOR",
+    "priority": "2",
+    "rank": "18",
+    "project": "dbcp",
+    "warning_line": "stringBuilder.append(NUPROP_WARNTEXT.get(propertyName)).append(\" You have set value of \\\"\")\n",
+    "warning_method": "private void validatePropertyNames(final Reference ref, final Name name, final List<String> warnMessages, final List<String> infoMessages) {\nfinal List<String> allPropsAsList = Arrays.asList(ALL_PROPERTIES);\nfinal String nameString = name != null ? \"Name = \" + name.toString() + \" \" : \"\";\nif (NUPROP_WARNTEXT != null && !NUPROP_WARNTEXT.isEmpty()) {\nfor (final String propertyName : NUPROP_WARNTEXT.keySet()) {\nfinal RefAddr ra = ref.get(propertyName);\nif (ra != null && !allPropsAsList.contains(ra.getType())) {\nfinal StringBuilder stringBuilder = new StringBuilder(nameString);\nfinal String propertyValue = Objects.toString(ra.getContent(), null);\nstringBuilder.append(NUPROP_WARNTEXT.get(propertyName)).append(\" You have set value of \\\"\").append(propertyValue).append(\"\\\" for \\\"\").append(propertyName).append(\"\\\" property, which is being ignored.\");\nwarnMessages.add(stringBuilder.toString());\n}\n}\n}\nfinal Enumeration<RefAddr> allRefAddrs = ref.getAll();\nwhile (allRefAddrs.hasMoreElements()) {\nfinal RefAddr ra = allRefAddrs.nextElement();\nfinal String propertyName = ra.getType();\nif (!(allPropsAsList.contains(propertyName) || NUPROP_WARNTEXT.containsKey(propertyName) || SILENT_PROPERTIES.contains(propertyName))) {\nfinal String propertyValue = Objects.toString(ra.getContent(), null);\nfinal StringBuilder stringBuilder = new StringBuilder(nameString);\nstringBuilder.append(\"Ignoring unknown property: \").append(\"value of \\\"\").append(propertyValue).append(\"\\\" for \\\"\").append(propertyName).append(\"\\\" property\");\ninfoMessages.add(stringBuilder.toString());\n}\n}\n}"
+}

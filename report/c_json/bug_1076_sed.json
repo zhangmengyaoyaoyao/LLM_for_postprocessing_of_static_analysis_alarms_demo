@@ -1,0 +1,7 @@
+{
+    "Project": "sed",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "  new_regex->flags = flags;",
+    "Code_function": "compile_regex(b, flags, needed_sub)\n  struct buffer *b;\n  int flags;\n  int needed_sub;\n{\n  struct regex *new_regex;\n  size_t re_len;\n\n  /* // matches the last RE */\n  if (size_buffer(b) == 0)\n    {\n      if (flags > 0)\n\tbad_prog(_(BAD_MODIF));\n      return NULL;\n    }\n\n  re_len = size_buffer(b);\n  new_regex = ck_malloc(sizeof (struct regex) + re_len - 1);\n  new_regex->flags = flags;\n  memcpy (new_regex->re, get_buffer(b), re_len);\n\n#ifdef REG_PERL\n  new_regex->sz = re_len;\n#else\n  /* GNU regex does not process \\t & co. */\n  new_regex->sz = normalize_text(new_regex->re, re_len, TEXT_REGEX);\n#endif\n\n  compile_regex_1 (new_regex, needed_sub);\n  return new_regex;\n}"
+}

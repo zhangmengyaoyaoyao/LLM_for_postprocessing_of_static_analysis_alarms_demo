@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "CSA",
+    "Bug Type": "unix.Malloc",
+    "Code_line": "\t\tc = c->prev;",
+    "Code_function": "delete_breakpoint(BREAKPOINT *b)\n{\n\tINSTRUCTION *pc = b->bpi;\n\tstruct commands_item *c;\n\n\t/* N.B.: easiest thing to do is to turn Op_breakpoint into a no-op;\n\t * deleteing the instruction is not that simple,\n\t * since could have reference to it somewhere else (e.g. cur_pc).\n\t */\n\n\tpc->opcode = Op_no_op;\n\tpc->source_line = 0;\n\tpc->break_pt = NULL;\n\n\t/* delete commands */\n\tfor (c = b->commands.next; c != &b->commands; c = c->next) {\n\t\tc = c->prev;\n\t\tdelete_commands_item(c->next);\n\t}\n\n\tfree_context(b->cndn.ctxt, false);\n\tif (b->cndn.expr != NULL)\n\t\tefree(b->cndn.expr);\n\n\t/* remove from list */\n\tb->next->prev = b->prev;\n\tb->prev->next = b->next;\n\tefree(b);\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "I18N",
+    "vtype": "DM_DEFAULT_ENCODING",
+    "priority": "1",
+    "rank": "19",
+    "project": "net",
+    "warning_line": "digest = md5.digest(timestamp.getBytes());\n",
+    "warning_method": "public boolean login(String username, String timestamp, String secret) throws IOException, NoSuchAlgorithmException {\nint i;\nbyte[] digest;\nStringBuilder buffer, digestBuffer;\nMessageDigest md5;\nif (getState() != AUTHORIZATION_STATE) {\nreturn false;\n}\nmd5 = MessageDigest.getInstance(\"MD5\");\ntimestamp += secret;\ndigest = md5.digest(timestamp.getBytes());\ndigestBuffer = new StringBuilder(128);\nfor (i = 0; i < digest.length; i++) {\nint digit = digest[i] & 0xff;\nif (digit <= 15) {\ndigestBuffer.append(\"0\");\n}\ndigestBuffer.append(Integer.toHexString(digit));\n}\nbuffer = new StringBuilder(256);\nbuffer.append(username);\nbuffer.append(' ');\nbuffer.append(digestBuffer.toString());\nif (sendCommand(POP3Command.APOP, buffer.toString()) != POP3Reply.OK) {\nreturn false;\n}\nsetState(TRANSACTION_STATE);\nreturn true;\n}"
+}

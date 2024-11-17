@@ -1,0 +1,9 @@
+{
+    "category": "EXPERIMENTAL",
+    "vtype": "OBL_UNSATISFIED_OBLIGATION",
+    "priority": "2",
+    "rank": "20",
+    "project": "configuration",
+    "warning_line": "ResultSet rs = pstmt.executeQuery();\n",
+    "warning_method": "public Object getProperty(String key) {\nObject result = null;\nStringBuilder query = new StringBuilder(\"SELECT * FROM \");\nquery.append(table).append(\" WHERE \");\nquery.append(keyColumn).append(\"=?\");\nif (nameColumn != null) {\nquery.append(\" AND \" + nameColumn + \"=?\");\n}\nConnection conn = null;\nPreparedStatement pstmt = null;\ntry {\nconn = getConnection();\npstmt = conn.prepareStatement(query.toString());\npstmt.setString(1, key);\nif (nameColumn != null) {\npstmt.setString(2, name);\n}\nResultSet rs = pstmt.executeQuery();\nList<Object> results = new ArrayList<Object>();\nwhile (rs.next()) {\nObject value = rs.getObject(valueColumn);\nif (isDelimiterParsingDisabled()) {\nresults.add(value);\n} else {\nIterator<?> it = PropertyConverter.toIterator(value, getListDelimiter());\nwhile (it.hasNext()) {\nresults.add(it.next());\n}\n}\n}\nif (!results.isEmpty()) {\nresult = (results.size() > 1) ? results : results.get(0);\n}\n} catch (SQLException e) {\nfireError(EVENT_READ_PROPERTY, key, null, e);\n} finally {\nclose(conn, pstmt);\n}\nreturn result;\n}"
+}

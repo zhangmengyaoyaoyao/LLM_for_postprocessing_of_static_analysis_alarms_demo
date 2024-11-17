@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L2",
+    "Code_line": "          bfd_zalloc (abfd, (bfd_size_type) sizeof (struct data_struct));",
+    "Code_function": "find_chunk (bfd *abfd, bfd_vma vma, bfd_boolean create)\n{\n  struct data_struct *d = abfd->tdata.tekhex_data->data;\n\n  vma &= ~CHUNK_MASK;\n  while (d && (d->vma) != vma)\n    d = d->next;\n\n  if (!d && create)\n    {\n      /* No chunk for this address, so make one up.  */\n      d = (struct data_struct *)\n          bfd_zalloc (abfd, (bfd_size_type) sizeof (struct data_struct));\n\n      if (!d)\n\treturn NULL;\n\n      d->next = abfd->tdata.tekhex_data->data;\n      d->vma = vma;\n      abfd->tdata.tekhex_data->data = d;\n    }\n  return d;\n}"
+}

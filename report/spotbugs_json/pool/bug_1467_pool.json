@@ -1,0 +1,9 @@
+{
+    "category": "PERFORMANCE",
+    "vtype": "WMI_WRONG_MAP_ITERATOR",
+    "priority": "2",
+    "rank": "18",
+    "project": "pool",
+    "warning_line": "ObjectQueue pool = (ObjectQueue)_poolMap.get(key);\n",
+    "warning_method": "public void setFactory(KeyedPoolableObjectFactory factory) throws IllegalStateException {\nMap toDestroy = new HashMap();\nfinal KeyedPoolableObjectFactory oldFactory = _factory;\nsynchronized (this) {\nassertOpen();\nif (0 < getNumActive()) {\nthrow new IllegalStateException(\"Objects are already active\");\n} else {\nfor (Iterator it = _poolMap.keySet().iterator(); it.hasNext(); ) {\nObject key = it.next();\nObjectQueue pool = (ObjectQueue) _poolMap.get(key);\nif (pool != null) {\nList objects = new ArrayList();\nobjects.addAll(pool.queue);\ntoDestroy.put(key, objects);\nit.remove();\n_poolList.remove(key);\n_totalIdle = _totalIdle - pool.queue.size();\n_totalInternalProcessing = _totalInternalProcessing + pool.queue.size();\npool.queue.clear();\n}\n}\n_factory = factory;\n_factoryClassLoader = Thread.currentThread().getContextClassLoader();\n}\n}\ndestroy(toDestroy, oldFactory);\n}"
+}

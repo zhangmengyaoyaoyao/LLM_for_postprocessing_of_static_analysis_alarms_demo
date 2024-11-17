@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "RI_REDUNDANT_INTERFACES",
+    "priority": "3",
+    "rank": "20",
+    "project": "pool",
+    "warning_line": "super(delegate);\nprune = !(delegate instanceof EvictorLender);\n}\npublic Object borrow() {\nfinal EvictorReference ref = (EvictorReference)super.borrow();\nObject obj = null;\nif (ref != null) {\nsynchronized (ref) {\nobj = ref.get();\nref.clear();\n}\n}\nreturn obj;\n}\npublic void repay(final Object obj) {\nsuper.repay(createReference(obj));\n}\npublic ListIterator listIterator() {\nreturn new EvictorListIterator(super.listIterator());\n}\npublic int size() {\nif (prune) {\nsynchronized (getObjectPool().getPool()) {\nfinal Iterator iter = super.listIterator();\nwhile (iter.hasNext()) {\nObject o = iter.next();\nwhile (o instanceof LenderReference) {\no = ((LenderReference)o).get();\n}\nif (o == null) {\niter.remove();\n}\n}\n}\n}\nreturn super.size();\n}\nprotected abstract EvictorReference createReference(Object obj);\nprotected final Timer getTimer() {\nreturn CompositeObjectPool.COMPOSITE_TIMER;\n",
+    "warning_method": "public Object borrow() {\nfinal EvictorReference ref = (EvictorReference) super.borrow();\nObject obj = null;\nif (ref != null) {\nsynchronized (ref) {\nobj = ref.get();\nref.clear();\n}\n}\nreturn obj;\n}"
+}

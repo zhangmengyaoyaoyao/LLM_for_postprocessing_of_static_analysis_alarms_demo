@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "Bug Type": "UNINITIALIZED_VALUE",
+    "Code_line": "  if (pat_n != (size_t)-1 && dn_n !=(size_t)-1)",
+    "Code_function": "mbskipname (pat, dname, flags)\n     char *pat, *dname;\n     int flags;\n{\n  int ret, ext;\n  wchar_t *pat_wc, *dn_wc;\n  size_t pat_n, dn_n;\n\n  if (mbsmbchar (dname) == 0 && mbsmbchar (pat) == 0)\n    return (skipname (pat, dname, flags));\n\n  ext = 0;\n#if EXTENDED_GLOB\n  ext = extglob_pattern_p (pat);\n#endif\n\n  pat_wc = dn_wc = (wchar_t *)NULL;\n\n  pat_n = xdupmbstowcs (&pat_wc, NULL, pat);\n  if (pat_n != (size_t)-1)\n    dn_n = xdupmbstowcs (&dn_wc, NULL, dname);\n\n  ret = 0;\n  if (pat_n != (size_t)-1 && dn_n !=(size_t)-1)\n    ret = ext ? wextglob_skipname (pat_wc, dn_wc, flags) : wchkname (pat_wc, dn_wc);\n  else\n    ret = skipname (pat, dname, flags);\n\n  FREE (pat_wc);\n  FREE (dn_wc);\n\n  return ret;\n}"
+}

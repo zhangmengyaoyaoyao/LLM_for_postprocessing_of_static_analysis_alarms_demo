@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_S2",
+    "Code_line": "  return (append_type (info, \" \")",
+    "Code_function": "substitute_type (struct pr_handle *info, const char *s)\n{\n  char *u;\n\n  assert (info->stack != NULL);\n\n  u = strchr (info->stack->type, '|');\n  if (u != NULL)\n    {\n      char *n;\n\n      n = (char *) xmalloc (strlen (info->stack->type) + strlen (s));\n\n      memcpy (n, info->stack->type, u - info->stack->type);\n      strcpy (n + (u - info->stack->type), s);\n      strcat (n, u + 1);\n\n      free (info->stack->type);\n      info->stack->type = n;\n\n      return TRUE;\n    }\n\n  if (strchr (s, '|') != NULL\n      && (strchr (info->stack->type, '{') != NULL\n\t  || strchr (info->stack->type, '(') != NULL))\n    {\n      if (! prepend_type (info, \"(\")\n\t  || ! append_type (info, \")\"))\n\treturn FALSE;\n    }\n\n  if (*s == '\\0')\n    return TRUE;\n\n  return (append_type (info, \" \")\n\t  && append_type (info, s));\n}"
+}

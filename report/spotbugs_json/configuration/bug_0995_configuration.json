@@ -1,0 +1,9 @@
+{
+    "category": "SECURITY",
+    "vtype": "SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING",
+    "priority": "2",
+    "rank": "12",
+    "project": "configuration",
+    "warning_line": "pstmt = conn.prepareStatement(query.toString());\n",
+    "warning_method": "@Override\nprotected void addPropertyDirect(String key, Object obj) {\nStringBuilder query = new StringBuilder(\"INSERT INTO \" + table);\nif (nameColumn != null) {\nquery.append(\" (\" + nameColumn + \", \" + keyColumn + \", \" + valueColumn + \") VALUES (?, ?, ?)\");\n} else {\nquery.append(\" (\" + keyColumn + \", \" + valueColumn + \") VALUES (?, ?)\");\n}\nConnection conn = null;\nPreparedStatement pstmt = null;\ntry {\nconn = getConnection();\npstmt = conn.prepareStatement(query.toString());\nint index = 1;\nif (nameColumn != null) {\npstmt.setString(index++, name);\n}\npstmt.setString(index++, key);\npstmt.setString(index++, String.valueOf(obj));\npstmt.executeUpdate();\ncommitIfRequired(conn);\n} catch (SQLException e) {\nfireError(EVENT_ADD_PROPERTY, key, obj, e);\n} finally {\nclose(conn, pstmt);\n}\n}"
+}

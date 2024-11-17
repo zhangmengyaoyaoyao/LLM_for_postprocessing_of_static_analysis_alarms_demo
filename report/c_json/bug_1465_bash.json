@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "CSA",
+    "Bug Type": "core.NullDereference",
+    "Code_line": "      buffers[fd2]->b_flag |= B_WASBASHINPUT;",
+    "Code_function": "duplicate_buffered_stream (fd1, fd2)\n     int fd1, fd2;\n{\n  int is_bash_input, m;\n\n  if (fd1 == fd2)\n    return 0;\n\n  m = max (fd1, fd2);\n  ALLOCATE_BUFFERS (m);\n\n  /* If FD2 is the file descriptor bash is currently using for shell input,\n     we need to do some extra work to make sure that the buffered stream\n     actually exists (it might not if fd1 was not active, and the copy\n     didn't actually do anything). */\n  is_bash_input = (bash_input.type == st_bstream) &&\n\t\t  (bash_input.location.buffered_fd == fd2);\n\n  if (buffers[fd2])\n    {\n      /* If the two objects share the same b_buffer, don't free it. */\n      if (buffers[fd1] && buffers[fd1]->b_buffer && buffers[fd1]->b_buffer == buffers[fd2]->b_buffer)\n\tbuffers[fd2] = (BUFFERED_STREAM *)NULL;\n      else\n\tfree_buffered_stream (buffers[fd2]);\n    }\n  buffers[fd2] = copy_buffered_stream (buffers[fd1]);\n  if (buffers[fd2])\n    buffers[fd2]->b_fd = fd2;\n\n  if (is_bash_input)\n    {\n      if (!buffers[fd2])\n\tfd_to_buffered_stream (fd2);\n      buffers[fd2]->b_flag |= B_WASBASHINPUT;\n    }\n\n  return (fd2);\n}"
+}

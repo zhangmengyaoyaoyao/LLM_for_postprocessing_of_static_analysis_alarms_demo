@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L2",
+    "Code_line": "      char * debug_filename = bfd_follow_gnu_debugaltlink (unit->abfd, DEBUGDIR);",
+    "Code_function": "read_alt_indirect_ref (struct comp_unit * unit,\n\t\t       bfd_uint64_t       offset)\n{\n  struct dwarf2_debug *stash = unit->stash;\n\n  if (stash->alt_bfd_ptr == NULL)\n    {\n      bfd *  debug_bfd;\n      char * debug_filename = bfd_follow_gnu_debugaltlink (unit->abfd, DEBUGDIR);\n\n      if (debug_filename == NULL)\n\treturn FALSE;\n\n      if ((debug_bfd = bfd_openr (debug_filename, NULL)) == NULL\n\t  || ! bfd_check_format (debug_bfd, bfd_object))\n\t{\n\t  if (debug_bfd)\n\t    bfd_close (debug_bfd);\n\n\t  /* FIXME: Should we report our failure to follow the debuglink ?  */\n\t  free (debug_filename);\n\t  return NULL;\n\t}\n      stash->alt_bfd_ptr = debug_bfd;\n    }\n\n  if (! read_section (unit->stash->alt_bfd_ptr,\n\t\t      stash->debug_sections + debug_info_alt,\n\t\t      NULL, /* FIXME: Do we need to load alternate symbols ?  */\n\t\t      offset,\n\t\t      &stash->alt_dwarf_info_buffer,\n\t\t      &stash->alt_dwarf_info_size))\n    return NULL;\n\n  if (offset >= stash->alt_dwarf_info_size)\n    return NULL;\n  return stash->alt_dwarf_info_buffer + offset;\n}"
+}

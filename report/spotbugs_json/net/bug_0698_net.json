@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "OS_OPEN_STREAM_EXCEPTION_PATH",
+    "priority": "3",
+    "rank": "19",
+    "project": "net",
+    "warning_line": "output = new ToNetASCIIOutputStream(getBufferedOutputStream(socket.getOutputStream()));\n",
+    "warning_method": "protected boolean _storeFile(String command, String remote, InputStream local) throws IOException {\nSocket socket = _openDataConnection_(command, remote);\nif (socket == null) {\nreturn false;\n}\nfinal OutputStream output;\nif (__fileType == ASCII_FILE_TYPE) {\noutput = new ToNetASCIIOutputStream(getBufferedOutputStream(socket.getOutputStream()));\n} else {\noutput = getBufferedOutputStream(socket.getOutputStream());\n}\nCSL csl = null;\nif (__controlKeepAliveTimeout > 0) {\ncsl = new CSL(this, __controlKeepAliveTimeout, __controlKeepAliveReplyTimeout);\n}\ntry {\nUtil.copyStream(local, output, getBufferSize(), CopyStreamEvent.UNKNOWN_STREAM_SIZE, __mergeListeners(csl), false);\n} catch (IOException e) {\nUtil.closeQuietly(socket);\nif (csl != null) {\n__cslDebug = csl.cleanUp();\n}\nthrow e;\n}\noutput.close();\nsocket.close();\nif (csl != null) {\ncsl.cleanUp();\n}\nboolean ok = completePendingCommand();\nreturn ok;\n}"
+}

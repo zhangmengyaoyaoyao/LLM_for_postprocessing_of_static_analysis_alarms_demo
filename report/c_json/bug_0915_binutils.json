@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "    d_print_comp (&dpi, options, dc);",
+    "Code_function": "cplus_demangle_print_callback (int options,\n                               const struct demangle_component *dc,\n                               demangle_callbackref callback, void *opaque)\n{\n  struct d_print_info dpi;\n\n  d_print_init (&dpi, callback, opaque, dc);\n\n  {\n#ifdef CP_DYNAMIC_ARRAYS\n    __extension__ struct d_saved_scope scopes[dpi.num_saved_scopes];\n    __extension__ struct d_print_template temps[dpi.num_copy_templates];\n\n    dpi.saved_scopes = scopes;\n    dpi.copy_templates = temps;\n#else\n    dpi.saved_scopes = alloca (dpi.num_saved_scopes\n\t\t\t       * sizeof (*dpi.saved_scopes));\n    dpi.copy_templates = alloca (dpi.num_copy_templates\n\t\t\t\t * sizeof (*dpi.copy_templates));\n#endif\n\n    d_print_comp (&dpi, options, dc);\n  }\n\n  d_print_flush (&dpi);\n\n  return ! d_print_saw_error (&dpi);\n}"
+}

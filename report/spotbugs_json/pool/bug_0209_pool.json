@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch (Exception e2) {\n",
+    "warning_method": "public synchronized Object borrowObject(Object key) throws Exception {\nassertOpen();\nStack stack = (Stack) (_pools.get(key));\nif (null == stack) {\nstack = new Stack();\nstack.ensureCapacity(_initSleepingCapacity > _maxSleeping ? _maxSleeping : _initSleepingCapacity);\n_pools.put(key, stack);\n}\nObject obj = null;\ndo {\nboolean newlyMade = false;\n// TODO: Don't use exception, test size.\nif (!stack.empty()) {\nobj = stack.pop();\n_totIdle--;\n} else {\nif (null == _factory) {\nthrow new NoSuchElementException(\"pools without a factory cannot create new objects as needed.\");\n} else {\nobj = _factory.makeObject(key);\nnewlyMade = true;\n}\n}\nif (!newlyMade && null != obj && null != _factory) {\ntry {\n_factory.activateObject(key, obj);\nif (!_factory.validateObject(key, obj)) {\ntry {\n_factory.destroyObject(key, obj);\n} catch (Exception e2) {\n}\nobj = null;\n}\n} catch (Exception e) {\ntry {\n_factory.destroyObject(key, obj);\n} catch (Exception e2) {\n}\nobj = null;\n}\n}\n} while (obj == null);\nincrementActiveCount(key);\nreturn obj;\n}"
+}

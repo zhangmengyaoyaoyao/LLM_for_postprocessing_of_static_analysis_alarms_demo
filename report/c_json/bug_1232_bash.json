@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "  not = (npat[0] == '!');",
+    "Code_function": "filter_stringlist (sl, filterpat, text)\n     STRINGLIST *sl;\n     char *filterpat, *text;\n{\n  int i, m, not;\n  STRINGLIST *ret;\n  char *npat, *t;\n\n  if (sl == 0 || sl->list == 0 || sl->list_len == 0)\n    return sl;\n\n  npat = shouldexp_filterpat (filterpat) ? preproc_filterpat (filterpat, text) : filterpat;\n\n  not = (npat[0] == '!');\n  t = not ? npat + 1 : npat;\n\n  ret = strlist_create (sl->list_size);\n  for (i = 0; i < sl->list_len; i++)\n    {\n      m = strmatch (t, sl->list[i], FNMATCH_EXTFLAG);\n      if ((not && m == FNM_NOMATCH) || (not == 0 && m != FNM_NOMATCH))\n\tfree (sl->list[i]);\n      else\n\tret->list[ret->list_len++] = sl->list[i];\n    }\n\n  ret->list[ret->list_len] = (char *)NULL;\n  if (npat != filterpat)\n    free (npat);\n\n  return ret;\n}"
+}

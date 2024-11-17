@@ -1,0 +1,9 @@
+{
+    "category": "PERFORMANCE",
+    "vtype": "SIC_INNER_SHOULD_BE_STATIC",
+    "priority": "2",
+    "rank": "18",
+    "project": "mavendp",
+    "warning_line": "private class ModuleDescriptor\n{\nString name;\nboolean automatic = true;\n",
+    "warning_method": "private StringBuilder buildArtifactListOutput(Set<Artifact> artifacts, boolean outputAbsoluteArtifactFilename, boolean theOutputScope, boolean theSort) {\nStringBuilder sb = new StringBuilder();\nList<String> artifactStringList = new ArrayList<>();\nfor (Artifact artifact : artifacts) {\nMessageBuilder messageBuilder = MessageUtils.buffer();\nmessageBuilder.a(\"   \");\nif (theOutputScope) {\nmessageBuilder.a(artifact.toString());\n} else {\nmessageBuilder.a(artifact.getId());\n}\nif (outputAbsoluteArtifactFilename) {\ntry {\nString artifactFilename = artifact.getFile().getAbsoluteFile().getPath();\nmessageBuilder.a(':').a(artifactFilename);\n} catch (NullPointerException e) {\n}\n}\nif (theOutputScope && artifact.isOptional()) {\nmessageBuilder.a(\" (optional)\");\n}\nif (artifact.getFile() != null) {\nModuleDescriptor moduleDescriptor = getModuleDescriptor(artifact.getFile());\nif (moduleDescriptor != null) {\nmessageBuilder.project(\" -- module \" + moduleDescriptor.name);\nif (moduleDescriptor.automatic) {\nif (\"MANIFEST\".equals(moduleDescriptor.moduleNameSource)) {\nmessageBuilder.strong(\" [auto]\");\n} else {\nmessageBuilder.warning(\" (auto)\");\n}\n}\n}\n}\nartifactStringList.add(messageBuilder.toString() + System.lineSeparator());\n}\nif (theSort) {\nCollections.sort(artifactStringList);\n}\nfor (String artifactString : artifactStringList) {\nsb.append(artifactString);\n}\nreturn sb;\n}"
+}

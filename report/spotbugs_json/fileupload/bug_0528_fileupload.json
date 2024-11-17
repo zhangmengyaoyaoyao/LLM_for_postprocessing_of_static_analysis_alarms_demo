@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "BC_UNCONFIRMED_CAST_OF_RETURN_VALUE",
+    "priority": "3",
+    "rank": "20",
+    "project": "fileupload",
+    "warning_line": "throw (FileUploadException) e.getCause();\n",
+    "warning_method": "public List<FileItem> parseRequest(RequestContext ctx) throws FileUploadException {\nList<FileItem> items = new ArrayList<FileItem>();\nboolean successful = false;\ntry {\nFileItemIterator iter = getItemIterator(ctx);\nFileItemFactory fac = getFileItemFactory();\nif (fac == null) {\nthrow new NullPointerException(\"No FileItemFactory has been set.\");\n}\nwhile (iter.hasNext()) {\nfinal FileItemStream item = iter.next();\nfinal String fileName = ((FileItemIteratorImpl.FileItemStreamImpl) item).name;\nFileItem fileItem = fac.createItem(item.getFieldName(), item.getContentType(), item.isFormField(), fileName);\nitems.add(fileItem);\ntry {\nStreams.copy(item.openStream(), fileItem.getOutputStream(), true);\n} catch (FileUploadIOException e) {\nthrow (FileUploadException) e.getCause();\n} catch (IOException e) {\nthrow new IOFileUploadException(format(\"Processing of %s request failed. %s\", MULTIPART_FORM_DATA, e.getMessage()), e);\n}\nfinal FileItemHeaders fih = item.getHeaders();\nfileItem.setHeaders(fih);\n}\nsuccessful = true;\nreturn items;\n} catch (FileUploadIOException e) {\nthrow (FileUploadException) e.getCause();\n} catch (IOException e) {\nthrow new FileUploadException(e.getMessage(), e);\n} finally {\nif (!successful) {\nfor (FileItem fileItem : items) {\ntry {\nfileItem.delete();\n} catch (Throwable e) {\n}\n}\n}\n}\n}"
+}

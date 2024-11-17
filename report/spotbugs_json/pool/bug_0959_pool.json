@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "NO_NOTIFY_NOT_NOTIFYALL",
+    "priority": "3",
+    "rank": "17",
+    "project": "pool",
+    "warning_line": "l.notify();\n",
+    "warning_method": "@Override\npublic void close() throws Exception {\nsuper.close();\nsynchronized (this) {\nclear();\nif (null != _evictionCursor) {\n_evictionCursor.close();\n_evictionCursor = null;\n}\nif (null != _evictionKeyCursor) {\n_evictionKeyCursor.close();\n_evictionKeyCursor = null;\n}\nstartEvictor(-1L);\nwhile (_allocationQueue.size() > 0) {\nLatch<K, V> l = _allocationQueue.removeFirst();\nsynchronized (l) {\nl.notify();\n}\n}\n}\n}"
+}

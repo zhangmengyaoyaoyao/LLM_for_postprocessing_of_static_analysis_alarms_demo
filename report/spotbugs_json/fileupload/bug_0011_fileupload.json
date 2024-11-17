@@ -1,0 +1,9 @@
+{
+    "category": "I18N",
+    "vtype": "DM_CONVERT_CASE",
+    "priority": "3",
+    "rank": "20",
+    "project": "fileupload",
+    "warning_line": ".trim().toLowerCase();\n",
+    "warning_method": "protected Map parseHeaders(String headerPart) {\nMap headers = new HashMap();\nint start = 0;\nint end = 0;\nfor (; ; ) {\nint offset = headerPart.indexOf('\\r', end);\nif (offset == -1 || offset + 1 >= headerPart.length()) {\nthrow new IllegalStateException(\"Expected headers to be terminated by an empty line.\");\n}\nif (headerPart.charAt(offset + 1) != '\\n') {\nend = offset + 1;\n} else if (offset == start) {\nbreak;\n} else {\nString header = headerPart.substring(start, offset);\nstart = end = offset + 2;\nif (header.indexOf(':') == -1) {\ncontinue;\n}\nString headerName = header.substring(0, header.indexOf(':')).trim().toLowerCase();\nString headerValue = header.substring(header.indexOf(':') + 1).trim();\nif (getHeader(headers, headerName) != null) {\nheaders.put(headerName, getHeader(headers, headerName) + ',' + headerValue);\n} else {\nheaders.put(headerName, headerValue);\n}\n}\n}\nreturn headers;\n}"
+}

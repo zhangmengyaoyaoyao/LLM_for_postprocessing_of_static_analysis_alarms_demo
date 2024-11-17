@@ -1,0 +1,7 @@
+{
+    "Project": "Zephyr",
+    "Tool": "Infer",
+    "Bug Type": "Null Dereference",
+    "Code_line": "\tret = bt_hci_cmd_send_sync(BT_HCI_OP_LE_RAND, NULL, &rsp);",
+    "Code_function": "int prng_init(void)\n{\n\tstruct bt_hci_rp_le_rand *rp;\n\tstruct net_buf *rsp;\n\tint ret;\n\n\t/* Check first that HCI_LE_Rand is supported */\n\tif (!BT_CMD_TEST(bt_dev.supported_commands, 27, 7)) {\n\t\treturn -ENOTSUP;\n\t}\n\n\tret = bt_hci_cmd_send_sync(BT_HCI_OP_LE_RAND, NULL, &rsp);\n\tif (ret) {\n\t\treturn ret;\n\t}\n\n\trp = (void *)rsp->data;\n\n\tret = tc_hmac_prng_init(&prng, rp->rand, sizeof(rp->rand));\n\n\tnet_buf_unref(rsp);\n\n\tif (ret == TC_CRYPTO_FAIL) {\n\t\tBT_ERR(\"Failed to initialize PRNG\");\n\t\treturn -EIO;\n\t}\n\n\t/* re-seed is needed after init */\n\treturn prng_reseed(&prng);\n}"
+}

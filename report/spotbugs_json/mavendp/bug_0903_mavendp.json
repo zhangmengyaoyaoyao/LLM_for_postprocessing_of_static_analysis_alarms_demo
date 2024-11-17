@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "RV_RETURN_VALUE_IGNORED_INFERRED",
+    "priority": "2",
+    "rank": "17",
+    "project": "mavendp",
+    "warning_line": "node.getDependency().setArtifact( node.getDependency().getArtifact().setProperties( artifactProperties ) );\n",
+    "warning_method": "private void applyDependencyManagementDfs(Map<String, org.apache.maven.model.Dependency> dependencyManagementMap, DependencyNode node) {\nif (dependencyManagementMap.containsKey(getDependencyManagementCoordinate(node.getArtifact()))) {\norg.apache.maven.model.Dependency manager = dependencyManagementMap.get(getDependencyManagementCoordinate(node.getArtifact()));\nMap<String, String> artifactProperties = new HashMap<>();\nfor (Map.Entry<String, String> entry : node.getArtifact().getProperties().entrySet()) {\nartifactProperties.put(entry.getKey(), entry.getValue());\n}\nif (!manager.getVersion().equals(node.getArtifact().getVersion())) {\nartifactProperties.put(PRE_MANAGED_VERSION, node.getArtifact().getVersion());\nnode.setArtifact(node.getArtifact().setVersion(manager.getVersion()));\n}\nif (!manager.getScope().equals(node.getDependency().getScope())) {\nartifactProperties.put(PRE_MANAGED_SCOPE, node.getDependency().getScope());\nartifactProperties.put(MANAGED_SCOPE, manager.getScope());\n}\nnode.setArtifact(node.getArtifact().setProperties(artifactProperties));\nnode.getDependency().setArtifact(node.getDependency().getArtifact().setProperties(artifactProperties));\n}\nfor (DependencyNode child : node.getChildren()) {\napplyDependencyManagementDfs(dependencyManagementMap, child);\n}\n}"
+}

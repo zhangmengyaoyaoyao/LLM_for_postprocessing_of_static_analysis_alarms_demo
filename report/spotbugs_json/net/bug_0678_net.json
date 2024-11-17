@@ -1,0 +1,9 @@
+{
+    "category": "I18N",
+    "vtype": "DM_DEFAULT_ENCODING",
+    "priority": "1",
+    "rank": "19",
+    "project": "net",
+    "warning_line": "BufferedReader reader = new BufferedReader(\n",
+    "warning_method": "private void tunnelHandshake(String host, int port, InputStream input, OutputStream output) throws IOException, UnsupportedEncodingException {\nfinal String connectString = \"CONNECT \" + host + \":\" + port + \" HTTP/1.1\";\n_output_.write(connectString.getBytes(getControlEncoding()));\n_output_.write(CRLF);\nif (proxyUsername != null && proxyPassword != null) {\nfinal String header = \"Proxy-Authorization: Basic \" + base64.encode(proxyUsername + \":\" + proxyPassword) + \"\\r\\n\";\n_output_.write(header.getBytes(\"UTF-8\"));\n_output_.write(CRLF);\nList<String> response = new ArrayList<String>();\nBufferedReader reader = new BufferedReader(new InputStreamReader(_input_));\nfor (String line = reader.readLine(); line != null && line.length() > 0; line = reader.readLine()) {\nresponse.add(line);\n}\nint size = response.size();\nif (size == 0) {\nthrow new IOException(\"No response from proxy\");\n}\nString code = null;\nString resp = response.get(0);\nif (resp.startsWith(\"HTTP/\") && resp.length() >= 12) {\ncode = resp.substring(9, 12);\n} else {\nthrow new IOException(\"Invalid response from proxy: \" + resp);\n}\nif (!\"200\".equals(code)) {\nStringBuilder msg = new StringBuilder();\nmsg.append(\"HTTPTunnelConnector: connection failed\\r\\n\");\nmsg.append(\"Response received from the proxy:\\r\\n\");\nfor (String line : response) {\nmsg.append(line);\nmsg.append(\"\\r\\n\");\n}\nthrow new IOException(msg.toString());\n}\n}\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "CORRECTNESS",
+    "vtype": "NP_UNWRITTEN_FIELD",
+    "priority": "2",
+    "rank": "8",
+    "project": "mavendp",
+    "warning_line": "(ArtifactRepositoryLayout) repositoryLayouts.get( \"default\" ),\n",
+    "warning_method": "public void execute() throws MojoExecutionException {\nDependencyStatusSets dss = getDependencySets(this.failOnMissingClassifierArtifact);\nSet<Artifact> artifacts = dss.getResolvedDependencies();\nif (!useRepositoryLayout) {\nfor (Artifact artifact : artifacts) {\ncopyArtifact(artifact, this.stripVersion, this.prependGroupId);\n}\n} else {\ntry {\nArtifactRepository targetRepository = repositoryFactory.createDeploymentArtifactRepository(\"local\", outputDirectory.toURL().toExternalForm(), (ArtifactRepositoryLayout) repositoryLayouts.get(\"default\"), false);\nfor (Artifact artifact : artifacts) {\ninstallArtifact(artifact, targetRepository);\n}\n} catch (MalformedURLException e) {\nthrow new MojoExecutionException(\"Could not create outputDirectory repository\", e);\n}\n}\nSet<Artifact> skippedArtifacts = dss.getSkippedDependencies();\nfor (Artifact artifact : skippedArtifacts) {\ngetLog().info(artifact.getFile().getName() + \" already exists in destination.\");\n}\nif (isCopyPom()) {\ncopyPoms(getOutputDirectory(), artifacts, this.stripVersion);\ncopyPoms(getOutputDirectory(), skippedArtifacts, this.stripVersion);\n}\n}"
+}

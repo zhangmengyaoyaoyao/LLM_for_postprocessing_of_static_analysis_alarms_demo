@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "\tmemset(pi->awkpath, 0, (max_path + 1) * sizeof(char *));",
+    "Code_function": "init_awkpath(path_info *pi)\n{\n\tchar *path;\n\tchar *start, *end, *p;\n\tint len, i;\n\tint max_path;\t\t/* (# of allocated paths)-1 */\n\n#define INC_PATH 5\n\n\tpi->max_pathlen = 0;\n\tif ((path = getenv(pi->envname)) == NULL || *path == '\\0')\n\t\tpath = pi->dfltp[0];\n\n\tmax_path = INC_PATH;\n\temalloc(pi->awkpath, char **, (max_path + 1) * sizeof(char *), \"init_awkpath\");\n\tmemset(pi->awkpath, 0, (max_path + 1) * sizeof(char *));\n\n\tend = start = path;\n\ti = 0;\n\twhile (*start) {\n\t\twhile (*end && *end != envsep)\n\t\t\tend++;\n\t\tlen = end - start;\n\t\tif (len > 0) {\n\t\t\temalloc(p, char *, len + 2, \"init_awkpath\");\n\t\t\tmemcpy(p, start, len);\n\n\t\t\t/* add directory punctuation if necessary */\n\t\t\tif (! isdirpunct(end[-1]))\n\t\t\t\tp[len++] = '/';\n\t\t\tp[len] = '\\0';\n\n\t\t\tif (i == max_path) {\n\t\t\t\tmax_path += INC_PATH;\n\t\t\t\terealloc(pi->awkpath, char **, (max_path + 1) * sizeof(char *), \"init_awkpath\");\n\t\t\t\tmemset(pi->awkpath + i, 0, (INC_PATH + 1) * sizeof(char *));\n\t\t\t}\n\t\t\tpi->awkpath[i++] = p;\n\t\t\tif (len > pi->max_pathlen)\n\t\t\t\tpi->max_pathlen = len;\n\t\t}\n\n\t\t/* skip one or more envsep char */\n\t\twhile (*end && *end == envsep)\n\t\t\tend++;\n\t\tstart = end;\n\t}\n\tpi->awkpath[i] = NULL;\n\n#undef INC_PATH\n}"
+}

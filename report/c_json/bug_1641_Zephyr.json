@@ -1,0 +1,7 @@
+{
+    "Project": "Zephyr",
+    "Tool": "Infer",
+    "Bug Type": "Null Dereference",
+    "Code_line": "\t\tif (att->req && att->req->buf == buf) {",
+    "Code_function": "void att_pdu_sent(struct bt_conn *conn, void *user_data)\n{\n\tstruct bt_att *att = att_get(conn);\n\tstruct net_buf *buf;\n\n\tBT_DBG(\"conn %p att %p\", conn, att);\n\n\twhile ((buf = net_buf_get(&att->tx_queue, K_NO_WAIT))) {\n\t\t/* Check if the queued buf is a request */\n\t\tif (att->req && att->req->buf == buf) {\n\t\t\t/* Save request state so it can be resent */\n\t\t\tnet_buf_simple_save(&att->req->buf->b,\n\t\t\t\t\t    &att->req->state);\n\t\t}\n\n\t\tif (!att_send(conn, buf, NULL, NULL)) {\n\t\t\treturn;\n\t\t}\n\t}\n\n\tk_sem_give(&att->tx_sem);\n}"
+}

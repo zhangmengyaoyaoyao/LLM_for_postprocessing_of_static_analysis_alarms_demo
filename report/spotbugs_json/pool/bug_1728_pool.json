@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "RI_REDUNDANT_INTERFACES",
+    "priority": "3",
+    "rank": "20",
+    "project": "pool",
+    "warning_line": "final class InvalidEvictorLender extends EvictorLender implements Serializable {\nprivate static final long serialVersionUID = -3200445766813431919L;\nprivate long validationFrequencyMillis = 10L * 60L * 1000L; \nInvalidEvictorLender(final Lender delegate) throws IllegalArgumentException {\nsuper(delegate);\n}\nprotected EvictorReference createReference(final Object obj) {\nreturn new InvalidEvictorReference(obj);\n}\npublic long getValidationFrequencyMillis() {\nreturn validationFrequencyMillis;\n}\npublic void setValidationFrequencyMillis(final long validationFrequencyMillis) throws IllegalArgumentException {\nif (validationFrequencyMillis < 0) {\nthrow new IllegalArgumentException(\"validationFrequencyMillis must not be negative. was: \" + validationFrequencyMillis);\n}\nthis.validationFrequencyMillis = validationFrequencyMillis;\n}\npublic String toString() {\nreturn \"InvalidEvictor{\" +\n\"validationFrequencyMillis=\" + validationFrequencyMillis +\n\", delegate=\" + super.toString() +\n",
+    "warning_method": "public void run() {\nif (referant == null) {\ncancel();\nreturn;\n}\nfinal PoolableObjectFactory factory = getObjectPool().getFactory();\nsynchronized (InvalidEvictorReference.this) {\nObject r = referant;\nwhile (r instanceof LenderReference) {\nr = ((LenderReference) r).get();\n}\nif (r == null) {\nclear();\nreturn;\n}\ntry {\nfactory.activateObject(r);\nif (factory.validateObject(r)) {\nfactory.passivateObject(r);\n} else {\nfactory.destroyObject(r);\nclear();\n}\n} catch (Exception e) {\nclear();\n}\n}\n}"
+}

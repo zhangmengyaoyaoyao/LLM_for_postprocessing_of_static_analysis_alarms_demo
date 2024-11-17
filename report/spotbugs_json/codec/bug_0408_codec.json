@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "SF_SWITCH_FALLTHROUGH",
+    "priority": "3",
+    "rank": "20",
+    "project": "codec",
+    "warning_line": "case 7: localCrc = (localCrc >>> 8) ^ T[((localCrc ^ b[i++]) << 24) >>> 24];\ncase 6: localCrc = (localCrc >>> 8) ^ T[((localCrc ^ b[i++]) << 24) >>> 24];\n",
+    "warning_method": "@Override\npublic void update(final byte[] b, final int offset, final int len) {\nint localCrc = crc;\nfinal int remainder = len & 0x7;\nint i = offset;\nfor (final int end = offset + len - remainder; i < end; i += 8) {\nfinal int x = localCrc ^ ((((b[i] << 24) >>> 24) + ((b[i + 1] << 24) >>> 16)) + (((b[i + 2] << 24) >>> 8) + (b[i + 3] << 24)));\nlocalCrc = ((T[((x << 24) >>> 24) + 0x700] ^ T[((x << 16) >>> 24) + 0x600]) ^ (T[((x << 8) >>> 24) + 0x500] ^ T[(x >>> 24) + 0x400])) ^ ((T[((b[i + 4] << 24) >>> 24) + 0x300] ^ T[((b[i + 5] << 24) >>> 24) + 0x200]) ^ (T[((b[i + 6] << 24) >>> 24) + 0x100] ^ T[((b[i + 7] << 24) >>> 24)]));\n}\nswitch(remainder) {\ncase 7:\nlocalCrc = (localCrc >>> 8) ^ T[((localCrc ^ b[i++]) << 24) >>> 24];\ncase 6:\nlocalCrc = (localCrc >>> 8) ^ T[((localCrc ^ b[i++]) << 24) >>> 24];\ncase 5:\nlocalCrc = (localCrc >>> 8) ^ T[((localCrc ^ b[i++]) << 24) >>> 24];\ncase 4:\nlocalCrc = (localCrc >>> 8) ^ T[((localCrc ^ b[i++]) << 24) >>> 24];\ncase 3:\nlocalCrc = (localCrc >>> 8) ^ T[((localCrc ^ b[i++]) << 24) >>> 24];\ncase 2:\nlocalCrc = (localCrc >>> 8) ^ T[((localCrc ^ b[i++]) << 24) >>> 24];\ncase 1:\nlocalCrc = (localCrc >>> 8) ^ T[((localCrc ^ b[i++]) << 24) >>> 24];\ndefault:\n}\ncrc = localCrc;\n}"
+}

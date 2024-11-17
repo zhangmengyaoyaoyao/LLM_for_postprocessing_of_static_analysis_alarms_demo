@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "SF_SWITCH_NO_DEFAULT",
+    "priority": "2",
+    "rank": "19",
+    "project": "codec",
+    "warning_line": "switch (offset + length - index) {\ncase 3:\nk1 ^= data[index + 2] << 16;\ncase 2:\nk1 ^= data[index + 1] << 8;\ncase 1:\nk1 ^= data[index];\nk1 *= C1_32;\nk1 = Integer.rotateLeft(k1, R1_32);\nk1 *= C2_32;\nhash ^= k1;\n",
+    "warning_method": "@Deprecated\npublic static int hash32(final byte[] data, final int offset, final int length, final int seed) {\nint hash = seed;\nfinal int nblocks = length >> 2;\nfor (int i = 0; i < nblocks; i++) {\nfinal int index = offset + (i << 2);\nfinal int k = getLittleEndianInt(data, index);\nhash = mix32(k, hash);\n}\n// Note: This fails to apply masking using 0xff to the 3 remaining bytes.\nfinal int index = offset + (nblocks << 2);\nint k1 = 0;\nswitch(offset + length - index) {\ncase 3:\nk1 ^= data[index + 2] << 16;\ncase 2:\nk1 ^= data[index + 1] << 8;\ncase 1:\nk1 ^= data[index];\nk1 *= C1_32;\nk1 = Integer.rotateLeft(k1, R1_32);\nk1 *= C2_32;\nhash ^= k1;\n}\nhash ^= length;\nreturn fmix32(hash);\n}"
+}

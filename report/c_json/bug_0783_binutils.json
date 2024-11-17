@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_S2",
+    "Code_line": "      tindex = stab_get_struct_index (info, tag, id, DEBUG_KIND_ILLEGAL,",
+    "Code_function": "stab_start_struct_type (void *p, const char *tag, unsigned int id,\n\t\t\tbfd_boolean structp, unsigned int size)\n{\n  struct stab_write_handle *info = (struct stab_write_handle *) p;\n  long tindex;\n  bfd_boolean definition;\n  char buf[40];\n\n  if (id == 0)\n    {\n      tindex = 0;\n      *buf = '\\0';\n      definition = FALSE;\n    }\n  else\n    {\n      tindex = stab_get_struct_index (info, tag, id, DEBUG_KIND_ILLEGAL,\n\t\t\t\t     &size);\n      if (tindex < 0)\n\treturn FALSE;\n      sprintf (buf, \"%ld=\", tindex);\n      definition = TRUE;\n    }\n\n  sprintf (buf + strlen (buf), \"%c%u\",\n\t   structp ? 's' : 'u',\n\t   size);\n\n  if (! stab_push_string (info, buf, tindex, definition, size))\n    return FALSE;\n\n  info->type_stack->fields = (char *) xmalloc (1);\n  info->type_stack->fields[0] = '\\0';\n\n  return TRUE;\n}"
+}

@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "      if (! append_type (info, \"/* undefined */\"))",
+    "Code_function": "pr_enum_type (void *p, const char *tag, const char **names,\n\t      bfd_signed_vma *values)\n{\n  struct pr_handle *info = (struct pr_handle *) p;\n  unsigned int i;\n  bfd_signed_vma val;\n\n  if (! push_type (info, \"enum \"))\n    return FALSE;\n  if (tag != NULL)\n    {\n      if (! append_type (info, tag)\n\t  || ! append_type (info, \" \"))\n\treturn FALSE;\n    }\n  if (! append_type (info, \"{ \"))\n    return FALSE;\n\n  if (names == NULL)\n    {\n      if (! append_type (info, \"/* undefined */\"))\n\treturn FALSE;\n    }\n  else\n    {\n      val = 0;\n      for (i = 0; names[i] != NULL; i++)\n\t{\n\t  if (i > 0)\n\t    {\n\t      if (! append_type (info, \", \"))\n\t\treturn FALSE;\n\t    }\n\n\t  if (! append_type (info, names[i]))\n\t    return FALSE;\n\n\t  if (values[i] != val)\n\t    {\n\t      char ab[20];\n\n\t      print_vma (values[i], ab, FALSE, FALSE);\n\t      if (! append_type (info, \" = \")\n\t\t  || ! append_type (info, ab))\n\t\treturn FALSE;\n\t      val = values[i];\n\t    }\n\n\t  ++val;\n\t}\n    }\n\n  return append_type (info, \" }\");\n}"
+}

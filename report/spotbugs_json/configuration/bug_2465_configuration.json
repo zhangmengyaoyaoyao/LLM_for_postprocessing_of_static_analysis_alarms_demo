@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "RCN_REDUNDANT_NULLCHECK_OF_NONNULL_VALUE",
+    "priority": "3",
+    "rank": "20",
+    "project": "configuration",
+    "warning_line": "if (file != null && file.exists())\n",
+    "warning_method": "public static URL locate(String base, String name) {\nif (log.isDebugEnabled()) {\nStringBuffer buf = new StringBuffer();\nbuf.append(\"ConfigurationUtils.locate(): base is \").append(base);\nbuf.append(\", name is \").append(name);\nlog.debug(buf.toString());\n}\nif (name == null) {\nreturn null;\n}\nURL url = null;\ntry {\nif (base == null) {\nurl = new URL(name);\n} else {\nURL baseURL = new URL(base);\nurl = new URL(baseURL, name);\nInputStream in = null;\ntry {\nin = url.openStream();\n} finally {\nif (in != null) {\nin.close();\n}\n}\n}\nlog.debug(\"Loading configuration from the URL \" + url);\n} catch (IOException e) {\nurl = null;\n}\nif (url == null) {\nFile file = new File(name);\nif (file.isAbsolute() && file.exists()) {\ntry {\nurl = file.toURL();\nlog.debug(\"Loading configuration from the absolute path \" + name);\n} catch (MalformedURLException e) {\nlog.warn(\"Could not obtain URL from file\", e);\n}\n}\n}\nif (url == null) {\ntry {\nFile file = constructFile(base, name);\nif (file != null && file.exists()) {\nurl = file.toURL();\n}\nif (url != null) {\nlog.debug(\"Loading configuration from the path \" + file);\n}\n} catch (MalformedURLException e) {\nlog.warn(\"Could not obtain URL from file\", e);\n}\n}\nif (url == null) {\ntry {\nFile file = constructFile(System.getProperty(\"user.home\"), name);\nif (file != null && file.exists()) {\nurl = file.toURL();\n}\nif (url != null) {\nlog.debug(\"Loading configuration from the home path \" + file);\n}\n} catch (MalformedURLException e) {\nlog.warn(\"Could not obtain URL from file\", e);\n}\n}\nif (url == null) {\nurl = locateFromClasspath(name);\n}\nreturn url;\n}"
+}

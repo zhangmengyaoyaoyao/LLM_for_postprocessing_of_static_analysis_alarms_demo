@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "dbcp",
+    "warning_line": "} catch (final Exception ignored) {\n",
+    "warning_method": "private void updateTransactionStatus() throws SQLException {\nif (transactionContext != null && !transactionContext.isTransactionComplete()) {\nif (transactionContext.isActive()) {\nif (transactionContext != transactionRegistry.getActiveTransactionContext()) {\nthrow new SQLException(\"Connection can not be used while enlisted in another transaction\");\n}\nreturn;\n}\ntransactionComplete();\n}\ntransactionContext = transactionRegistry.getActiveTransactionContext();\nif (transactionContext != null && transactionContext.getSharedConnection() != null) {\n@SuppressWarnings(\"resource\")\nfinal C connection = getDelegateInternal();\nsetDelegate(null);\nif (connection != null && transactionContext.getSharedConnection() != connection) {\ntry {\npool.returnObject(connection);\n} catch (final Exception e) {\ntry {\npool.invalidateObject(connection);\n} catch (final Exception ignored) {\n}\n}\n}\ntransactionContext.addTransactionContextListener(new CompletionListener());\n@SuppressWarnings(\"unchecked\")\nfinal C shared = (C) transactionContext.getSharedConnection();\nsetDelegate(shared);\nisSharedConnection = true;\n} else {\nC connection = getDelegateInternal();\nif (connection == null) {\ntry {\nconnection = pool.borrowObject();\nsetDelegate(connection);\n} catch (final Exception e) {\nthrow new SQLException(\"Unable to acquire a new connection from the pool\", e);\n}\n}\nif (transactionContext != null) {\ntransactionContext.addTransactionContextListener(new CompletionListener());\ntry {\ntransactionContext.setSharedConnection(connection);\n} catch (final SQLException e) {\ntransactionContext = null;\ntry {\npool.invalidateObject(connection);\n} catch (final Exception ignored) {\n}\nthrow e;\n}\n}\n}\nclearCachedState();\n}"
+}

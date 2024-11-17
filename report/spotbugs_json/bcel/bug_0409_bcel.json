@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "QF_QUESTIONABLE_FOR_LOOP",
+    "priority": "2",
+    "rank": "17",
+    "project": "bcel",
+    "warning_line": "for (int i = 0, pow = 1; pow <= Const.MAX_ACC_FLAG_I; i++) {\n",
+    "warning_method": "public static String printFlags(final int flags, final FLAGS location) {\nif (flags == 0) {\nreturn \"0\";\n}\nfinal StringBuilder buf = new StringBuilder();\nfor (int i = 0, pow = 1; pow <= Const.MAX_ACC_FLAG_I; i++) {\nif ((flags & pow) != 0) {\nif ((pow == Const.ACC_SYNCHRONIZED) && (location == FLAGS.CLASS)) {\nbuf.append(CONSTANT_PREFIX + \"ACC_SUPER | \");\n} else if ((pow == Const.ACC_VOLATILE) && (location == FLAGS.METHOD)) {\nbuf.append(CONSTANT_PREFIX + \"ACC_BRIDGE | \");\n} else if ((pow == Const.ACC_TRANSIENT) && (location == FLAGS.METHOD)) {\nbuf.append(CONSTANT_PREFIX + \"ACC_VARARGS | \");\n} else {\nif (i < Const.ACCESS_NAMES_LENGTH) {\nbuf.append(CONSTANT_PREFIX + \"ACC_\").append(Const.getAccessName(i).toUpperCase(Locale.ENGLISH)).append(\" | \");\n} else {\nbuf.append(String.format(CONSTANT_PREFIX + \"ACC_BIT %x | \", pow));\n}\n}\n}\npow <<= 1;\n}\nfinal String str = buf.toString();\nreturn str.substring(0, str.length() - 3);\n}"
+}

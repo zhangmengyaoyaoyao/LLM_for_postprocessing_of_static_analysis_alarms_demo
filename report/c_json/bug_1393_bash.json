@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "Bug Type": "UNINITIALIZED_VALUE",
+    "Code_line": "\tADVANCE_CHAR (string, slen, i);",
+    "Code_function": "unclosed_pair (string, eindex, openstr)\n     char *string;\n     int eindex;\n     char *openstr;\n{\n  int i, pass_next, openc, olen;\n  size_t slen;\n  DECLARE_MBSTATE;\n\n  slen = strlen (string);\n  olen = strlen (openstr);\n  i = pass_next = openc = 0;\n  while (i <= eindex)\n    {\n      if (pass_next)\n\t{\n\t  pass_next = 0;\n\t  if (i >= eindex)\t/* XXX was if (i >= eindex - 1) */\n\t    return 0;\n\t  ADVANCE_CHAR (string, slen, i);\n\t  continue;\n\t}\n      else if (string[i] == '\\\\')\n\t{\n\t  pass_next = 1;\n\t  i++;\n\t  continue;\n\t}\n      else if (STREQN (string + i, openstr, olen))\n\t{\n\t  openc = 1 - openc;\n\t  i += olen;\n\t}\n      else if (string[i] == '\\'' || string[i] == '\"')\n\t{\n\t  i = (string[i] == '\\'') ? skip_single_quoted (string, slen, i)\n\t\t\t\t  : skip_double_quoted (string, slen, i);\n\t  if (i > eindex)\n\t    return 0;\n\t}\n      else\n\tADVANCE_CHAR (string, slen, i);\n    }\n  return (openc);\n}"
+}

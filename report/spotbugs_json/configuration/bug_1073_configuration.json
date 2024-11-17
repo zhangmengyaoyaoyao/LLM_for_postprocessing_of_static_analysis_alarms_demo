@@ -1,0 +1,9 @@
+{
+    "category": "PERFORMANCE",
+    "vtype": "SIC_INNER_SHOULD_BE_STATIC_ANON",
+    "priority": "3",
+    "rank": "20",
+    "project": "configuration",
+    "warning_line": "{\n@Override\npublic InputSource resolveEntity(final String publicId, final String systemId)\n{\nreturn new InputSource(getClass().getClassLoader().getResourceAsStream(\"properties.dtd\"));\n",
+    "warning_method": "@Override\npublic void read(final Reader in) throws ConfigurationException {\nfinal SAXParserFactory factory = SAXParserFactory.newInstance();\nfactory.setNamespaceAware(false);\nfactory.setValidating(true);\ntry {\nfinal SAXParser parser = factory.newSAXParser();\nfinal XMLReader xmlReader = parser.getXMLReader();\nxmlReader.setEntityResolver(new EntityResolver() {\n@Override\npublic InputSource resolveEntity(final String publicId, final String systemId) {\nreturn new InputSource(getClass().getClassLoader().getResourceAsStream(\"properties.dtd\"));\n}\n});\nxmlReader.setContentHandler(new XMLPropertiesHandler());\nxmlReader.parse(new InputSource(in));\n} catch (final Exception e) {\nthrow new ConfigurationException(\"Unable to parse the configuration file\", e);\n}\n}"
+}

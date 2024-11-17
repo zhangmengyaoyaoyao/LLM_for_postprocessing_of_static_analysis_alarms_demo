@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_S2",
+    "Code_line": "\t\t\tr->wstptr[n->wstlen] = L'\\0';",
+    "Code_function": "r_dupnode(NODE *n)\n{\n\tNODE *r;\n\n\tassert(n->type == Node_val);\n\n#ifdef GAWKDEBUG\n\tif ((n->flags & MALLOC) != 0) {\n\t\tn->valref++;\n\t\treturn n;\n\t}\n#endif\n\n\tgetnode(r);\n\t*r = *n;\n\tr->flags &= ~FIELD;\n\tr->flags |= MALLOC;\n\tr->valref = 1;\n\t/*\n\t * DON'T call free_wstr(r) here!\n\t * r->wstptr still points at n->wstptr's value, and we\n\t * don't want to free it!\n\t */\n\tr->wstptr = NULL;\n\tr->wstlen = 0;\n\n\tif ((n->flags & STRCUR) != 0) {\n\t\temalloc(r->stptr, char *, n->stlen + 2, \"r_dupnode\");\n\t\tmemcpy(r->stptr, n->stptr, n->stlen);\n\t\tr->stptr[n->stlen] = '\\0';\n\t\tif ((n->flags & WSTRCUR) != 0) {\n\t\t\tr->wstlen = n->wstlen;\n\t\t\temalloc(r->wstptr, wchar_t *, sizeof(wchar_t) * (n->wstlen + 2), \"r_dupnode\");\n\t\t\tmemcpy(r->wstptr, n->wstptr, n->wstlen * sizeof(wchar_t));\n\t\t\tr->wstptr[n->wstlen] = L'\\0';\n\t\t\tr->flags |= WSTRCUR;\n\t\t}\n\t}\n\n\treturn r;\n}"
+}

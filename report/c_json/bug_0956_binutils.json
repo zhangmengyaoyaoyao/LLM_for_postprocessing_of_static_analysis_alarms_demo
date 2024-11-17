@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_S2",
+    "Code_line": "      fc->col_type[prev] = DW_CFA_unreferenced;",
+    "Code_function": "frame_need_space (Frame_Chunk *fc, unsigned int reg)\n{\n  unsigned int prev = fc->ncols;\n\n  if (reg < (unsigned int) fc->ncols)\n    return 0;\n\n  if (dwarf_regnames_count\n      && reg > dwarf_regnames_count)\n    return -1;\n\n  fc->ncols = reg + 1;\n  /* PR 17512: file: 10450-2643-0.004.\n     If reg == -1 then this can happen...  */\n  if (fc->ncols == 0)\n    return -1;\n\n  /* PR 17512: file: 2844a11d.  */\n  if (fc->ncols > 1024)\n    {\n      error (_(\"Unfeasibly large register number: %u\\n\"), reg);\n      fc->ncols = 0;\n      /* FIXME: 1024 is an arbitrary limit.  Increase it if\n\t we ever encounter a valid binary that exceeds it.  */\n      return -1;\n    }\n\n  fc->col_type = (short int *) xcrealloc (fc->col_type, fc->ncols,\n\t\t\t\t\t  sizeof (short int));\n  fc->col_offset = (int *) xcrealloc (fc->col_offset, fc->ncols, sizeof (int));\n  /* PR 17512: file:002-10025-0.005.  */\n  if (fc->col_type == NULL || fc->col_offset == NULL)\n    {\n      error (_(\"Out of memory allocating %u columns in dwarf frame arrays\\n\"),\n\t     fc->ncols);\n      fc->ncols = 0;\n      return -1;\n    }\n\n  while (prev < fc->ncols)\n    {\n      fc->col_type[prev] = DW_CFA_unreferenced;\n      fc->col_offset[prev] = 0;\n      prev++;\n    }\n  return 1;\n}"
+}

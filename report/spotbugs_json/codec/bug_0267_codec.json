@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "SF_SWITCH_FALLTHROUGH",
+    "priority": "3",
+    "rank": "20",
+    "project": "codec",
+    "warning_line": "h ^= ((long) data[index + 6] & 0xff) << 48;\ncase 6:\nh ^= ((long) data[index + 5] & 0xff) << 40;\n",
+    "warning_method": "public static long hash64(final byte[] data, final int length, final int seed) {\nlong h = (seed & 0xffffffffL) ^ (length * M64);\nfinal int nblocks = length >> 3;\nfor (int i = 0; i < nblocks; i++) {\nfinal int index = (i << 3);\nlong k = getLittleEndianLong(data, index);\nk *= M64;\nk ^= k >>> R64;\nk *= M64;\nh ^= k;\nh *= M64;\n}\nfinal int index = (nblocks << 3);\nswitch(length - index) {\ncase 7:\nh ^= ((long) data[index + 6] & 0xff) << 48;\ncase 6:\nh ^= ((long) data[index + 5] & 0xff) << 40;\ncase 5:\nh ^= ((long) data[index + 4] & 0xff) << 32;\ncase 4:\nh ^= ((long) data[index + 3] & 0xff) << 24;\ncase 3:\nh ^= ((long) data[index + 2] & 0xff) << 16;\ncase 2:\nh ^= ((long) data[index + 1] & 0xff) << 8;\ncase 1:\nh ^= ((long) data[index] & 0xff);\nh *= M64;\n}\nh ^= h >>> R64;\nh *= M64;\nh ^= h >>> R64;\nreturn h;\n}"
+}

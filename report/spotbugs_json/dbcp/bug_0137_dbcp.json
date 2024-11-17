@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "DLS_DEAD_LOCAL_STORE",
+    "priority": "3",
+    "rank": "20",
+    "project": "dbcp",
+    "warning_line": "final int size = resultSetList.size();\n",
+    "warning_method": "@Override\npublic void close() throws SQLException {\nif (isClosed()) {\nreturn;\n}\nfinal List<Exception> thrownList = new ArrayList<>();\ntry {\nif (connection != null) {\nconnection.removeTrace(this);\nconnection = null;\n}\nfinal List<AbandonedTrace> resultSetList = getTrace();\nif (resultSetList != null) {\nfinal int size = resultSetList.size();\nfinal ResultSet[] resultSets = resultSetList.toArray(Utils.EMPTY_RESULT_SET_ARRAY);\nfor (final ResultSet resultSet : resultSets) {\nif (resultSet != null) {\ntry {\nresultSet.close();\n} catch (final Exception e) {\nif (connection != null) {\nconnection.handleExceptionNoThrow(e);\n}\nthrownList.add(e);\n}\n}\n}\nclearTrace();\n}\nif (statement != null) {\ntry {\nstatement.close();\n} catch (final Exception e) {\nif (connection != null) {\nconnection.handleExceptionNoThrow(e);\n}\nthrownList.add(e);\n}\n}\n} finally {\nclosed = true;\nstatement = null;\nif (!thrownList.isEmpty()) {\nthrow new SQLExceptionList(thrownList);\n}\n}\n}"
+}

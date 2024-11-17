@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "REC_CATCH_EXCEPTION",
+    "priority": "3",
+    "rank": "20",
+    "project": "configuration",
+    "warning_line": "catch (Exception e)\n",
+    "warning_method": "public void read(Reader in) throws ConfigurationException {\nif (!(getRootNode() instanceof PListNode)) {\ninitRoot();\n}\nEntityResolver resolver = new EntityResolver() {\npublic InputSource resolveEntity(String publicId, String systemId) {\nreturn new InputSource(getClass().getClassLoader().getResourceAsStream(\"PropertyList-1.0.dtd\"));\n}\n};\nXMLPropertyListHandler handler = new XMLPropertyListHandler(getRootNode());\ntry {\nSAXParserFactory factory = SAXParserFactory.newInstance();\nfactory.setValidating(true);\nSAXParser parser = factory.newSAXParser();\nparser.getXMLReader().setEntityResolver(resolver);\nparser.getXMLReader().setContentHandler(handler);\nparser.getXMLReader().parse(new InputSource(in));\n} catch (Exception e) {\nthrow new ConfigurationException(\"Unable to parse the configuration file\", e);\n}\n}"
+}

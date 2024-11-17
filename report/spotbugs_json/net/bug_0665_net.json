@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "LI_LAZY_INIT_STATIC",
+    "priority": "2",
+    "rank": "14",
+    "project": "net",
+    "warning_line": "if (simpleFormatter != null) {\nformatter = simpleFormatter.get();\n}\nif (formatter == null) {\nformatter = new SimpleDateFormat(NTP_DATE_FORMAT, Locale.US);\nformatter.setTimeZone(TimeZone.getDefault());\nsimpleFormatter = new SoftReference<DateFormat>(formatter);\n",
+    "warning_method": "public String toDateString() {\nDateFormat formatter = null;\nif (simpleFormatter != null) {\nformatter = simpleFormatter.get();\n}\nif (formatter == null) {\nformatter = new SimpleDateFormat(NTP_DATE_FORMAT, Locale.US);\nformatter.setTimeZone(TimeZone.getDefault());\nsimpleFormatter = new SoftReference<DateFormat>(formatter);\n}\nDate ntpDate = getDate();\nsynchronized (formatter) {\nreturn formatter.format(ntpDate);\n}\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "VO_VOLATILE_INCREMENT",
+    "priority": "2",
+    "rank": "14",
+    "project": "pool",
+    "warning_line": "_numActive++;\n",
+    "warning_method": "@Override\npublic synchronized T borrowObject() throws Exception {\nassertOpen();\nT obj = null;\nboolean newlyCreated = false;\nwhile (null == obj) {\nif (!_pool.empty()) {\nobj = _pool.pop();\n} else {\nif (null == _factory) {\nthrow new NoSuchElementException();\n} else {\nobj = _factory.makeObject();\nnewlyCreated = true;\nif (obj == null) {\nthrow new NoSuchElementException(\"PoolableObjectFactory.makeObject() returned null.\");\n}\n}\n}\nif (null != _factory && null != obj) {\ntry {\n_factory.activateObject(obj);\nif (!_factory.validateObject(obj)) {\nthrow new Exception(\"ValidateObject failed\");\n}\n} catch (Throwable t) {\nPoolUtils.checkRethrow(t);\ntry {\n_factory.destroyObject(obj);\n} catch (Throwable t2) {\nPoolUtils.checkRethrow(t2);\n} finally {\nobj = null;\n}\nif (newlyCreated) {\nthrow new NoSuchElementException(\"Could not create a validated object, cause: \" + t.getMessage());\n}\n}\n}\n}\n_numActive++;\nreturn obj;\n}"
+}

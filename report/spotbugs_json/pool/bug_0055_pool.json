@@ -1,0 +1,9 @@
+{
+    "category": "PERFORMANCE",
+    "vtype": "WMI_WRONG_MAP_ITERATOR",
+    "priority": "2",
+    "rank": "18",
+    "project": "pool",
+    "warning_line": "final LinkedList list = ((ObjectQueue)_poolMap.get(key)).queue;\n",
+    "warning_method": "public synchronized void clearOldest() {\nfinal Map map = new TreeMap();\nfor (Iterator keyiter = _poolMap.keySet().iterator(); keyiter.hasNext(); ) {\nfinal Object key = keyiter.next();\nfinal LinkedList list = ((ObjectQueue) _poolMap.get(key)).queue;\nfor (Iterator it = list.iterator(); it.hasNext(); ) {\nmap.put(it.next(), key);\n}\n}\nSet setPairKeys = map.entrySet();\nint itemsToRemove = ((int) (map.size() * 0.15)) + 1;\nIterator iter = setPairKeys.iterator();\nwhile (iter.hasNext() && itemsToRemove > 0) {\nMap.Entry entry = (Map.Entry) iter.next();\nObject key = entry.getValue();\nObjectTimestampPair pairTimeStamp = (ObjectTimestampPair) entry.getKey();\nfinal LinkedList list = ((ObjectQueue) (_poolMap.get(key))).queue;\nlist.remove(pairTimeStamp);\ntry {\n_factory.destroyObject(key, pairTimeStamp.value);\n} catch (Exception e) {\n}\nif (list.isEmpty()) {\n_poolMap.remove(key);\n}\n_totalIdle--;\nitemsToRemove--;\n}\nnotifyAll();\n}"
+}

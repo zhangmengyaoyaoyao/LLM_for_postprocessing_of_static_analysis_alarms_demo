@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "NN_NAKED_NOTIFY",
+    "priority": "2",
+    "rank": "14",
+    "project": "pool",
+    "warning_line": "latch.notify();\n",
+    "warning_method": "private synchronized void allocate() {\nif (isClosed())\nreturn;\nfor (; ; ) {\nif (!_pool.isEmpty() && !_allocationQueue.isEmpty()) {\nLatch latch = _allocationQueue.removeFirst();\nlatch.setPair(_pool.removeFirst());\n_numInternalProcessing++;\nsynchronized (latch) {\nlatch.notify();\n}\n} else {\nbreak;\n}\n}\nfor (; ; ) {\nif ((!_allocationQueue.isEmpty()) && (this.maxTotal < 0 || (_numActive + _numInternalProcessing) < this.maxTotal)) {\nLatch latch = _allocationQueue.removeFirst();\nlatch.setMayCreate(true);\n_numInternalProcessing++;\nsynchronized (latch) {\nlatch.notify();\n}\n} else {\nbreak;\n}\n}\n}"
+}

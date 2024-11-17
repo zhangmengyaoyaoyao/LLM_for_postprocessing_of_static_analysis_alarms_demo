@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "DC_DOUBLECHECK",
+    "priority": "2",
+    "rank": "14",
+    "project": "digester",
+    "warning_line": "if ( factory == null )\n{\nsynchronized ( this )\n{\n// check again for null now that we're in the synchronized block:\nif ( factory == null )\n",
+    "warning_method": "Object createProxy() {\nObject[] constructorArguments = new Object[templateConstructorArguments.length];\narraycopy(templateConstructorArguments, 0, constructorArguments, 0, constructorArguments.length);\ndigester.pushParams(constructorArguments);\nDeferredConstructionCallback callback = new DeferredConstructionCallback(constructor, constructorArguments);\nObject result;\nif (factory == null) {\nsynchronized (this) {\n// check again for null now that we're in the synchronized block:\nif (factory == null) {\nEnhancer enhancer = new Enhancer();\nenhancer.setSuperclass(clazz);\nenhancer.setCallback(callback);\nenhancer.setClassLoader(digester.getClassLoader());\nenhancer.setInterceptDuringConstruction(false);\nif (hasDefaultConstructor) {\nresult = enhancer.create();\n} else {\nresult = enhancer.create(constructor.getParameterTypes(), constructorArguments);\n}\nfactory = (Factory) result;\nreturn result;\n}\n}\n}\nif (hasDefaultConstructor) {\nresult = factory.newInstance(callback);\n} else {\nresult = factory.newInstance(constructor.getParameterTypes(), constructorArguments, new Callback[] { callback });\n}\nreturn result;\n}"
+}

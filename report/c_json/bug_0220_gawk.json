@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "\t\t\tstrcpy(path, pi->awkpath[i]);",
+    "Code_function": "do_find_source(const char *src, struct stat *stb, int *errcode, path_info *pi)\n{\n\tchar *path;\n\tint i;\n\n\tassert(errcode != NULL);\n\n\t/* some kind of path name, no search */\n\tif (ispath(src)) {\n\t\temalloc(path, char *, strlen(src) + 1, \"do_find_source\");\n\t\tstrcpy(path, src);\n\t\tif (stat(path, stb) == 0)\n\t\t\treturn path;\n\t\t*errcode = errno;\n\t\tefree(path);\n\t\treturn NULL;\n\t}\n\n\tif (pi->awkpath == NULL)\n\t\tinit_awkpath(pi);\n\n\temalloc(path, char *, pi->max_pathlen + strlen(src) + 1, \"do_find_source\");\n\tfor (i = 0; pi->awkpath[i] != NULL; i++) {\n\t\tif (strcmp(pi->awkpath[i], \"./\") == 0 || strcmp(pi->awkpath[i], \".\") == 0)\n\t\t\t*path = '\\0';\n\t\telse\n\t\t\tstrcpy(path, pi->awkpath[i]);\n\t\tstrcat(path, src);\n\t\tif (stat(path, stb) == 0)\n\t\t\treturn path;\n\t}\n\n\t/* not found, give up */\n\t*errcode = errno;\n\tefree(path);\n\treturn NULL;\n}"
+}

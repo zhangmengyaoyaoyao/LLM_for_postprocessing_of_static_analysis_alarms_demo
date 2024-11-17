@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "SF_SWITCH_FALLTHROUGH",
+    "priority": "2",
+    "rank": "17",
+    "project": "bcel",
+    "warning_line": "dim = ((MULTIANEWARRAY) i).getDimensions();\ncase Const.ANEWARRAY:\ncase Const.NEWARRAY:\nif (type instanceof ArrayType) {\n",
+    "warning_method": "@Override\npublic void visitAllocationInstruction(final AllocationInstruction i) {\nType type;\nif (i instanceof CPInstruction) {\ntype = ((CPInstruction) i).getType(_cp);\n} else {\ntype = ((NEWARRAY) i).getType();\n}\nshort opcode = ((Instruction) i).getOpcode();\nint dim = 1;\nswitch(opcode) {\ncase Const.NEW:\n_out.println(\"il.append(_factory.createNew(\\\"\" + ((ObjectType) type).getClassName() + \"\\\"));\");\nbreak;\ncase Const.MULTIANEWARRAY:\ndim = ((MULTIANEWARRAY) i).getDimensions();\ncase Const.ANEWARRAY:\ncase Const.NEWARRAY:\nif (type instanceof ArrayType) {\ntype = ((ArrayType) type).getBasicType();\n}\n_out.println(\"il.append(_factory.createNewArray(\" + BCELifier.printType(type) + \", (short) \" + dim + \"));\");\nbreak;\ndefault:\nthrow new RuntimeException(\"Oops: \" + opcode);\n}\n}"
+}

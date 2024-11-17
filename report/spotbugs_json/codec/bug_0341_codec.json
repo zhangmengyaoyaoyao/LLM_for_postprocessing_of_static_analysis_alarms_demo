@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "SF_SWITCH_FALLTHROUGH",
+    "priority": "3",
+    "rank": "20",
+    "project": "codec",
+    "warning_line": "k1 ^= ((long) data[index + 6] & 0xff) << 48;\ncase 6:\nk1 ^= ((long) data[index + 5] & 0xff) << 40;\n",
+    "warning_method": "public static long hash64(final byte[] data, final int offset, final int length, final int seed) {\n// Note: This fails to apply masking using 0xffffffffL to the seed.\nlong hash = seed;\nfinal int nblocks = length >> 3;\nfor (int i = 0; i < nblocks; i++) {\nfinal int index = offset + (i << 3);\nlong k = getLittleEndianLong(data, index);\nk *= C1;\nk = Long.rotateLeft(k, R1);\nk *= C2;\nhash ^= k;\nhash = Long.rotateLeft(hash, R2) * M + N1;\n}\nlong k1 = 0;\nfinal int index = offset + (nblocks << 3);\nswitch(offset + length - index) {\ncase 7:\nk1 ^= ((long) data[index + 6] & 0xff) << 48;\ncase 6:\nk1 ^= ((long) data[index + 5] & 0xff) << 40;\ncase 5:\nk1 ^= ((long) data[index + 4] & 0xff) << 32;\ncase 4:\nk1 ^= ((long) data[index + 3] & 0xff) << 24;\ncase 3:\nk1 ^= ((long) data[index + 2] & 0xff) << 16;\ncase 2:\nk1 ^= ((long) data[index + 1] & 0xff) << 8;\ncase 1:\nk1 ^= ((long) data[index] & 0xff);\nk1 *= C1;\nk1 = Long.rotateLeft(k1, R1);\nk1 *= C2;\nhash ^= k1;\n}\nhash ^= length;\nhash = fmix64(hash);\nreturn hash;\n}"
+}

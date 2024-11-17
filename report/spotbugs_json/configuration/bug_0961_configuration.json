@@ -1,0 +1,9 @@
+{
+    "category": "PERFORMANCE",
+    "vtype": "SIC_INNER_SHOULD_BE_STATIC_ANON",
+    "priority": "3",
+    "rank": "20",
+    "project": "configuration",
+    "warning_line": "{\npublic InputSource resolveEntity(String publicId, String systemId)\n{\nreturn new InputSource(getClass().getClassLoader().getResourceAsStream(\"PropertyList-1.0.dtd\"));\n",
+    "warning_method": "public void load(Reader in) throws ConfigurationException {\nif (!(getRootNode() instanceof PListNode)) {\ninitRoot();\n}\nEntityResolver resolver = new EntityResolver() {\npublic InputSource resolveEntity(String publicId, String systemId) {\nreturn new InputSource(getClass().getClassLoader().getResourceAsStream(\"PropertyList-1.0.dtd\"));\n}\n};\nXMLPropertyListHandler handler = new XMLPropertyListHandler(getRoot());\ntry {\nSAXParserFactory factory = SAXParserFactory.newInstance();\nfactory.setValidating(true);\nSAXParser parser = factory.newSAXParser();\nparser.getXMLReader().setEntityResolver(resolver);\nparser.getXMLReader().setContentHandler(handler);\nparser.getXMLReader().parse(new InputSource(in));\n} catch (Exception e) {\nthrow new ConfigurationException(\"Unable to parse the configuration file\", e);\n}\n}"
+}

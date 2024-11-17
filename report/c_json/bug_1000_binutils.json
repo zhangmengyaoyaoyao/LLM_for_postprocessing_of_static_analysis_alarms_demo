@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L2",
+    "Code_line": "\t  strcpy (buf, tmp + 29 - i);",
+    "Code_function": "print_operand_value (char *buf, int hex, bfd_vma disp)\n{\n  if (address_mode == mode_64bit)\n    {\n      if (hex)\n\t{\n\t  char tmp[30];\n\t  int i;\n\t  buf[0] = '0';\n\t  buf[1] = 'x';\n\t  sprintf_vma (tmp, disp);\n\t  for (i = 0; tmp[i] == '0' && tmp[i + 1]; i++);\n\t  strcpy (buf + 2, tmp + i);\n\t}\n      else\n\t{\n\t  bfd_signed_vma v = disp;\n\t  char tmp[30];\n\t  int i;\n\t  if (v < 0)\n\t    {\n\t      *(buf++) = '-';\n\t      v = -disp;\n\t      /* Check for possible overflow on 0x8000000000000000.  */\n\t      if (v < 0)\n\t\t{\n\t\t  strcpy (buf, \"9223372036854775808\");\n\t\t  return;\n\t\t}\n\t    }\n\t  if (!v)\n\t    {\n\t      strcpy (buf, \"0\");\n\t      return;\n\t    }\n\n\t  i = 0;\n\t  tmp[29] = 0;\n\t  while (v)\n\t    {\n\t      tmp[28 - i] = (v % 10) + '0';\n\t      v /= 10;\n\t      i++;\n\t    }\n\t  strcpy (buf, tmp + 29 - i);\n\t}\n    }\n  else\n    {\n      if (hex)\n\tsprintf (buf, \"0x%x\", (unsigned int) disp);\n      else\n\tsprintf (buf, \"%d\", (int) disp);\n    }\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "PZLA_PREFER_ZERO_LENGTH_ARRAYS",
+    "priority": "3",
+    "rank": "20",
+    "project": "codec",
+    "warning_line": "return null;\n",
+    "warning_method": "public static final byte[] decodeQuotedPrintable(byte[] bytes) throws DecoderException {\nif (bytes == null) {\nreturn null;\n}\nByteArrayOutputStream buffer = new ByteArrayOutputStream();\nfor (int i = 0; i < bytes.length; i++) {\nint b = bytes[i];\nif (b == ESCAPE_CHAR) {\ntry {\nint u = Character.digit((char) bytes[++i], 16);\nint l = Character.digit((char) bytes[++i], 16);\nif (u == -1 || l == -1) {\nthrow new DecoderException(\"Invalid quoted-printable encoding\");\n}\nbuffer.write((char) ((u << 4) + l));\n} catch (ArrayIndexOutOfBoundsException e) {\nthrow new DecoderException(\"Invalid quoted-printable encoding\");\n}\n} else {\nbuffer.write(b);\n}\n}\nreturn buffer.toByteArray();\n}"
+}

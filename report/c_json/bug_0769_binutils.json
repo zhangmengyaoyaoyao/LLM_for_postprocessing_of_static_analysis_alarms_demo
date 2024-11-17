@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "  else if (bfd_check_format_matches (file, bfd_object, &matching))",
+    "Code_function": "display_file (char *filename)\n{\n  bfd_boolean retval = TRUE;\n  bfd *file;\n  char **matching;\n\n  if (get_file_size (filename) < 1)\n    return FALSE;\n\n  file = bfd_openr (filename, target ? target : plugin_target);\n  if (file == NULL)\n    {\n      bfd_nonfatal (filename);\n      return FALSE;\n    }\n\n  /* If printing line numbers, decompress the debug sections.  */\n  if (line_numbers)\n    file->flags |= BFD_DECOMPRESS;\n\n  if (bfd_check_format (file, bfd_archive))\n    {\n      display_archive (file);\n    }\n  else if (bfd_check_format_matches (file, bfd_object, &matching))\n    {\n      set_print_width (file);\n      format->print_object_filename (filename);\n      display_rel_file (file, NULL);\n    }\n  else\n    {\n      bfd_nonfatal (filename);\n      if (bfd_get_error () == bfd_error_file_ambiguously_recognized)\n\t{\n\t  list_matching_formats (matching);\n\t  free (matching);\n\t}\n      retval = FALSE;\n    }\n\n  if (!bfd_close (file))\n    bfd_fatal (filename);\n\n  lineno_cache_bfd = NULL;\n  lineno_cache_rel_bfd = NULL;\n\n  return retval;\n}"
+}

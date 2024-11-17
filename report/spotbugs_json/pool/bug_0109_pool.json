@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "UCF_USELESS_CONTROL_FLOW",
+    "priority": "3",
+    "rank": "20",
+    "project": "pool",
+    "warning_line": "if (!underTest.endEvictionTest()) {\n",
+    "warning_method": "public void evict() throws Exception {\nassertOpen();\nif (_idleObjects.size() == 0) {\nreturn;\n}\nPooledObject<T> underTest = null;\nfor (int i = 0, m = getNumTests(); i < m; i++) {\nif (_evictionIterator == null || !_evictionIterator.hasNext()) {\nif (getLifo()) {\n_evictionIterator = _idleObjects.descendingIterator();\n} else {\n_evictionIterator = _idleObjects.iterator();\n}\n}\nif (!_evictionIterator.hasNext()) {\nreturn;\n} else {\ntry {\nunderTest = _evictionIterator.next();\n} catch (NoSuchElementException nsee) {\ni--;\n_evictionIterator = null;\ncontinue;\n}\n}\nif (!underTest.startEvictionTest()) {\ni--;\ncontinue;\n}\nif (getMinEvictableIdleTimeMillis() > 0 && getMinEvictableIdleTimeMillis() < underTest.getIdleTimeMillis() || (getSoftMinEvictableIdleTimeMillis() > 0 && getSoftMinEvictableIdleTimeMillis() < underTest.getIdleTimeMillis() && getMinIdle() < _idleObjects.size())) {\ndestroy(underTest);\n} else {\nif (getTestWhileIdle()) {\nboolean active = false;\ntry {\n_factory.activateObject(underTest.getObject());\nactive = true;\n} catch (Exception e) {\ndestroy(underTest);\n}\nif (active) {\nif (!_factory.validateObject(underTest.getObject())) {\ndestroy(underTest);\n} else {\ntry {\n_factory.passivateObject(underTest.getObject());\n} catch (Exception e) {\ndestroy(underTest);\n}\n}\n}\n}\nif (!underTest.endEvictionTest()) {\n}\n}\n}\nreturn;\n}"
+}

@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "\tbfd_section_hash_newfunc (NULL, &abfd->section_htab, name);",
+    "Code_function": "bfd_make_section_anyway_with_flags (bfd *abfd, const char *name,\n\t\t\t\t    flagword flags)\n{\n  struct section_hash_entry *sh;\n  asection *newsect;\n\n  if (abfd->output_has_begun)\n    {\n      bfd_set_error (bfd_error_invalid_operation);\n      return NULL;\n    }\n\n  sh = section_hash_lookup (&abfd->section_htab, name, TRUE, FALSE);\n  if (sh == NULL)\n    return NULL;\n\n  newsect = &sh->section;\n  if (newsect->name != NULL)\n    {\n      /* We are making a section of the same name.  Put it in the\n\t section hash table.  Even though we can't find it directly by a\n\t hash lookup, we'll be able to find the section by traversing\n\t sh->root.next quicker than looking at all the bfd sections.  */\n      struct section_hash_entry *new_sh;\n      new_sh = (struct section_hash_entry *)\n\tbfd_section_hash_newfunc (NULL, &abfd->section_htab, name);\n      if (new_sh == NULL)\n\treturn NULL;\n\n      new_sh->root = sh->root;\n      sh->root.next = &new_sh->root;\n      newsect = &new_sh->section;\n    }\n\n  newsect->flags = flags;\n  newsect->name = name;\n  return bfd_section_init (abfd, newsect);\n}"
+}

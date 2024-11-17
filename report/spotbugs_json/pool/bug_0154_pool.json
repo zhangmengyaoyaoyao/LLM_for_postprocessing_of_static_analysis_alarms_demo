@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch(Exception e) {\n",
+    "warning_method": "public synchronized void returnObject(Object key, Object obj) throws Exception {\nboolean success = true;\nif (_testOnReturn && !_factory.validateObject(key, obj)) {\nsuccess = false;\ntry {\n_factory.destroyObject(key, obj);\n} catch (Exception e) {\n}\n} else {\ntry {\n_factory.passivateObject(key, obj);\n} catch (Exception e) {\nsuccess = false;\n}\n}\nif (isClosed()) {\ntry {\n_factory.destroyObject(key, obj);\n} catch (Exception e) {\n}\nreturn;\n}\nboolean shouldDestroy = false;\nObjectQueue pool = (ObjectQueue) (_poolMap.get(key));\nif (null == pool) {\npool = new ObjectQueue();\n_poolMap.put(key, pool);\n_poolList.add(key);\n}\npool.decrementActiveCount();\nif (_maxIdle >= 0 && (pool.queue.size() >= _maxIdle)) {\nshouldDestroy = true;\n} else if (success) {\nif (_lifo) {\npool.queue.addFirst(new ObjectTimestampPair(obj));\n} else {\npool.queue.addLast(new ObjectTimestampPair(obj));\n}\n_totalIdle++;\n}\nnotifyAll();\nif (shouldDestroy) {\ntry {\n_factory.destroyObject(key, obj);\n} catch (Exception e) {\n}\n}\n}"
+}

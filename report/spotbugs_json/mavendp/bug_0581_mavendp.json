@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "RV_RETURN_VALUE_IGNORED_BAD_PRACTICE",
+    "priority": "2",
+    "rank": "16",
+    "project": "mavendp",
+    "warning_line": "location.mkdirs();\n",
+    "warning_method": "protected void unpack(File file, File location, String includes, String excludes) throws MojoExecutionException {\ntry {\ngetLog().info(\"Unpacking \" + file.getPath() + \"to\\n \" + location.getPath() + \"\\nwith Includes \" + includes + \" and excludes:\" + excludes);\nlocation.mkdirs();\nUnArchiver unArchiver;\nunArchiver = archiverManager.getUnArchiver(file);\nunArchiver.setSourceFile(file);\nunArchiver.setDestDirectory(location);\nif (StringUtils.isNotEmpty(excludes) || StringUtils.isNotEmpty(includes)) {\nIncludeExcludeFileSelector[] selectors = new IncludeExcludeFileSelector[] { new IncludeExcludeFileSelector() };\nif (StringUtils.isNotEmpty(excludes)) {\nselectors[0].setExcludes(excludes.split(\",\"));\n}\nif (StringUtils.isNotEmpty(includes)) {\nselectors[0].setIncludes(includes.split(\",\"));\n}\nunArchiver.setFileSelectors(selectors);\n}\nif (this.silent) {\nsilenceUnarchiver(unArchiver);\n}\nunArchiver.extract();\n} catch (NoSuchArchiverException e) {\nthrow new MojoExecutionException(\"Unknown archiver type\", e);\n} catch (ArchiverException e) {\ne.printStackTrace();\nthrow new MojoExecutionException(\"Error unpacking file: \" + file + \" to: \" + location + \"\\r\\n\" + e.toString(), e);\n}\n}"
+}

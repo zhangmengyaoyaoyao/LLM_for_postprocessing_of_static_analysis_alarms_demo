@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "\t      cattext (&out, \"\\n@itemize @bullet\\n\");",
+    "Code_function": "bulletize ()\n{\n  unsigned int idx = 0;\n  int on = 0;\n  string_type out;\n  init_string (&out);\n\n  while (at (tos, idx))\n    {\n      if (at (tos, idx) == '@'\n\t  && at (tos, idx + 1) == '*')\n\t{\n\t  cattext (&out, \"*\");\n\t  idx += 2;\n\t}\n      else if (at (tos, idx) == '\\n'\n\t       && at (tos, idx + 1) == 'o'\n\t       && isspace ((unsigned char) at (tos, idx + 2)))\n\t{\n\t  if (!on)\n\t    {\n\t      cattext (&out, \"\\n@itemize @bullet\\n\");\n\t      on = 1;\n\n\t    }\n\t  cattext (&out, \"\\n@item\\n\");\n\t  idx += 3;\n\t}\n      else\n\t{\n\t  catchar (&out, at (tos, idx));\n\t  if (on && at (tos, idx) == '\\n'\n\t      && at (tos, idx + 1) == '\\n'\n\t      && at (tos, idx + 2) != 'o')\n\t    {\n\t      cattext (&out, \"@end itemize\");\n\t      on = 0;\n\t    }\n\t  idx++;\n\n\t}\n    }\n  if (on)\n    {\n      cattext (&out, \"@end itemize\\n\");\n    }\n\n  delete_string (tos);\n  *tos = out;\n  pc++;\n}"
+}

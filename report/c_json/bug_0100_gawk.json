@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "\tpreassigns[numassigns].type = type;",
+    "Code_function": "add_preassign(enum assign_type type, char *val)\n{\n\tstatic long alloc_assigns;\t\t/* for how many are allocated */\n\n#define INIT_SRC 4\n\n\t++numassigns;\n\n\tif (preassigns == NULL) {\n\t\temalloc(preassigns, struct pre_assign *,\n\t\t\tINIT_SRC * sizeof(struct pre_assign), \"add_preassign\");\n\t\talloc_assigns = INIT_SRC;\n\t} else if (numassigns >= alloc_assigns) {\n\t\talloc_assigns *= 2;\n\t\terealloc(preassigns, struct pre_assign *,\n\t\t\talloc_assigns * sizeof(struct pre_assign), \"add_preassigns\");\n\t}\n\tpreassigns[numassigns].type = type;\n\tpreassigns[numassigns].val = estrdup(val, strlen(val));\n\n#undef INIT_SRC\n}"
+}

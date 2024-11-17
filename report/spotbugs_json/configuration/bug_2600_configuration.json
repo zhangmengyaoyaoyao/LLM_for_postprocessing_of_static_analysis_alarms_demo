@@ -1,0 +1,9 @@
+{
+    "category": "SECURITY",
+    "vtype": "SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING",
+    "priority": "3",
+    "rank": "15",
+    "project": "configuration",
+    "warning_line": "pstmt = conn.prepareStatement(query.toString());\n",
+    "warning_method": "@Override\npublic void clear() {\nfireEvent(EVENT_CLEAR, null, null, true);\nStringBuilder query = new StringBuilder(\"DELETE FROM \" + table);\nif (nameColumn != null) {\nquery.append(\" WHERE \" + nameColumn + \"=?\");\n}\nConnection conn = null;\nPreparedStatement pstmt = null;\ntry {\nconn = getConnection();\npstmt = conn.prepareStatement(query.toString());\nif (nameColumn != null) {\npstmt.setString(1, name);\n}\npstmt.executeUpdate();\ncommitIfRequired(conn);\n} catch (SQLException e) {\nfireError(EVENT_CLEAR, null, null, e);\n} finally {\nclose(conn, pstmt, null);\n}\nfireEvent(EVENT_CLEAR, null, null, false);\n}"
+}

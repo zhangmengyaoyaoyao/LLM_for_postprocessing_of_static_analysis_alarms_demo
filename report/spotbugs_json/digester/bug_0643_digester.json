@@ -1,0 +1,9 @@
+{
+    "category": "CORRECTNESS",
+    "vtype": "VA_FORMAT_STRING_EXTRA_ARGUMENTS_PASSED",
+    "priority": "2",
+    "rank": "9",
+    "project": "digester",
+    "warning_line": "throw new SAXException( format( \"[ObjectCreateRule]{%s} Class '%s' does not have a construcor with types\",\n",
+    "warning_method": "@Override\npublic void begin(String namespace, String name, Attributes attributes) throws Exception {\nClass<?> clazz = this.clazz;\nif (clazz == null) {\nString realClassName = className;\nif (attributeName != null) {\nString value = attributes.getValue(attributeName);\nif (value != null) {\nrealClassName = value;\n}\n}\nif (getDigester().getLogger().isDebugEnabled()) {\ngetDigester().getLogger().debug(format(\"[ObjectCreateRule]{%s} New '%s'\", getDigester().getMatch(), realClassName));\n}\nclazz = getDigester().getClassLoader().loadClass(realClassName);\n}\nObject instance;\nif (constructorArgumentsTypes == null || constructorArgumentsTypes.length == 0) {\nif (getDigester().getLogger().isDebugEnabled()) {\ngetDigester().getLogger().debug(format(\"[ObjectCreateRule]{%s} New '%s' using default empty constructor\", getDigester().getMatch(), clazz.getName()));\n}\ninstance = clazz.newInstance();\n} else {\nConstructor<?> constructor = getAccessibleConstructor(clazz, constructorArgumentsTypes);\nif (constructor == null) {\nthrow new SAXException(format(\"[ObjectCreateRule]{%s} Class '%s' does not have a construcor with types\", getDigester().getMatch(), clazz.getName(), Arrays.toString(constructorArgumentsTypes)));\n}\ninstance = createLazyProxy(constructor);\n}\ngetDigester().push(instance);\n}"
+}

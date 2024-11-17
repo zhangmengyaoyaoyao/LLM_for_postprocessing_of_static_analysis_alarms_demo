@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "STCAL_INVOKE_ON_STATIC_DATE_FORMAT_INSTANCE",
+    "priority": "2",
+    "rank": "8",
+    "project": "configuration",
+    "warning_line": "out.print(\"<*D\" + DATE_FORMAT.format((Date) value) + \">\");\n",
+    "warning_method": "private void printValue(PrintWriter out, int indentLevel, Object value) {\nString padding = StringUtils.repeat(\" \", indentLevel * INDENT_SIZE);\nif (value instanceof List) {\nout.print(\"( \");\nIterator it = ((List) value).iterator();\nwhile (it.hasNext()) {\nprintValue(out, indentLevel + 1, it.next());\nif (it.hasNext()) {\nout.print(\", \");\n}\n}\nout.print(\" )\");\n} else if (value instanceof HierarchicalConfiguration) {\nprintNode(out, indentLevel, ((HierarchicalConfiguration) value).getRoot());\n} else if (value instanceof Configuration) {\nout.println();\nout.println(padding + \"{\");\nConfiguration config = (Configuration) value;\nIterator it = config.getKeys();\nwhile (it.hasNext()) {\nString key = (String) it.next();\nNode node = new Node(key);\nnode.setValue(config.getProperty(key));\nprintNode(out, indentLevel + 1, node);\nout.println(\";\");\n}\nout.println(padding + \"}\");\n} else if (value instanceof Map) {\nMap map = (Map) value;\nprintValue(out, indentLevel, new MapConfiguration(map));\n} else if (value instanceof byte[]) {\nout.print(\"<\" + new String(Hex.encodeHex((byte[]) value)) + \">\");\n} else if (value instanceof Date) {\nout.print(\"<*D\" + DATE_FORMAT.format((Date) value) + \">\");\n} else if (value != null) {\nout.print(quoteString(String.valueOf(value)));\n}\n}"
+}

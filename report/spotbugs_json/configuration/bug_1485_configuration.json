@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "BC_UNCONFIRMED_CAST",
+    "priority": "3",
+    "rank": "20",
+    "project": "configuration",
+    "warning_line": "fs = ((CatalogManager) catalogManager).getFileSystem();\n",
+    "warning_method": "@Override\npublic void loadSystemCatalogs() throws IOException {\nfs = ((CatalogManager) catalogManager).getFileSystem();\nString base = ((CatalogManager) catalogManager).getBaseDir();\n@SuppressWarnings(\"unchecked\")\nVector<String> catalogs = catalogManager.getCatalogFiles();\nif (catalogs != null) {\nfor (int count = 0; count < catalogs.size(); count++) {\nString fileName = catalogs.elementAt(count);\nURL url = null;\nInputStream is = null;\ntry {\nurl = locate(fs, base, fileName);\nif (url != null) {\nis = fs.getInputStream(url);\n}\n} catch (ConfigurationException ce) {\nString name = url.toString();\ncatalogManager.debug.message(DEBUG_ALL, \"Unable to get input stream for \" + name + \". \" + ce.getMessage());\n}\nif (is != null) {\nString mimeType = fileNameMap.getContentTypeFor(fileName);\ntry {\nif (mimeType != null) {\nparseCatalog(mimeType, is);\ncontinue;\n}\n} catch (Exception ex) {\ncatalogManager.debug.message(DEBUG_ALL, \"Exception caught parsing input stream for \" + fileName + \". \" + ex.getMessage());\n} finally {\nis.close();\n}\n}\nparseCatalog(base, fileName);\n}\n}\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "ICAST_INTEGER_MULTIPLY_CAST_TO_LONG",
+    "priority": "3",
+    "rank": "20",
+    "project": "pool",
+    "warning_line": "final long timeout = now - (abandonedConfig.getRemoveAbandonedTimeout() * 1000);\n",
+    "warning_method": "private void removeAbandoned() {\nfinal long now = System.currentTimeMillis();\nfinal long timeout = now - (abandonedConfig.getRemoveAbandonedTimeout() * 1000);\nArrayList<PooledObject<T>> remove = new ArrayList<PooledObject<T>>();\nIterator<PooledObject<T>> it = allObjects.values().iterator();\nwhile (it.hasNext()) {\nPooledObject<T> pooledObject = it.next();\nsynchronized (pooledObject) {\nif (pooledObject.getState() == PooledObjectState.ALLOCATED && pooledObject.getLastUsed() <= timeout) {\npooledObject.markAbandoned();\nremove.add(pooledObject);\n}\n}\n}\nIterator<PooledObject<T>> itr = remove.iterator();\nwhile (itr.hasNext()) {\nPooledObject<T> pooledObject = itr.next();\nif (abandonedConfig.getLogAbandoned()) {\npooledObject.printStackTrace();\n}\ntry {\ninvalidateObject(pooledObject.getObject());\n} catch (Exception e) {\ne.printStackTrace();\n}\n}\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "LI_LAZY_INIT_STATIC",
+    "priority": "2",
+    "rank": "14",
+    "project": "net",
+    "warning_line": "if (utcFormatter != null)\nformatter = utcFormatter.get();\nif (formatter == null) {\nformatter = new SimpleDateFormat(NTP_DATE_FORMAT + \" 'UTC'\",\nLocale.US);\nformatter.setTimeZone(TimeZone.getTimeZone(\"UTC\"));\nutcFormatter = new SoftReference<DateFormat>(formatter);\n",
+    "warning_method": "public String toUTCString() {\nDateFormat formatter = null;\nif (utcFormatter != null)\nformatter = utcFormatter.get();\nif (formatter == null) {\nformatter = new SimpleDateFormat(NTP_DATE_FORMAT + \" 'UTC'\", Locale.US);\nformatter.setTimeZone(TimeZone.getTimeZone(\"UTC\"));\nutcFormatter = new SoftReference<DateFormat>(formatter);\n}\nDate ntpDate = getDate();\nsynchronized (formatter) {\nreturn formatter.format(ntpDate);\n}\n}"
+}

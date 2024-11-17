@@ -1,0 +1,9 @@
+{
+    "category": "I18N",
+    "vtype": "DM_DEFAULT_ENCODING",
+    "priority": "1",
+    "rank": "19",
+    "project": "mavendp",
+    "warning_line": "outputWriter = new FileWriter( outputFile );\n",
+    "warning_method": "protected void doExecute() throws MojoExecutionException {\nWriter outputWriter = null;\ntry {\nfinal Set<Artifact> plugins = resolvePluginArtifacts();\nif (this.outputFile != null) {\noutputFile.getParentFile().mkdirs();\noutputWriter = new FileWriter(outputFile);\n}\nfor (final Artifact plugin : plugins) {\nString logStr = \"Plugin Resolved: \" + DependencyUtil.getFormattedFileName(plugin, false);\nif (!silent) {\nthis.getLog().info(logStr);\n}\nif (outputWriter != null) {\noutputWriter.write(logStr);\noutputWriter.write(\"\\n\");\n}\nif (!excludeTransitive) {\nfor (final Artifact artifact : resolveArtifactDependencies(plugin)) {\nlogStr = \"    Plugin Dependency Resolved: \" + DependencyUtil.getFormattedFileName(artifact, false);\nif (!silent) {\nthis.getLog().info(logStr);\n}\nif (outputWriter != null) {\noutputWriter.write(logStr);\noutputWriter.write(\"\\n\");\n}\n}\n}\n}\n} catch (final IOException e) {\nthrow new MojoExecutionException(\"Nested:\", e);\n} catch (final ArtifactResolutionException e) {\nthrow new MojoExecutionException(\"Nested:\", e);\n} catch (final ArtifactNotFoundException e) {\nthrow new MojoExecutionException(\"Nested:\", e);\n} catch (final ProjectBuildingException e) {\nthrow new MojoExecutionException(\"Nested:\", e);\n} catch (final InvalidDependencyVersionException e) {\nthrow new MojoExecutionException(\"Nested:\", e);\n} catch (final ArtifactFilterException e) {\nthrow new MojoExecutionException(\"Nested:\", e);\n} finally {\nIOUtil.close(outputWriter);\n}\n}"
+}

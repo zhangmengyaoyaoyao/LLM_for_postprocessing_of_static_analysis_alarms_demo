@@ -1,0 +1,7 @@
+{
+    "Project": "Zephyr",
+    "Tool": "Infer",
+    "Bug Type": "Uninitialized Value",
+    "Code_line": "\t\t*out++ = buffer[i % (TC_AES_BLOCK_SIZE)] ^ *in++;",
+    "Code_function": "static int ccm_ctr_mode(uint8_t *out, unsigned int outlen, const uint8_t *in,\n\t\t\tunsigned int inlen, uint8_t *ctr, const TCAesKeySched_t sched)\n{\n\n\tuint8_t buffer[TC_AES_BLOCK_SIZE];\n\tuint8_t nonce[TC_AES_BLOCK_SIZE];\n\tuint16_t block_num;\n\tunsigned int i;\n\n\t/* input sanity check: */\n\tif (out == (uint8_t *) 0 ||\n\t    in == (uint8_t *) 0 ||\n\t    ctr == (uint8_t *) 0 ||\n\t    sched == (TCAesKeySched_t) 0 ||\n\t    inlen == 0 ||\n\t    outlen == 0 ||\n\t    outlen != inlen) {\n\t\treturn TC_CRYPTO_FAIL;\n\t}\n\n\t/* copy the counter to the nonce */\n\t(void) _copy(nonce, sizeof(nonce), ctr, sizeof(nonce));\n\n\t/* select the last 2 bytes of the nonce to be incremented */\n\tblock_num = (uint16_t) ((nonce[14] << 8)|(nonce[15]));\n\tfor (i = 0; i < inlen; ++i) {\n\t\tif ((i % (TC_AES_BLOCK_SIZE)) == 0) {\n\t\t\tblock_num++;\n\t\t\tnonce[14] = (uint8_t)(block_num >> 8);\n\t\t\tnonce[15] = (uint8_t)(block_num);\n\t\t\tif (!tc_aes_encrypt(buffer, nonce, sched)) {\n\t\t\t\treturn TC_CRYPTO_FAIL;\n\t\t\t}\n\t\t}\n\t\t/* update the output */\n\t\t*out++ = buffer[i % (TC_AES_BLOCK_SIZE)] ^ *in++;\n\t}\n\n\t/* update the counter */\n\tctr[14] = nonce[14]; ctr[15] = nonce[15];\n\n\treturn TC_CRYPTO_SUCCESS;\n}"
+}

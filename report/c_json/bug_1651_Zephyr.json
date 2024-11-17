@@ -1,0 +1,7 @@
+{
+    "Project": "Zephyr",
+    "Tool": "Infer",
+    "Bug Type": "Null Dereference",
+    "Code_line": "\terr = bt_hci_cmd_send_sync(BT_HCI_OP_READ_BUFFER_SIZE, NULL, &rsp);",
+    "Code_function": "static int br_init(void)\n{\n#if defined(CONFIG_BT_CONN)\n\tstruct net_buf *rsp;\n\tint err;\n\n\tif (bt_dev.le.mtu) {\n\t\treturn 0;\n\t}\n\n\t/* Use BR/EDR buffer size if LE reports zero buffers */\n\terr = bt_hci_cmd_send_sync(BT_HCI_OP_READ_BUFFER_SIZE, NULL, &rsp);\n\tif (err) {\n\t\treturn err;\n\t}\n\n\tread_buffer_size_complete(rsp);\n\tnet_buf_unref(rsp);\n#endif /* CONFIG_BT_CONN */\n\n\treturn 0;\n}"
+}

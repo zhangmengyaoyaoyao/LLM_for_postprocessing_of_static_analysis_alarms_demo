@@ -1,0 +1,9 @@
+{
+    "category": "SECURITY",
+    "vtype": "SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING",
+    "priority": "3",
+    "rank": "15",
+    "project": "configuration",
+    "warning_line": "pstmt = conn.prepareStatement(query.toString());\n",
+    "warning_method": "public Object getProperty(String key) {\nObject result = null;\nStringBuilder query = new StringBuilder(\"SELECT * FROM \");\nquery.append(table).append(\" WHERE \");\nquery.append(keyColumn).append(\"=?\");\nif (nameColumn != null) {\nquery.append(\" AND \" + nameColumn + \"=?\");\n}\nConnection conn = null;\nPreparedStatement pstmt = null;\nResultSet rs = null;\ntry {\nconn = getConnection();\npstmt = conn.prepareStatement(query.toString());\npstmt.setString(1, key);\nif (nameColumn != null) {\npstmt.setString(2, name);\n}\nrs = pstmt.executeQuery();\nList<Object> results = new ArrayList<Object>();\nwhile (rs.next()) {\nObject value = rs.getObject(valueColumn);\nif (isDelimiterParsingDisabled()) {\nresults.add(value);\n} else {\nIterator<?> it = PropertyConverter.toIterator(value, getListDelimiter());\nwhile (it.hasNext()) {\nresults.add(it.next());\n}\n}\n}\nif (!results.isEmpty()) {\nresult = (results.size() > 1) ? results : results.get(0);\n}\n} catch (SQLException e) {\nfireError(EVENT_READ_PROPERTY, key, null, e);\n} finally {\nclose(conn, pstmt, rs);\n}\nreturn result;\n}"
+}

@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_S2",
+    "Code_line": "\tsb_add_char (out, '&');",
+    "Code_function": "sub_actual (size_t start, sb *in, sb *t, struct hash_control *formal_hash,\n\t    int kind, sb *out, int copyifnotthere)\n{\n  size_t src;\n  formal_entry *ptr;\n\n  src = get_apost_token (start, in, t, kind);\n  /* See if it's in the macro's hash table, unless this is\n     macro_strip_at and kind is '@' and the token did not end in '@'.  */\n  if (macro_strip_at\n      && kind == '@'\n      && (src == start || in->ptr[src - 1] != '@'))\n    ptr = NULL;\n  else\n    ptr = (formal_entry *) hash_find (formal_hash, sb_terminate (t));\n  if (ptr)\n    {\n      if (ptr->actual.len)\n\t{\n\t  sb_add_sb (out, &ptr->actual);\n\t}\n      else\n\t{\n\t  sb_add_sb (out, &ptr->def);\n\t}\n    }\n  else if (kind == '&')\n    {\n      /* Doing this permits people to use & in macro bodies.  */\n      sb_add_char (out, '&');\n      sb_add_sb (out, t);\n      if (src != start && in->ptr[src - 1] == '&')\n\tsb_add_char (out, '&');\n    }\n  else if (copyifnotthere)\n    {\n      sb_add_sb (out, t);\n    }\n  else\n    {\n      sb_add_char (out, '\\\\');\n      sb_add_sb (out, t);\n    }\n  return src;\n}"
+}

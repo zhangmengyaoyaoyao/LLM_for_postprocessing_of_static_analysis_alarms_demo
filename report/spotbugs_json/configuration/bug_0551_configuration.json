@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "REC_CATCH_EXCEPTION",
+    "priority": "3",
+    "rank": "20",
+    "project": "configuration",
+    "warning_line": "catch (Exception ex)\n",
+    "warning_method": "private FileSystemOptions getOptions(String scheme) {\nFileSystemOptions opts = new FileSystemOptions();\nFileSystemConfigBuilder builder;\ntry {\nbuilder = VFS.getManager().getFileSystemConfigBuilder(scheme);\n} catch (Exception ex) {\nreturn null;\n}\nFileOptionsProvider provider = getFileOptionsProvider();\nif (provider != null) {\nMap map = provider.getOptions();\nif (map == null) {\nreturn null;\n}\nIterator iter = map.entrySet().iterator();\nint count = 0;\nwhile (iter.hasNext()) {\nMap.Entry entry = (Map.Entry) iter.next();\ntry {\nString key = (String) entry.getKey();\nif (FileOptionsProvider.CURRENT_USER.equals(key)) {\nkey = \"creatorName\";\n}\nsetProperty(builder, opts, key, entry.getValue());\n++count;\n} catch (Exception ex) {\ncontinue;\n}\n}\nif (count > 0) {\nreturn opts;\n}\n}\nreturn null;\n}"
+}

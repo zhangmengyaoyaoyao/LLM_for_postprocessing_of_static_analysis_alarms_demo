@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L1",
+    "Code_line": "  w = (l && l->word) ? copy_word (l->word) : make_word (\"\");",
+    "Code_function": "build_arg_list (cmd, cname, text, lwords, ind)\n     char *cmd;\n     const char *cname;\n     const char *text;\n     WORD_LIST *lwords;\n     int ind;\n{\n  WORD_LIST *ret, *cl, *l;\n  WORD_DESC *w;\n  int i;\n\n  ret = (WORD_LIST *)NULL;\n  w = make_word (cmd);\n  ret = make_word_list (w, (WORD_LIST *)NULL);\t/* $0 */\n\n  w = make_word (cname);\t\t\t/* $1 */\n  cl = ret->next = make_word_list (w, (WORD_LIST *)NULL);\n\n  w = make_word (text);\n  cl->next = make_word_list (w, (WORD_LIST *)NULL);\t/* $2 */\n  cl = cl->next;\n\n  /* Search lwords for current word */\n  for (l = lwords, i = 1; l && i < ind-1; l = l->next, i++)\n    ;\n  w = (l && l->word) ? copy_word (l->word) : make_word (\"\");\n  cl->next = make_word_list (w, (WORD_LIST *)NULL);\n\n  return ret;\n}"
+}

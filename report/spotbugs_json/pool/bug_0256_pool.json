@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch (Exception e2) {\n",
+    "warning_method": "@Override\npublic void returnObject(K key, V obj) throws Exception {\ntry {\naddObjectToPool(key, obj, true);\n} catch (Exception e) {\nif (_factory != null) {\ntry {\n_factory.destroyObject(key, obj);\n} catch (Exception e2) {\n}\n// TODO: Correctness here depends on control in addObjectToPool.\nObjectQueue pool = _poolMap.get(key);\nif (pool != null) {\nsynchronized (this) {\npool.decrementActiveCount();\nif (pool.queue.isEmpty() && pool.activeCount == 0 && pool.internalProcessingCount == 0) {\n_poolMap.remove(key);\n_poolList.remove(key);\n}\n}\nallocate();\n}\n}\n}\n}"
+}

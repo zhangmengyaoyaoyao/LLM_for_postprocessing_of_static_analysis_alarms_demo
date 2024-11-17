@@ -1,0 +1,9 @@
+{
+    "category": "PERFORMANCE",
+    "vtype": "DM_GC",
+    "priority": "1",
+    "rank": "16",
+    "project": "bcel",
+    "warning_line": "System.gc(); \n",
+    "warning_method": "@Override\npublic void update(String classname) {\nSystem.gc();\nfor (int i = 0; i < indent; i++) {\nSystem.out.print(\" \");\n}\nSystem.out.println(classname);\nindent += 1;\nVerifier v = VerifierFactory.getVerifier(classname);\nVerificationResult vr;\nvr = v.doPass1();\nif (vr != VerificationResult.VR_OK) {\nSystem.out.println(\"Pass 1:\\n\" + vr);\n}\nvr = v.doPass2();\nif (vr != VerificationResult.VR_OK) {\nSystem.out.println(\"Pass 2:\\n\" + vr);\n}\nif (vr == VerificationResult.VR_OK) {\ntry {\nJavaClass jc = Repository.lookupClass(v.getClassName());\nfor (int i = 0; i < jc.getMethods().length; i++) {\nvr = v.doPass3a(i);\nif (vr != VerificationResult.VR_OK) {\nSystem.out.println(v.getClassName() + \", Pass 3a, method \" + i + \" ['\" + jc.getMethods()[i] + \"']:\\n\" + vr);\n}\nvr = v.doPass3b(i);\nif (vr != VerificationResult.VR_OK) {\nSystem.out.println(v.getClassName() + \", Pass 3b, method \" + i + \" ['\" + jc.getMethods()[i] + \"']:\\n\" + vr);\n}\n}\n} catch (ClassNotFoundException e) {\nSystem.err.println(\"Could not find class \" + v.getClassName() + \" in Repository\");\n}\n}\nindent -= 1;\n}"
+}

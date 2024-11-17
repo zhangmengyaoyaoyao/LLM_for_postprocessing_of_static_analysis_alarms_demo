@@ -1,0 +1,7 @@
+{
+    "Project": "Zephyr",
+    "Tool": "Infer",
+    "Bug Type": "Uninitialized Value",
+    "Code_line": "\t\t\telapsed = k_uptime_get_32() - start;",
+    "Code_function": "static void *k_queue_poll(struct k_queue *queue, s32_t timeout)\n{\n\tstruct k_poll_event event;\n\tint err, elapsed = 0, done = 0;\n\tk_spinlock_key_t key;\n\tvoid *val;\n\tu32_t start;\n\n\tk_poll_event_init(&event, K_POLL_TYPE_FIFO_DATA_AVAILABLE,\n\t\t\t  K_POLL_MODE_NOTIFY_ONLY, queue);\n\n\tif (timeout != K_FOREVER) {\n\t\tstart = k_uptime_get_32();\n\t}\n\n\tdo {\n\t\tevent.state = K_POLL_STATE_NOT_READY;\n\n\t\terr = k_poll(&event, 1, timeout - elapsed);\n\n\t\tif (err && err != -EAGAIN) {\n\t\t\treturn NULL;\n\t\t}\n\n\t\tkey = k_spin_lock(&queue->lock);\n\t\tval = z_queue_node_peek(sys_sflist_get(&queue->data_q), true);\n\t\tk_spin_unlock(&queue->lock, key);\n\n\t\tif ((val == NULL) && (timeout != K_FOREVER)) {\n\t\t\telapsed = k_uptime_get_32() - start;\n\t\t\tdone = elapsed > timeout;\n\t\t}\n\t} while (!val && !done);\n\n\treturn val;\n}"
+}

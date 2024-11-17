@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "\tARGC_node = install_symbol(estrdup(\"ARGC\", 4), Node_var);",
+    "Code_function": "init_args(int argc0, int argc, const char *argv0, char **argv)\n{\n\tint i, j;\n\tNODE **aptr;\n\tNODE *tmp;\n\n\tARGV_node = install_symbol(estrdup(\"ARGV\", 4), Node_var_array);\n\ttmp =  make_number(0.0);\n\taptr = assoc_lookup(ARGV_node, tmp);\n\tunref(tmp);\n\tunref(*aptr);\n\t*aptr = make_string(argv0, strlen(argv0));\n\t(*aptr)->flags |= MAYBE_NUM;\n\tfor (i = argc0, j = 1; i < argc; i++, j++) {\n\t\ttmp = make_number((AWKNUM) j);\n\t\taptr = assoc_lookup(ARGV_node, tmp);\n\t\tunref(tmp);\n\t\tunref(*aptr);\n\t\t*aptr = make_string(argv[i], strlen(argv[i]));\n\t\t(*aptr)->flags |= MAYBE_NUM;\n\t}\n\n\tARGC_node = install_symbol(estrdup(\"ARGC\", 4), Node_var);\n\tARGC_node->var_value = make_number((AWKNUM) j);\n}"
+}

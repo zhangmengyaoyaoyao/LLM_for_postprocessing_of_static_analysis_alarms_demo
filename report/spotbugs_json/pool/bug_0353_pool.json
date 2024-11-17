@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "JLM_JSR166_UTILCONCURRENT_MONITORENTER",
+    "priority": "2",
+    "rank": "8",
+    "project": "pool",
+    "warning_line": "synchronized (poolMap) {\n",
+    "warning_method": "private PooledObject<T> create(K key, boolean force) throws Exception {\nint maxActive = getMaxActive();\nint maxTotal = getMaxTotal();\nboolean loop = true;\nwhile (loop) {\nint newNumTotal = numTotal.incrementAndGet();\nif (!force && maxTotal > -1 && newNumTotal > maxTotal) {\nnumTotal.decrementAndGet();\nif (getNumIdle() == 0) {\nreturn null;\n} else {\nclearOldest();\n}\n} else {\nloop = false;\n}\n}\nObjectDeque<T> objectDeque;\nint newNumActive;\nsynchronized (poolMap) {\nobjectDeque = poolMap.get(key);\nif (objectDeque == null) {\nobjectDeque = new ObjectDeque<T>();\nnewNumActive = objectDeque.getNumActive().incrementAndGet();\npoolMap.put(key, objectDeque);\npoolKeyList.add(key);\n} else {\nnewNumActive = objectDeque.getNumActive().incrementAndGet();\n}\n}\nif (!force && maxActive > -1 && newNumActive > maxActive) {\ncleanObjectDeque(key, objectDeque);\nnumTotal.decrementAndGet();\nreturn null;\n}\nT t = null;\ntry {\nt = _factory.makeObject(key);\n} catch (Exception e) {\ncleanObjectDeque(key, objectDeque);\nnumTotal.decrementAndGet();\nthrow e;\n}\nPooledObject<T> p = new PooledObject<T>(t);\nobjectDeque.getAllObjects().put(t, p);\nreturn p;\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch (Exception e) {\n",
+    "warning_method": "@Override\npublic synchronized void returnObject(T obj) throws Exception {\nboolean success = !isClosed();\nfinal PooledSoftReference<T> ref = findReference(obj);\nif (ref == null) {\nthrow new IllegalStateException(\"Returned object not currently part of this pool\");\n}\nif (factory != null) {\nif (!factory.validateObject(ref)) {\nsuccess = false;\n} else {\ntry {\nfactory.passivateObject(ref);\n} catch (Exception e) {\nsuccess = false;\n}\n}\n}\nboolean shouldDestroy = !success;\nnumActive--;\nif (success) {\nref.deallocate();\nidleReferences.add(ref);\n}\nnotifyAll();\nif (shouldDestroy && factory != null) {\ntry {\ndestroy(ref);\n} catch (Exception e) {\n}\n}\n}"
+}

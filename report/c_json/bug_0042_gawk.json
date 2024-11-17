@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L2",
+    "Code_line": "\tfd = devopen_simple(file, \"w\", true);",
+    "Code_function": "set_prof_file(const char *file)\n{\n\tint fd;\n\n\tassert(file != NULL);\n\tfd = devopen_simple(file, \"w\", true);\n\tif (fd == INVALID_HANDLE)\n\t\tprof_fp = NULL;\n\telse if (fd == fileno(stdout))\n\t\tprof_fp = stdout;\n\telse if (fd == fileno(stderr))\n\t\tprof_fp = stderr;\n\telse\n\t\tprof_fp = fdopen(fd, \"w\");\n\n\tif (prof_fp == NULL) {\n\t\t/* don't leak file descriptors */\n\t\tint e = errno;\n\n\t\tif (   fd != INVALID_HANDLE\n\t\t    && fd != fileno(stdout)\n\t\t    && fd != fileno(stderr))\n\t\t\t(void) close(fd);\n\n\t\terrno = e;\n\t\twarning(_(\"could not open `%s' for writing: %s\"),\n\t\t\t\tfile, strerror(errno));\n\t\twarning(_(\"sending profile to standard error\"));\n\t\tprof_fp = stderr;\n\t}\n}"
+}

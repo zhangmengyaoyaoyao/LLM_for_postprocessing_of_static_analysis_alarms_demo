@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L2",
+    "Code_line": "  h = elf_link_hash_lookup (elf_hash_table (info), copy, FALSE, FALSE, TRUE);",
+    "Code_function": "_bfd_elf_archive_symbol_lookup (bfd *abfd,\n\t\t\t\tstruct bfd_link_info *info,\n\t\t\t\tconst char *name)\n{\n  struct elf_link_hash_entry *h;\n  char *p, *copy;\n  size_t len, first;\n\n  h = elf_link_hash_lookup (elf_hash_table (info), name, FALSE, FALSE, TRUE);\n  if (h != NULL)\n    return h;\n\n  /* If this is a default version (the name contains @@), look up the\n     symbol again with only one `@' as well as without the version.\n     The effect is that references to the symbol with and without the\n     version will be matched by the default symbol in the archive.  */\n\n  p = strchr (name, ELF_VER_CHR);\n  if (p == NULL || p[1] != ELF_VER_CHR)\n    return h;\n\n  /* First check with only one `@'.  */\n  len = strlen (name);\n  copy = (char *) bfd_alloc (abfd, len);\n  if (copy == NULL)\n    return (struct elf_link_hash_entry *) 0 - 1;\n\n  first = p - name + 1;\n  memcpy (copy, name, first);\n  memcpy (copy + first, name + first + 1, len - first);\n\n  h = elf_link_hash_lookup (elf_hash_table (info), copy, FALSE, FALSE, TRUE);\n  if (h == NULL)\n    {\n      /* We also need to check references to the symbol without the\n\t version.  */\n      copy[first - 1] = '\\0';\n      h = elf_link_hash_lookup (elf_hash_table (info), copy,\n\t\t\t\tFALSE, FALSE, TRUE);\n    }\n\n  bfd_release (abfd, copy);\n  return h;\n}"
+}

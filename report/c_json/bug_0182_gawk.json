@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "\tmemset(d, 0, sizeof(struct list_item));",
+    "Code_function": "add_item(struct list_item *list, int type, NODE *symbol, char *pname)\n{\n\tstruct list_item *d;\n\n\temalloc(d, struct list_item *, sizeof(struct list_item), \"add_item\");\n\tmemset(d, 0, sizeof(struct list_item));\n\td->commands.next = d->commands.prev = &d->commands;\n\n\td->number = ++list->number;\n\td->sname = symbol->vname;\n\tif (pname != NULL) {\t/* function param */\n\t\td->sname = pname;\n\t\td->flags |= PARAM;\n\t\td->fcall_count = fcall_count - cur_frame;\n\t}\n\n\tif (type == D_field) {\n\t\t/* field number */\n\t\td->symbol = symbol;\n\t\td->flags |= FIELD_NUM;\n\t} else if (type == D_subscript) {\n\t\t/* subscript */\n\t\td->symbol = symbol;\n\t\td->flags |= SUBSCRIPT;\n\t} else {\n\t\t/* array or variable */\n\t\td->symbol = symbol;\n\t}\n\n\t/* add to list */\n\td->next = list->next;\n\td->prev = list;\n\tlist->next = d;\n\td->next->prev = d;\n\treturn d;\n}"
+}

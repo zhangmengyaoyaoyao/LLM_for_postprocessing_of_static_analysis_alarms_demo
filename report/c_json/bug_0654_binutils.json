@@ -1,0 +1,7 @@
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "  if (! bfd_check_format_matches (abfd, bfd_object, &matching))",
+    "Code_function": "process_file (const char *file_name, const char *section_name,\n\t      const char *target)\n{\n  bfd *abfd;\n  asection *section;\n  char **matching;\n\n  if (get_file_size (file_name) < 1)\n    return 1;\n\n  abfd = bfd_openr (file_name, target);\n  if (abfd == NULL)\n    bfd_fatal (file_name);\n\n  /* Decompress sections.  */\n  abfd->flags |= BFD_DECOMPRESS;\n\n  if (bfd_check_format (abfd, bfd_archive))\n    fatal (_(\"%s: cannot get addresses from archive\"), file_name);\n\n  if (! bfd_check_format_matches (abfd, bfd_object, &matching))\n    {\n      bfd_nonfatal (bfd_get_filename (abfd));\n      if (bfd_get_error () == bfd_error_file_ambiguously_recognized)\n\t{\n\t  list_matching_formats (matching);\n\t  free (matching);\n\t}\n      xexit (1);\n    }\n\n  if (section_name != NULL)\n    {\n      section = bfd_get_section_by_name (abfd, section_name);\n      if (section == NULL)\n\tfatal (_(\"%s: cannot find section %s\"), file_name, section_name);\n    }\n  else\n    section = NULL;\n\n  slurp_symtab (abfd);\n\n  translate_addresses (abfd, section);\n\n  if (syms != NULL)\n    {\n      free (syms);\n      syms = NULL;\n    }\n\n  bfd_close (abfd);\n\n  return 0;\n}"
+}

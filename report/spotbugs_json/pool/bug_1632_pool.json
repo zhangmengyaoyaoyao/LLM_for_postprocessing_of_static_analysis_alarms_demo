@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch(Exception e) {\n",
+    "warning_method": "private void addObjectToPool(K key, V obj, boolean decrementNumActive) throws Exception {\nboolean success = true;\nif (this.testOnReturn && !_factory.validateObject(key, obj)) {\nsuccess = false;\n} else {\n_factory.passivateObject(key, obj);\n}\nboolean shouldDestroy = !success;\nObjectQueue pool;\nsynchronized (this) {\npool = (_poolMap.get(key));\nif (null == pool) {\npool = new ObjectQueue();\n_poolMap.put(key, pool);\n_poolList.add(key);\n}\nif (isClosed()) {\nshouldDestroy = true;\n} else {\nif (this.maxIdlePerKey >= 0 && (pool.queue.size() >= this.maxIdlePerKey)) {\nshouldDestroy = true;\n} else if (success) {\nif (this.lifo) {\npool.queue.addFirst(new ObjectTimestampPair<V>(obj));\n} else {\npool.queue.addLast(new ObjectTimestampPair<V>(obj));\n}\n_totalIdle++;\nif (decrementNumActive) {\npool.decrementActiveCount();\n}\nallocate();\n}\n}\n}\nif (shouldDestroy) {\ntry {\n_factory.destroyObject(key, obj);\n} catch (Exception e) {\n}\nif (decrementNumActive) {\nsynchronized (this) {\npool.decrementActiveCount();\nallocate();\n}\n}\n}\n}"
+}

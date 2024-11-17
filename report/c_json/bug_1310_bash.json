@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "Bug Type": "UNINITIALIZED_VALUE",
+    "Code_line": "  return end + 1;",
+    "Code_function": "gobble_line (fd, bufp, append_end)\n     int fd;\n     register struct buffer *bufp;\n     char *append_end;\n{\n  register char *end;\n  register int nread;\n  register char *buf = bufp->beg;\n  register char *tem;\n\n  if (!append_end)\n    append_end = bufp->ptr;\n\n  while (1)\n    {\n      end = append_end;\n      while (*end && *end != '\\n') end++;\n      if (*end)\n        break;\n      if (bufp->ateof)\n\treturn buf + bufp->full;\n      if (bufp->ptr == buf)\n\t{\n\t  if (bufp->full == bufp->size)\n\t    {\n\t      bufp->size *= 2;\n\t      /* Add 1 to size to ensure room for terminating null.  */\n\t      tem = (char *) xrealloc (buf, bufp->size + 1);\n\t      bufp->ptr = (bufp->ptr - buf) + tem;\n\t      append_end = (append_end - buf) + tem;\n\t      bufp->beg = buf = tem;\n\t    }\n\t}\n      else\n\t{\n\t  append_end -= bufp->ptr - buf;\n\t  bcopy (bufp->ptr, buf, bufp->full -= bufp->ptr - buf);\n\t  bufp->ptr = buf;\n\t}\n      if (!(nread = read (fd, buf + bufp->full, bufp->size - bufp->full)))\n\tbufp->ateof = 1;\n      bufp->full += nread;\n      buf[bufp->full] = '\\0';\n    }\n  return end + 1;\n}"
+}

@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "} catch (Exception e) {\n",
+    "warning_method": "@Override\npublic void returnObject(T obj) {\nPooledObject<T> p = allObjects.get(obj);\nif (p == null) {\nthrow new IllegalStateException(\"Returned object not currently part of this pool\");\n}\nlong activeTime = p.getActiveTimeMillis();\nif (getTestOnReturn()) {\nif (!factory.validateObject(obj)) {\ntry {\ndestroy(p);\n} catch (Exception e) {\n}\nupdateStatsReturn(activeTime);\nreturn;\n}\n}\ntry {\nfactory.passivateObject(obj);\n} catch (Exception e1) {\ntry {\ndestroy(p);\n} catch (Exception e) {\n}\nupdateStatsReturn(activeTime);\nreturn;\n}\nif (!p.deallocate()) {\nthrow new IllegalStateException(\"Object has already been retured to this pool\");\n}\nint maxIdle = getMaxIdle();\nif (isClosed() || maxIdle > -1 && maxIdle <= idleObjects.size()) {\ntry {\ndestroy(p);\n} catch (Exception e) {\n}\n} else {\nif (getLifo()) {\nidleObjects.addFirst(p);\n} else {\nidleObjects.addLast(p);\n}\n}\nupdateStatsReturn(activeTime);\n}"
+}

@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "CSA",
+    "Bug Type": "core.CallAndMessage",
+    "Code_line": "\tif (install_func(& api_impl, NULL /* ext_id */) == 0)",
+    "Code_function": "load_ext(const char *lib_name)\n{\n\tint (*install_func)(const gawk_api_t *const, awk_ext_id_t);\n\tvoid *dl;\n\tint flags = RTLD_LAZY;\n\tint *gpl_compat;\n\n\tif (do_sandbox)\n\t\tfatal(_(\"extensions are not allowed in sandbox mode\"));\n\n\tif (do_traditional || do_posix)\n\t\tfatal(_(\"-l / @load are gawk extensions\"));\n\n\tif (lib_name == NULL)\n\t\tfatal(_(\"load_ext: received NULL lib_name\"));\n\n\tif ((dl = dlopen(lib_name, flags)) == NULL)\n\t\tfatal(_(\"load_ext: cannot open library `%s' (%s)\\n\"), lib_name,\n\t\t      dlerror());\n\n\t/* Per the GNU Coding standards */\n\tgpl_compat = (int *) dlsym(dl, \"plugin_is_GPL_compatible\");\n\tif (gpl_compat == NULL)\n\t\tfatal(_(\"load_ext: library `%s': does not define `plugin_is_GPL_compatible' (%s)\\n\"),\n\t\t\t\tlib_name, dlerror());\n\n\tinstall_func = (int (*)(const gawk_api_t *const, awk_ext_id_t))\n\t\t\t\tdlsym(dl, INIT_FUNC);\n\tif (install_func == NULL)\n\t\tfatal(_(\"load_ext: library `%s': cannot call function `%s' (%s)\\n\"),\n\t\t\t\tlib_name, INIT_FUNC, dlerror());\n\n\tif (install_func(& api_impl, NULL /* ext_id */) == 0)\n\t\twarning(_(\"load_ext: library `%s' initialization routine `%s' failed\\n\"),\n\t\t\t\tlib_name, INIT_FUNC);\n}"
+}

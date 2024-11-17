@@ -1,0 +1,9 @@
+{
+    "category": "I18N",
+    "vtype": "DM_CONVERT_CASE",
+    "priority": "3",
+    "rank": "20",
+    "project": "fileupload",
+    "warning_line": "subContentType.toLowerCase().startsWith(MULTIPART_MIXED)) {\n",
+    "warning_method": "private boolean findNextItem() throws IOException {\nif (eof) {\nreturn false;\n}\nif (currentItem != null) {\ncurrentItem.close();\ncurrentItem = null;\n}\nfor (; ; ) {\nboolean nextPart;\nif (skipPreamble) {\nnextPart = multi.skipPreamble();\n} else {\nnextPart = multi.readBoundary();\n}\nif (!nextPart) {\nif (currentFieldName == null) {\neof = true;\nreturn false;\n}\nmulti.setBoundary(boundary);\ncurrentFieldName = null;\ncontinue;\n}\nMap headers = parseHeaders(multi.readHeaders());\nif (currentFieldName == null) {\nString fieldName = getFieldName(headers);\nif (fieldName != null) {\nString subContentType = getHeader(headers, CONTENT_TYPE);\nif (subContentType != null && subContentType.toLowerCase().startsWith(MULTIPART_MIXED)) {\ncurrentFieldName = fieldName;\nbyte[] subBoundary = getBoundary(subContentType);\nmulti.setBoundary(subBoundary);\nskipPreamble = true;\ncontinue;\n}\nString fileName = getFileName(headers);\ncurrentItem = new FileItemStreamImpl(fileName, fieldName, getHeader(headers, CONTENT_TYPE), fileName == null);\nnotifier.noteItem();\nitemValid = true;\nreturn true;\n}\n} else {\nString fileName = getFileName(headers);\nif (fileName != null) {\ncurrentItem = new FileItemStreamImpl(fileName, currentFieldName, getHeader(headers, CONTENT_TYPE), false);\nnotifier.noteItem();\nitemValid = true;\nreturn true;\n}\n}\nmulti.discardBodyData();\n}\n}"
+}

@@ -1,0 +1,7 @@
+{
+    "Project": "apr",
+    "Tool": "Infer",
+    "Bug Type": "BUFFER_OVERRUN_L3",
+    "Code_line": "        memcpy(t->index_first,s->index_first,sizeof(int) * TABLE_HASH_SIZE);",
+    "Code_function": "static void apr_table_cat(apr_table_t *t, const apr_table_t *s)\n{\n    const int n = t->a.nelts;\n    register int idx;\n\n    apr_array_cat(&t->a,&s->a);\n\n    if (n == 0) {\n        memcpy(t->index_first,s->index_first,sizeof(int) * TABLE_HASH_SIZE);\n        memcpy(t->index_last, s->index_last, sizeof(int) * TABLE_HASH_SIZE);\n        t->index_initialized = s->index_initialized;\n        return;\n    }\n\n    for (idx = 0; idx < TABLE_HASH_SIZE; ++idx) {\n        if (TABLE_INDEX_IS_INITIALIZED(s, idx)) {\n            t->index_last[idx] = s->index_last[idx] + n;\n            if (!TABLE_INDEX_IS_INITIALIZED(t, idx)) {\n                t->index_first[idx] = s->index_first[idx] + n;\n            }\n        }\n    }\n\n    t->index_initialized |= s->index_initialized;\n}"
+}

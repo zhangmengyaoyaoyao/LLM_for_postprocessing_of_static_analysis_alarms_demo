@@ -1,0 +1,7 @@
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "\tmemset(parms, '\\0', pcount * sizeof(NODE));",
+    "Code_function": "make_params(char **pnames, int pcount)\n{\n\tNODE *p, *parms;\n\tint i;\n\n\tif (pcount <= 0 || pnames == NULL)\n\t\treturn NULL;\n\n\temalloc(parms, NODE *, pcount * sizeof(NODE), \"make_params\");\n\tmemset(parms, '\\0', pcount * sizeof(NODE));\n\n\tfor (i = 0, p = parms; i < pcount; i++, p++) {\n\t\tp->type = Node_param_list;\n\t\tp->param = pnames[i];\t/* shadows pname and vname */\n\t\tp->param_cnt = i;\n\t}\n\n\treturn parms;\n}"
+}

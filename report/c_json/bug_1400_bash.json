@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "Bug Type": "NULL_DEREFERENCE",
+    "Code_line": "      if (namelen == 0 || (STREQN (username, entry->pw_name, namelen)))",
+    "Code_function": "rl_username_completion_function (text, state)\n     const char *text;\n     int state;\n{\n#if defined (__WIN32__) || defined (__OPENNT)\n  return (char *)NULL;\n#else /* !__WIN32__ && !__OPENNT) */\n  static char *username = (char *)NULL;\n  static struct passwd *entry;\n  static int namelen, first_char, first_char_loc;\n  char *value;\n\n  if (state == 0)\n    {\n      FREE (username);\n\n      first_char = *text;\n      first_char_loc = first_char == '~';\n\n      username = savestring (&text[first_char_loc]);\n      namelen = strlen (username);\n#if defined (HAVE_GETPWENT)\n      setpwent ();\n#endif\n    }\n\n#if defined (HAVE_GETPWENT)\n  while (entry = getpwent ())\n    {\n      /* Null usernames should result in all users as possible completions. */\n      if (namelen == 0 || (STREQN (username, entry->pw_name, namelen)))\n\tbreak;\n    }\n#endif\n\n  if (entry == 0)\n    {\n#if defined (HAVE_GETPWENT)\n      endpwent ();\n#endif\n      return ((char *)NULL);\n    }\n  else\n    {\n      value = (char *)xmalloc (2 + strlen (entry->pw_name));\n\n      *value = *text;\n\n      strcpy (value + first_char_loc, entry->pw_name);\n\n      if (first_char == '~')\n\trl_filename_completion_desired = 1;\n\n      return (value);\n    }\n#endif /* !__WIN32__ && !__OPENNT */\n}"
+}

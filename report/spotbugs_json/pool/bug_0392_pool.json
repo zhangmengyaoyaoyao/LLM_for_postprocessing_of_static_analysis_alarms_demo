@@ -1,0 +1,9 @@
+{
+    "category": "DODGY_CODE",
+    "vtype": "UCF_USELESS_CONTROL_FLOW",
+    "priority": "3",
+    "rank": "20",
+    "project": "pool",
+    "warning_line": "if (!p.deallocate()) {\n",
+    "warning_method": "@Override\npublic void returnObject(K key, T t) throws Exception {\nObjectDeque<T> objectDeque = poolMap.get(key);\nPooledObject<T> p = objectDeque.getAllObjects().get(t);\nif (p == null) {\nthrow new IllegalStateException(\"Returned object not currently part of this pool\");\n}\nif (getTestOnReturn()) {\nif (!_factory.validateObject(key, t)) {\ntry {\ndestroy(key, p, true);\n} catch (Exception e) {\n}\nreturn;\n}\n}\ntry {\n_factory.passivateObject(key, t);\n} catch (Exception e1) {\ntry {\ndestroy(key, p, true);\n} catch (Exception e) {\n}\nreturn;\n}\nif (!p.deallocate()) {\n}\nint maxIdle = getMaxIdlePerKey();\nLinkedBlockingDeque<PooledObject<T>> idleObjects = objectDeque.getIdleObjects();\nif (isClosed() || maxIdle > -1 && maxIdle <= idleObjects.size()) {\ntry {\ndestroy(key, p, true);\n} catch (Exception e) {\n}\n} else {\nif (getLifo()) {\nidleObjects.addFirst(p);\n} else {\nidleObjects.addLast(p);\n}\n}\n}"
+}

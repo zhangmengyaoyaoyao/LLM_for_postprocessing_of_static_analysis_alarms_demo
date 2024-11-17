@@ -1,0 +1,7 @@
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "Bug Type": "UNINITIALIZED_VALUE",
+    "Code_line": "\t  SCOPY_CHAR_M (r, string, send, sindex);",
+    "Code_function": "string_quote_removal (string, quoted)\n     char *string;\n     int quoted;\n{\n  size_t slen;\n  char *r, *result_string, *temp, *send;\n  int sindex, tindex, dquote;\n  unsigned char c;\n  DECLARE_MBSTATE;\n\n  /* The result can be no longer than the original string. */\n  slen = strlen (string);\n  send = string + slen;\n\n  r = result_string = (char *)xmalloc (slen + 1);\n\n  for (dquote = sindex = 0; c = string[sindex];)\n    {\n      switch (c)\n\t{\n\tcase '\\\\':\n\t  c = string[++sindex];\n\t  if (c == 0)\n\t    {\n\t      *r++ = '\\\\';\n\t      break;\n\t    }\n\t  if (((quoted & (Q_HERE_DOCUMENT|Q_DOUBLE_QUOTES)) || dquote) && (sh_syntaxtab[c] & CBSDQUOTE) == 0)\n\t    *r++ = '\\\\';\n\t  /* FALLTHROUGH */\n\n\tdefault:\n\t  SCOPY_CHAR_M (r, string, send, sindex);\n\t  break;\n\n\tcase '\\'':\n\t  if ((quoted & (Q_HERE_DOCUMENT|Q_DOUBLE_QUOTES)) || dquote)\n\t    {\n\t      *r++ = c;\n\t      sindex++;\n\t      break;\n\t    }\n\t  tindex = sindex + 1;\n\t  temp = string_extract_single_quoted (string, &tindex);\n\t  if (temp)\n\t    {\n\t      strcpy (r, temp);\n\t      r += strlen (r);\n\t      free (temp);\n\t    }\n\t  sindex = tindex;\n\t  break;\n\n\tcase '\"':\n\t  dquote = 1 - dquote;\n\t  sindex++;\n\t  break;\n\t}\n    }\n    *r = '\\0';\n    return (result_string);\n}"
+}

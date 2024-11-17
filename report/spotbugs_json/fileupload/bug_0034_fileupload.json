@@ -1,0 +1,9 @@
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "OS_OPEN_STREAM_EXCEPTION_PATH",
+    "priority": "3",
+    "rank": "19",
+    "project": "fileupload",
+    "warning_line": "FileInputStream input = new FileInputStream(dfosFile);\n",
+    "warning_method": "private void readObject(ObjectInputStream in) throws IOException, ClassNotFoundException {\nin.defaultReadObject();\nif (repository != null) {\nif (repository.isDirectory()) {\nif (repository.getPath().contains(\"\\0\")) {\nthrow new IOException(format(\"The repository [%s] contains a null character\", repository.getPath()));\n}\n} else {\nthrow new IOException(format(\"The repository [%s] is not a directory\", repository.getAbsolutePath()));\n}\n}\nOutputStream output = getOutputStream();\nif (cachedContent != null) {\noutput.write(cachedContent);\n} else {\nFileInputStream input = new FileInputStream(dfosFile);\nIOUtils.copy(input, output);\ninput.close();\ndfosFile.delete();\ndfosFile = null;\n}\noutput.close();\ncachedContent = null;\n}"
+}

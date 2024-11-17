@@ -1,0 +1,9 @@
+{
+    "category": "Multithreaded correctness",
+    "vtype": "NO_NOTIFY_NOT_NOTIFYALL",
+    "priority": "3",
+    "rank": "17",
+    "project": "net",
+    "warning_line": "__queue.notify();\n",
+    "warning_method": "@Override\npublic int read() throws IOException {\nsynchronized (__queue) {\nwhile (true) {\nif (__ioException != null) {\nIOException e;\ne = __ioException;\n__ioException = null;\nthrow e;\n}\nif (__bytesAvailable == 0) {\nif (__hasReachedEOF) {\nreturn EOF;\n}\nif (__threaded) {\n__queue.notify();\ntry {\n__readIsWaiting = true;\n__queue.wait();\n__readIsWaiting = false;\n} catch (InterruptedException e) {\nthrow new InterruptedIOException(\"Fatal thread interruption during read.\");\n}\n} else {\n__readIsWaiting = true;\nint ch;\nboolean mayBlock = true;\ndo {\ntry {\nif ((ch = __read(mayBlock)) < 0) {\nif (ch != WOULD_BLOCK) {\nreturn (ch);\n}\n}\n} catch (InterruptedIOException e) {\nsynchronized (__queue) {\n__ioException = e;\n__queue.notifyAll();\ntry {\n__queue.wait(100);\n} catch (InterruptedException interrupted) {\n}\n}\nreturn EOF;\n}\ntry {\nif (ch != WOULD_BLOCK) {\n__processChar(ch);\n}\n} catch (InterruptedException e) {\nif (__isClosed) {\nreturn EOF;\n}\n}\nmayBlock = false;\n} while (super.available() > 0 && __bytesAvailable < __queue.length - 1);\n__readIsWaiting = false;\n}\ncontinue;\n} else {\nint ch;\nch = __queue[__queueHead];\nif (++__queueHead >= __queue.length) {\n__queueHead = 0;\n}\n--__bytesAvailable;\nif (__bytesAvailable == 0 && __threaded) {\n__queue.notify();\n}\nreturn ch;\n}\n}\n}\n}"
+}
