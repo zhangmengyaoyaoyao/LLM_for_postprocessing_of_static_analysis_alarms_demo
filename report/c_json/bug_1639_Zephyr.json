@@ -2,6 +2,7 @@
     "Project": "Zephyr",
     "Tool": "Infer",
     "Bug Type": "Null Dereference",
+    "Message": "pointer `null` is dereferenced by call to `bt_hci_cmd_send_sync()` at line 41, column 9.",
     "Code_line": "\t\tret = bt_hci_cmd_send_sync(BT_HCI_OP_LE_RAND, NULL, &rsp);",
     "Code_function": "static int prng_reseed(struct tc_hmac_prng_struct *h)\n{\n\tu8_t seed[32];\n\ts64_t extra;\n\tint ret, i;\n\n\tfor (i = 0; i < (sizeof(seed) / 8); i++) {\n\t\tstruct bt_hci_rp_le_rand *rp;\n\t\tstruct net_buf *rsp;\n\n\t\tret = bt_hci_cmd_send_sync(BT_HCI_OP_LE_RAND, NULL, &rsp);\n\t\tif (ret) {\n\t\t\treturn ret;\n\t\t}\n\n\t\trp = (void *)rsp->data;\n\t\tmemcpy(&seed[i * 8], rp->rand, 8);\n\n\t\tnet_buf_unref(rsp);\n\t}\n\n\textra = k_uptime_get();\n\n\tret = tc_hmac_prng_reseed(h, seed, sizeof(seed), (u8_t *)&extra,\n\t\t\t\t  sizeof(extra));\n\tif (ret == TC_CRYPTO_FAIL) {\n\t\tBT_ERR(\"Failed to re-seed PRNG\");\n\t\treturn -EIO;\n\t}\n\n\treturn 0;\n}"
 }

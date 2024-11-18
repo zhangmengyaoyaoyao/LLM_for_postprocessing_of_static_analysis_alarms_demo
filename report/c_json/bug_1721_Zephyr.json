@@ -2,6 +2,7 @@
     "Project": "Zephyr",
     "Tool": "Infer",
     "Bug Type": "Uninitialized Value",
+    "Message": "The value read from ret was never initialized.",
     "Code_line": "\treturn ret;",
     "Code_function": "static int http_wait_data(int sock, struct http_request *req)\n{\n\tint total_received = 0;\n\tsize_t offset = 0;\n\tint received, ret;\n\n\tdo {\n\t\treceived = recv(sock, req->internal.response.recv_buf + offset,\n\t\t\t\treq->internal.response.recv_buf_len - offset,\n\t\t\t\t0);\n\t\tif (received == 0) {\n\t\t\t/* Connection closed */\n\t\t\tLOG_DBG(\"Connection closed\");\n\t\t\tret = total_received;\n\t\t\tbreak;\n\t\t} else if (received < 0) {\n\t\t\t/* Socket error */\n\t\t\tLOG_DBG(\"Connection error (%d)\", errno);\n\t\t\tret = -errno;\n\t\t\tbreak;\n\t\t} else {\n\t\t\treq->internal.response.data_len += received;\n\n\t\t\t(void)http_parser_execute(\n\t\t\t\t&req->internal.parser,\n\t\t\t\t&req->internal.parser_settings,\n\t\t\t\treq->internal.response.recv_buf + offset,\n\t\t\t\treceived);\n\t\t}\n\n\t\ttotal_received += received;\n\t\toffset += received;\n\n\t\tif (offset >= req->internal.response.recv_buf_len) {\n\t\t\toffset = 0;\n\t\t}\n\n\t\tif (req->internal.response.message_complete) {\n\t\t\tret = total_received;\n\t\t\tbreak;\n\t\t}\n\n\t} while (true);\n\n\treturn ret;\n}"
 }

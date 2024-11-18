@@ -2,6 +2,7 @@
     "Project": "apr",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset: [-47, +oo] (⇐ [0, 47] + [-47, +oo]) Size: [8192, +oo] by call to `apr_table_compress`.",
     "Code_line": "    apr_table_compress(a, flags);",
     "Code_function": "APR_DECLARE(void) apr_table_overlap(apr_table_t *a, const apr_table_t *b,\n\t\t\t\t    unsigned flags)\n{\n    if (a->a.nelts + b->a.nelts == 0) {\n        return;\n    }\n\n#if APR_POOL_DEBUG\n    /* Since the keys and values are not copied, it's required that\n     * b->a.pool has a lifetime at least as long as a->a.pool. */\n    if (!apr_pool_is_ancestor(b->a.pool, a->a.pool)) {\n        fprintf(stderr, \"apr_table_overlap: b's pool is not an ancestor of a's\\n\");\n        abort();\n    }\n#endif\n\n    apr_table_cat(a, b);\n\n    apr_table_compress(a, flags);\n}"
 }

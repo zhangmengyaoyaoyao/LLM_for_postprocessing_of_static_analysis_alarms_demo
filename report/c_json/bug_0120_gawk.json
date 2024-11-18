@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `cp` last assigned on line 725 could be null and is dereferenced at line 727, column 4.",
     "Code_line": "\t\t\tcp->pool_size = INSTR_CHUNK;",
     "Code_function": "bcalloc(OPCODE op, int size, int srcline)\n{\n\tINSTRUCTION *cp;\n\n\tif (size > 1) {\n\t\t/* wide instructions Op_rule, Op_func_call .. */\n\t\temalloc(cp, INSTRUCTION *, (size + 1) * sizeof(INSTRUCTION), \"bcalloc\");\n\t\tcp->pool_size = size;\n\t\tcp->nexti = pool_list->nexti;\n\t\tpool_list->nexti = cp++;\n\t} else {\n\t\tINSTRUCTION *pool;\n\n\t\tpool = pool_list->freei;\n\t\tif (pool == NULL) {\n\t\t\tINSTRUCTION *last;\n\t\t\temalloc(cp, INSTRUCTION *, (INSTR_CHUNK + 1) * sizeof(INSTRUCTION), \"bcalloc\");\n\n\t\t\tcp->pool_size = INSTR_CHUNK;\n\t\t\tcp->nexti = pool_list->nexti;\n\t\t\tpool_list->nexti = cp;\n\t\t\tpool = ++cp;\n\t\t\tlast = &pool[INSTR_CHUNK - 1];\n\t\t\tfor (; cp <= last; cp++) {\n\t\t\t\tcp->opcode = 0;\n\t\t\t\tcp->nexti = cp + 1;\n\t\t\t}\n\t\t\t--cp;\n\t\t\tcp->nexti = NULL;\n\t\t}\n\t\tcp = pool;\n\t\tpool_list->freei = cp->nexti;\n\t}\n\n\tmemset(cp, 0, size * sizeof(INSTRUCTION));\n\tcp->opcode = op;\n\tcp->source_line = srcline;\n\treturn cp;\n}"
 }

@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset added: [-20, 379] (⇐ [-188, 211] + 168) Size: 4064.",
     "Code_line": "      memset (ret, 0, sizeof (*ret));",
     "Code_function": "elf_x86_64_get_local_sym_hash (struct elf_x86_64_link_hash_table *htab,\n\t\t\t       bfd *abfd, const Elf_Internal_Rela *rel,\n\t\t\t       bfd_boolean create)\n{\n  struct elf_x86_64_link_hash_entry e, *ret;\n  asection *sec = abfd->sections;\n  hashval_t h = ELF_LOCAL_SYMBOL_HASH (sec->id,\n\t\t\t\t       htab->r_sym (rel->r_info));\n  void **slot;\n\n  e.elf.indx = sec->id;\n  e.elf.dynstr_index = htab->r_sym (rel->r_info);\n  slot = htab_find_slot_with_hash (htab->loc_hash_table, &e, h,\n\t\t\t\t   create ? INSERT : NO_INSERT);\n\n  if (!slot)\n    return NULL;\n\n  if (*slot)\n    {\n      ret = (struct elf_x86_64_link_hash_entry *) *slot;\n      return &ret->elf;\n    }\n\n  ret = (struct elf_x86_64_link_hash_entry *)\n\tobjalloc_alloc ((struct objalloc *) htab->loc_hash_memory,\n\t\t\tsizeof (struct elf_x86_64_link_hash_entry));\n  if (ret)\n    {\n      memset (ret, 0, sizeof (*ret));\n      ret->elf.indx = sec->id;\n      ret->elf.dynstr_index = htab->r_sym (rel->r_info);\n      ret->elf.dynindx = -1;\n      *slot = ret;\n    }\n  return &ret->elf;\n}"
 }

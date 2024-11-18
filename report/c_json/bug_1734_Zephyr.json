@@ -2,6 +2,7 @@
     "Project": "Zephyr",
     "Tool": "Infer",
     "Bug Type": "Uninitialized Value",
+    "Message": "The value read from rc was never initialized.",
     "Code_line": "\treturn rc;",
     "Code_function": "static int settings_line_cmp(char const *val, size_t val_len,\n\t\t\t     void *val_read_cb_ctx, off_t val_off)\n{\n\tsize_t len_read, exp_len;\n\tsize_t rem;\n\tchar buf[16];\n\tint rc;\n\toff_t off = 0;\n\n\tif (val_len == 0) {\n\t\treturn -EINVAL;\n\t}\n\n\tfor (rem = val_len; rem > 0; rem -= len_read) {\n\t\tlen_read = exp_len = MIN(sizeof(buf), rem);\n\t\trc = settings_line_val_read(val_off, off, buf, len_read,\n\t\t\t\t\t    &len_read, val_read_cb_ctx);\n\t\tif (rc) {\n\t\t\tbreak;\n\t\t}\n\n\t\tif (len_read != exp_len) {\n\t\t\trc = 1;\n\t\t\tbreak;\n\t\t}\n\n\t\trc = memcmp(val, buf, len_read);\n\t\tif (rc) {\n\t\t\tbreak;\n\t\t}\n\t\tval += len_read;\n\t\toff += len_read;\n\t}\n\n\treturn rc;\n}"
 }

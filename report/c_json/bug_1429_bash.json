@@ -2,6 +2,7 @@
     "Project": "bash",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `globtext` last assigned on line 3578 could be null and is dereferenced by call to `strcpy()` at line 3579, column 4.",
     "Code_line": "\t  strcpy (globtext, ttext);",
     "Code_function": "glob_complete_word (text, state)\n     const char *text;\n     int state;\n{\n  static char **matches = (char **)NULL;\n  static int ind;\n  int glen;\n  char *ret, *ttext;\n\n  if (state == 0)\n    {\n      rl_filename_completion_desired = 1;\n      FREE (matches);\n      if (globorig != globtext)\n\tFREE (globorig);\n      FREE (globtext);\n\n      ttext = bash_tilde_expand (text, 0);\n\n      if (rl_explicit_arg)\n\t{\n\t  globorig = savestring (ttext);\n\t  glen = strlen (ttext);\n\t  globtext = (char *)xmalloc (glen + 2);\n\t  strcpy (globtext, ttext);\n\t  globtext[glen] = '*';\n\t  globtext[glen+1] = '\\0';\n\t}\n      else\n        globtext = globorig = savestring (ttext);\n\n      if (ttext != text)\n\tfree (ttext);\n\n      matches = shell_glob_filename (globtext);\n      if (GLOB_FAILED (matches))\n\tmatches = (char **)NULL;\n      ind = 0;\n    }\n\n  ret = matches ? matches[ind] : (char *)NULL;\n  ind++;\n  return ret;\n}"
 }

@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "CSA",
     "Bug Type": "core.NullDereference",
+    "Message": "Array access (from variable 'match_lens') results in a null pointer dereference",
     "Code_line": "      if (match_lens[i] == mbclen)",
     "Code_function": "transit_state_consume_1char (struct dfa *d, state_num s,\n                             unsigned char const **pp,\n                             wint_t wc, size_t mbclen,\n                             int *match_lens)\n{\n  size_t i, j;\n  int k;\n  state_num s1, s2;\n  status_transit_state rs = TRANSIT_STATE_DONE;\n\n  if (! match_lens && d->states[s].mbps.nelem != 0)\n    match_lens = check_matching_with_multibyte_ops (d, s, (char const *) *pp,\n                                                    wc, mbclen);\n\n  /* Calculate the state which can be reached from the state 's' by\n     consuming 'mbclen' single bytes from the buffer.  */\n  s1 = s;\n  for (k = 0; k < mbclen; k++)\n    {\n      s2 = s1;\n      rs = transit_state_singlebyte (d, s2, (*pp)++, &s1);\n    }\n  copy (&d->states[s1].elems, &d->mb_follows);\n\n  /* Add all of the positions which can be reached from 's' by consuming\n     a single character.  */\n  for (i = 0; i < d->states[s].mbps.nelem; i++)\n    {\n      if (match_lens[i] == mbclen)\n        for (j = 0; j < d->follows[d->states[s].mbps.elems[i].index].nelem;\n             j++)\n          insert (d->follows[d->states[s].mbps.elems[i].index].elems[j],\n                  &d->mb_follows);\n    }\n\n  /* FIXME: this return value is always ignored.  */\n  return rs;\n}"
 }

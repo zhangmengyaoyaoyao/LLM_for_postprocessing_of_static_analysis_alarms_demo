@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `&out->ptr` last assigned on line 1005 could be null and is dereferenced by call to `catchar()` at line 1035, column 4.",
     "Code_line": "\t  catchar (&out, at (tos, idx));",
     "Code_function": "indent ()\n{\n  string_type out;\n  int tab = 0;\n  int idx = 0;\n  int ol = 0;\n  init_string (&out);\n  while (at (tos, idx))\n    {\n      switch (at (tos, idx))\n\t{\n\tcase '\\n':\n\t  cattext (&out, \"\\n\");\n\t  idx++;\n\t  if (tab && at (tos, idx))\n\t    {\n\t      cattext (&out, \"    \");\n\t    }\n\t  ol = 0;\n\t  break;\n\tcase '(':\n\t  tab++;\n\t  if (ol == 0)\n\t    cattext (&out, \"   \");\n\t  idx++;\n\t  cattext (&out, \"(\");\n\t  ol = 1;\n\t  break;\n\tcase ')':\n\t  tab--;\n\t  cattext (&out, \")\");\n\t  idx++;\n\t  ol = 1;\n\n\t  break;\n\tdefault:\n\t  catchar (&out, at (tos, idx));\n\t  ol = 1;\n\n\t  idx++;\n\t  break;\n\t}\n    }\n\n  pc++;\n  delete_string (tos);\n  *tos = out;\n\n}"
 }

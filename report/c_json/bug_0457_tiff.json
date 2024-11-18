@@ -2,6 +2,7 @@
     "Project": "tiff",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset: [0, 15] Size: [0, +oo] by call to `makebwmap`.",
     "Code_line": "\tif (!makebwmap(img))",
     "Code_function": "setupMap(TIFFRGBAImage* img)\n{\n    int32 x, range;\n\n    range = (int32)((1L<<img->bitspersample)-1);\n\n    /* treat 16 bit the same as eight bit */\n    if( img->bitspersample == 16 )\n        range = (int32) 255;\n\n    img->Map = (TIFFRGBValue*) _TIFFmalloc((range+1) * sizeof (TIFFRGBValue));\n    if (img->Map == NULL) {\n\t\tTIFFErrorExt(img->tif->tif_clientdata, TIFFFileName(img->tif),\n\t\t\t\"No space for photometric conversion table\");\n\t\treturn (0);\n    }\n    if (img->photometric == PHOTOMETRIC_MINISWHITE) {\n\tfor (x = 0; x <= range; x++)\n\t    img->Map[x] = (TIFFRGBValue) (((range - x) * 255) / range);\n    } else {\n\tfor (x = 0; x <= range; x++)\n\t    img->Map[x] = (TIFFRGBValue) ((x * 255) / range);\n    }\n    if (img->bitspersample <= 16 &&\n\t(img->photometric == PHOTOMETRIC_MINISBLACK ||\n\t img->photometric == PHOTOMETRIC_MINISWHITE)) {\n\t/*\n\t * Use photometric mapping table to construct\n\t * unpacking tables for samples <= 8 bits.\n\t */\n\tif (!makebwmap(img))\n\t    return (0);\n\t/* no longer need Map, free it */\n\t_TIFFfree(img->Map), img->Map = NULL;\n    }\n    return (1);\n}"
 }

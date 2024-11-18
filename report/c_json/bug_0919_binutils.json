@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L1",
+    "Message": "Offset: [max(490, `info->curbuf->c`), `info->curbuf->c`] Size: 490 by call to `ieee_real_write_byte`.",
     "Code_line": "    return ieee_write_byte (info, (int) v);",
     "Code_function": "ieee_write_number (struct ieee_handle *info, bfd_vma v)\n{\n  bfd_vma t;\n  bfd_byte ab[20];\n  bfd_byte *p;\n  unsigned int c;\n\n  if (v <= (bfd_vma) ieee_number_end_enum)\n    return ieee_write_byte (info, (int) v);\n\n  t = v;\n  p = ab + sizeof ab;\n  while (t != 0)\n    {\n      *--p = t & 0xff;\n      t >>= 8;\n    }\n  c = (ab + 20) - p;\n\n  if (c > (unsigned int) (ieee_number_repeat_end_enum\n\t\t\t  - ieee_number_repeat_start_enum))\n    {\n      fprintf (stderr, _(\"IEEE numeric overflow: 0x\"));\n      fprintf_vma (stderr, v);\n      fprintf (stderr, \"\\n\");\n      return FALSE;\n    }\n\n  if (! ieee_write_byte (info, (int) ieee_number_repeat_start_enum + c))\n    return FALSE;\n  for (; c > 0; --c, ++p)\n    {\n      if (! ieee_write_byte (info, *p))\n\treturn FALSE;\n    }\n\n  return TRUE;\n}"
 }

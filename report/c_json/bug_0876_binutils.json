@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset: [-1, +oo] Size: [120, +oo] by call to `scan_unit_for_symbols`.",
     "Code_line": "\t  && ! scan_unit_for_symbols (unit))",
     "Code_function": "comp_unit_find_nearest_line (struct comp_unit *unit,\n\t\t\t     bfd_vma addr,\n\t\t\t     const char **filename_ptr,\n\t\t\t     struct funcinfo **function_ptr,\n\t\t\t     unsigned int *linenumber_ptr,\n\t\t\t     unsigned int *discriminator_ptr,\n\t\t\t     struct dwarf2_debug *stash)\n{\n  bfd_boolean func_p;\n\n  if (unit->error)\n    return FALSE;\n\n  if (! unit->line_table)\n    {\n      if (! unit->stmtlist)\n\t{\n\t  unit->error = 1;\n\t  return FALSE;\n\t}\n\n      unit->line_table = decode_line_info (unit, stash);\n\n      if (! unit->line_table)\n\t{\n\t  unit->error = 1;\n\t  return FALSE;\n\t}\n\n      if (unit->first_child_die_ptr < unit->end_ptr\n\t  && ! scan_unit_for_symbols (unit))\n\t{\n\t  unit->error = 1;\n\t  return FALSE;\n\t}\n    }\n\n  *function_ptr = NULL;\n  func_p = lookup_address_in_function_table (unit, addr, function_ptr);\n  if (func_p && (*function_ptr)->tag == DW_TAG_inlined_subroutine)\n    stash->inliner_chain = *function_ptr;\n\n  return lookup_address_in_line_info_table (unit->line_table, addr,\n\t\t\t\t\t    filename_ptr,\n\t\t\t\t\t    linenumber_ptr,\n\t\t\t\t\t    discriminator_ptr);\n}"
 }

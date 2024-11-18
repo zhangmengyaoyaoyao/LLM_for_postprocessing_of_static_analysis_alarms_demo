@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset added: [0, 10] Size: [8, 88] by call to `string_append`.",
     "Code_line": "\t\t  string_append (s, optable[i].out);",
     "Code_function": "demangle_expression (struct work_stuff *work, const char **mangled,\n                     string *s, type_kind_t tk)\n{\n  int need_operator = 0;\n  int success;\n\n  success = 1;\n  string_appendn (s, \"(\", 1);\n  (*mangled)++;\n  while (success && **mangled != 'W' && **mangled != '\\0')\n    {\n      if (need_operator)\n\t{\n\t  size_t i;\n\t  size_t len;\n\n\t  success = 0;\n\n\t  len = strlen (*mangled);\n\n\t  for (i = 0; i < ARRAY_SIZE (optable); ++i)\n\t    {\n\t      size_t l = strlen (optable[i].in);\n\n\t      if (l <= len\n\t\t  && memcmp (optable[i].in, *mangled, l) == 0)\n\t\t{\n\t\t  string_appendn (s, \" \", 1);\n\t\t  string_append (s, optable[i].out);\n\t\t  string_appendn (s, \" \", 1);\n\t\t  success = 1;\n\t\t  (*mangled) += l;\n\t\t  break;\n\t\t}\n\t    }\n\n\t  if (!success)\n\t    break;\n\t}\n      else\n\tneed_operator = 1;\n\n      success = demangle_template_value_parm (work, mangled, s, tk);\n    }\n\n  if (**mangled != 'W')\n    success = 0;\n  else\n    {\n      string_appendn (s, \")\", 1);\n      (*mangled)++;\n    }\n\n  return success;\n}"
 }

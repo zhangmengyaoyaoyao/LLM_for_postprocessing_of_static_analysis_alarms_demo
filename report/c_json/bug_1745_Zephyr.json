@@ -2,6 +2,7 @@
     "Project": "Zephyr",
     "Tool": "Infer",
     "Bug Type": "Uninitialized Value",
+    "Message": "The value read from gpio was never initialized.",
     "Code_line": "\tif (!gpio) {",
     "Code_function": "int sx9500_setup_interrupt(struct device *dev)\n{\n\tstruct sx9500_data *data = dev->driver_data;\n\tstruct device *gpio;\n\n#ifdef CONFIG_SX9500_TRIGGER_OWN_THREAD\n\tk_sem_init(&data->sem, 0, UINT_MAX);\n#else\n\tdata->work.handler = sx9500_work_cb;\n\tdata->dev = dev;\n#endif\n\n\tgpio = device_get_binding(DT_INST_0_SEMTECH_SX9500_INT_GPIOS_CONTROLLER);\n\tif (!gpio) {\n\t\tLOG_DBG(\"sx9500: gpio controller %s not found\",\n\t\t\t    DT_INST_0_SEMTECH_SX9500_INT_GPIOS_CONTROLLER);\n\t\treturn -EINVAL;\n\t}\n\n\tgpio_pin_configure(gpio, DT_INST_0_SEMTECH_SX9500_INT_GPIOS_PIN,\n\t\t\t   GPIO_DIR_IN | GPIO_INT | GPIO_INT_EDGE |\n\t\t\t   GPIO_INT_ACTIVE_LOW | GPIO_INT_DEBOUNCE);\n\n\tgpio_init_callback(&data->gpio_cb,\n\t\t\t   sx9500_gpio_cb,\n\t\t\t   BIT(DT_INST_0_SEMTECH_SX9500_INT_GPIOS_PIN));\n\n\tgpio_add_callback(gpio, &data->gpio_cb);\n\tgpio_pin_enable_callback(gpio, DT_INST_0_SEMTECH_SX9500_INT_GPIOS_PIN);\n\n#ifdef CONFIG_SX9500_TRIGGER_OWN_THREAD\n\tk_thread_create(&sx9500_thread, sx9500_thread_stack,\n\t\t\tCONFIG_SX9500_THREAD_STACK_SIZE,\n\t\t\t(k_thread_entry_t)sx9500_thread_main, dev, 0, NULL,\n\t\t\tK_PRIO_COOP(CONFIG_SX9500_THREAD_PRIORITY), 0, K_NO_WAIT);\n#endif\n\n\treturn 0;\n}"
 }

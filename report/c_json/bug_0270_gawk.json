@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `pnames` last assigned on line 4309 could be null and is dereferenced at line 4335, column 3.",
     "Code_line": "\t\tpnames[i] = name;",
     "Code_function": "check_params(char *fname, int pcount, INSTRUCTION *list)\n{\n\tINSTRUCTION *p, *np;\n\tint i, j;\n\tchar *name;\n\tchar **pnames;\n\n\tassert(pcount > 0);\n\n\temalloc(pnames, char **, pcount * sizeof(char *), \"check_params\");\n\n\tfor (i = 0, p = list->nexti; p != NULL; i++, p = np) {\n\t\tnp = p->nexti;\n\t\tname = p->lextok;\n\t\tp->lextok = NULL;\n\n\t\tif (strcmp(name, fname) == 0) {\n\t\t\t/* check for function foo(foo) { ... }.  bleah. */\n\t\t\terror_ln(p->source_line,\n\t\t\t\t_(\"function `%s': can't use function name as parameter name\"), fname);\n\t\t} else if (is_std_var(name)) {\n\t\t\terror_ln(p->source_line,\n\t\t\t\t_(\"function `%s': can't use special variable `%s' as a function parameter\"),\n\t\t\t\t\tfname, name);\n\t\t}\n\n\t\t/* check for duplicate parameters */\n\t\tfor (j = 0; j < i; j++) {\n\t\t\tif (strcmp(name, pnames[j]) == 0) {\n\t\t\t\terror_ln(p->source_line,\n\t\t\t\t\t_(\"function `%s': parameter #%d, `%s', duplicates parameter #%d\"),\n\t\t\t\t\tfname, i + 1, name, j + 1);\n\t\t\t}\n\t\t}\n\n\t\tpnames[i] = name;\n\t\tbcfree(p);\n\t}\n\tbcfree(list);\n\n\treturn pnames;\n}"
 }

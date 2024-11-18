@@ -2,6 +2,7 @@
     "Project": "bash",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `ret` last assigned on line 4558 could be null and is dereferenced at line 4564, column 11.",
     "Code_line": "  itype = ret[0];",
     "Code_function": "array_remove_pattern (var, pattern, patspec, varname, quoted)\n     SHELL_VAR *var;\n     char *pattern;\n     int patspec;\n     char *varname;\t/* so we can figure out how it's indexed */\n     int quoted;\n{\n  ARRAY *a;\n  HASH_TABLE *h;\n  int itype;\n  char *ret;\n  WORD_LIST *list;\n  SHELL_VAR *v;\n\n  /* compute itype from varname here */\n  v = array_variable_part (varname, &ret, 0);\n\n  /* XXX */\n  if (v && invisible_p (var))\n    return ((char *)NULL);\n\n  itype = ret[0];\n\n  a = (v && array_p (v)) ? array_cell (v) : 0;\n  h = (v && assoc_p (v)) ? assoc_cell (v) : 0;\n\n  list = a ? array_to_word_list (a) : (h ? assoc_to_word_list (h) : 0);\n  if (list == 0)\n   return ((char *)NULL);\n  ret = list_remove_pattern (list, pattern, patspec, itype, quoted);\n  dispose_words (list);\n\n  return ret;\n}"
 }

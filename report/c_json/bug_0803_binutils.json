@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "UNINITIALIZED_VALUE",
+    "Message": "The value read from n was never initialized.",
     "Code_line": "  return n;",
     "Code_function": "objdump_sprintf (SFILE *f, const char *format, ...)\n{\n  size_t n;\n  va_list args;\n\n  while (1)\n    {\n      size_t space = f->alloc - f->pos;\n\n      va_start (args, format);\n      n = vsnprintf (f->buffer + f->pos, space, format, args);\n      va_end (args);\n\n      if (space > n)\n\tbreak;\n\n      f->alloc = (f->alloc + n) * 2;\n      f->buffer = (char *) xrealloc (f->buffer, f->alloc);\n    }\n  f->pos += n;\n\n  return n;\n}"
 }

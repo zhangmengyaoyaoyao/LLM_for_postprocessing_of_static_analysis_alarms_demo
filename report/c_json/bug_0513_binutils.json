@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset added: [-7, 64] Size: 64 by call to `md5_finish_ctx`.",
     "Code_line": "  md5_finish_ctx (&ctx, resblock);",
     "Code_function": "md5_stream (FILE *stream, void *resblock)\n{\n  /* Important: BLOCKSIZE must be a multiple of 64.  */\n#define BLOCKSIZE 4096\n  struct md5_ctx ctx;\n  char buffer[BLOCKSIZE + 72];\n  size_t sum;\n\n  /* Initialize the computation context.  */\n  md5_init_ctx (&ctx);\n\n  /* Iterate over full file contents.  */\n  while (1)\n    {\n      /* We read the file in blocks of BLOCKSIZE bytes.  One call of the\n\t computation function processes the whole buffer so that with the\n\t next round of the loop another block can be read.  */\n      size_t n;\n      sum = 0;\n\n      /* Read block.  Take care for partial reads.  */\n      do\n\t{\n\t  n = fread (buffer + sum, 1, BLOCKSIZE - sum, stream);\n\n\t  sum += n;\n\t}\n      while (sum < BLOCKSIZE && n != 0);\n      if (n == 0 && ferror (stream))\n        return 1;\n\n      /* If end of file is reached, end the loop.  */\n      if (n == 0)\n\tbreak;\n\n      /* Process buffer with BLOCKSIZE bytes.  Note that\n\t\t\tBLOCKSIZE % 64 == 0\n       */\n      md5_process_block (buffer, BLOCKSIZE, &ctx);\n    }\n\n  /* Add the last bytes if necessary.  */\n  if (sum > 0)\n    md5_process_bytes (buffer, sum, &ctx);\n\n  /* Construct result in desired memory.  */\n  md5_finish_ctx (&ctx, resblock);\n  return 0;\n}"
 }

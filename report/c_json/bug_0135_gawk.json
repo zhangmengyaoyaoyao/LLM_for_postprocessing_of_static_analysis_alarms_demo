@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset: [2, 11] Size: [0, 13] by call to `install_symbol`.",
     "Code_line": "\t\tn = *(vp->spec) = install_symbol(estrdup(vp->name, strlen(vp->name)), Node_var);",
     "Code_function": "init_vars()\n{\n\tconst struct varinit *vp;\n\tNODE *n;\n\n\tfor (vp = varinit; vp->name != NULL; vp++) {\n\t\tif ((vp->flags & NO_INSTALL) != 0)\n\t\t\tcontinue;\n\t\tn = *(vp->spec) = install_symbol(estrdup(vp->name, strlen(vp->name)), Node_var);\n\t\tif (vp->strval != NULL)\n\t\t\tn->var_value = make_string(vp->strval, strlen(vp->strval));\n\t\telse\n\t\t\tn->var_value = make_number(vp->numval);\n\t\tn->var_assign = (Func_ptr) vp->assign;\n\t\tn->var_update = (Func_ptr) vp->update;\n\t\tif (vp->do_assign)\n\t\t\t(*(vp->assign))();\n\t}\n\n\t/* Load PROCINFO and ENVIRON */\n\tif (! do_traditional)\n\t\tload_procinfo();\n\tload_environ();\n}"
 }

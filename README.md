@@ -28,8 +28,27 @@ json格式：report/spotbugs_json
 ### 格式转换
 report/csv2json_c.py: 转换为json格式
 
+# 手动处理
+例子：
+bug_0077_bcel
+```
+@@ actionable @@ 
+
+This warning is actionable because it points to a specific line of code (`System.exit(-1);`) that is considered a bad practice. The code is explicitly calling `System.exit(-1)` in a default case, which can cause the program to terminate abruptly. This warning suggests that the developer should review and refactor the code to handle the default case more gracefully.
+```
+
+
 # TODO
-1、提示词的example以md形式改写
-2、目前只尝试运行了zero-shot模板
-3、设置每分钟调用10次的限制
-4、提取回答中的结果
+已解决 1、提示词的example以md形式改写
+已解决 2、目前只尝试运行了zero-shot模板
+已解决 3、设置每分钟调用10次的限制
+已解决 4、提取回答中的结果到excel中
+已解决 5、c中tool和projectname需要从json中提取，这样才能区分开zero-shot和general-info
+6、每次都有提供提示词吗
+
+变量：
+llm
+工具
+提示词技术
+项目
+bug

@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset: 0 Size: [0, 2] by call to `make_str_node`.",
     "Code_line": "\treturn make_string(the_result, strlen(the_result));",
     "Code_function": "do_bindtextdomain(int nargs)\n{\n\tNODE *t1, *t2;\n\tconst char *directory, *domain;\n\tconst char *the_result;\n\n\tt1 = t2 = NULL;\n\t/* set defaults */\n\tdirectory = NULL;\n\tdomain = TEXTDOMAIN;\n\n\tif (nargs == 2) {\t/* second argument */\n\t\tt2 = POP_STRING();\n\t\tdomain = (const char *) t2->stptr;\n\t}\n\n\t/* first argument */\n\tt1 = POP_STRING();\n\tif (t1->stlen > 0)\n\t\tdirectory = (const char *) t1->stptr;\n\n\tthe_result = bindtextdomain(domain, directory);\n\n\tDEREF(t1);\n\tif (t2 != NULL)\n\t\tDEREF(t2);\n\n\treturn make_string(the_result, strlen(the_result));\n}"
 }

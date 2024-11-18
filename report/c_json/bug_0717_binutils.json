@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_S2",
+    "Message": "Offset added: [`info->types.alloc` + 32, +oo] (⇐ `info->types.alloc` + [32, +oo]) Size: [1, +oo] by call to `ieee_alloc_type`.",
     "Code_line": "  if (! ieee_alloc_type (info, indx, TRUE))",
     "Code_function": "ieee_read_type_index (struct ieee_info *info, const bfd_byte **pp,\n\t\t      debug_type *ptype)\n{\n  const bfd_byte *start;\n  bfd_vma indx;\n\n  start = *pp;\n\n  if (! ieee_read_number (info, pp, &indx))\n    return FALSE;\n\n  if (indx < 256)\n    {\n      *ptype = ieee_builtin_type (info, start, indx);\n      if (*ptype == NULL)\n\treturn FALSE;\n      return TRUE;\n    }\n\n  indx -= 256;\n  if (! ieee_alloc_type (info, indx, TRUE))\n    return FALSE;\n\n  *ptype = info->types.types[indx].type;\n\n  return TRUE;\n}"
 }

@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L2",
+    "Message": "Offset: [1, 34] Size: 34 by call to `stab_xcoff_builtin_type`.",
     "Code_line": "      return stab_xcoff_builtin_type (dhandle, info, typenums[1]);",
     "Code_function": "stab_find_type (void *dhandle, struct stab_handle *info, const int *typenums)\n{\n  debug_type *slot;\n\n  if (typenums[0] == 0 && typenums[1] < 0)\n    {\n      /* A negative type number indicates an XCOFF builtin type.  */\n      return stab_xcoff_builtin_type (dhandle, info, typenums[1]);\n    }\n\n  slot = stab_find_slot (info, typenums);\n  if (slot == NULL)\n    return DEBUG_TYPE_NULL;\n\n  if (*slot == DEBUG_TYPE_NULL)\n    return debug_make_indirect_type (dhandle, slot, (const char *) NULL);\n\n  return *slot;\n}"
 }

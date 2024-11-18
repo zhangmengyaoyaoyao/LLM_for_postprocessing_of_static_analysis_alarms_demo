@@ -2,6 +2,7 @@
     "Project": "Zephyr",
     "Tool": "Infer",
     "Bug Type": "Uninitialized Value",
+    "Message": "The value read from addrlen_copy was never initialized.",
     "Code_line": "\tZ_OOPS(src_addr && Z_SYSCALL_MEMORY_WRITE(src_addr, addrlen_copy));",
     "Code_function": "ssize_t z_vrfy_zsock_recvfrom(int sock, void *buf, size_t max_len, int flags,\n\t\t\t      struct sockaddr *src_addr, socklen_t *addrlen)\n{\n\tsocklen_t addrlen_copy;\n\tssize_t ret;\n\n\tif (Z_SYSCALL_MEMORY_WRITE(buf, max_len)) {\n\t\terrno = EFAULT;\n\t\treturn -1;\n\t}\n\n\tif (addrlen) {\n\t\tZ_OOPS(z_user_from_copy(&addrlen_copy, addrlen,\n\t\t\t\t\tsizeof(socklen_t)));\n\t}\n\tZ_OOPS(src_addr && Z_SYSCALL_MEMORY_WRITE(src_addr, addrlen_copy));\n\n\tret = z_impl_zsock_recvfrom(sock, (void *)buf, max_len, flags,\n\t\t\t\t   (struct sockaddr *)src_addr,\n\t\t\t\t   addrlen ? &addrlen_copy : NULL);\n\n\tif (addrlen) {\n\t\tZ_OOPS(z_user_to_copy(addrlen, &addrlen_copy,\n\t\t\t\t      sizeof(socklen_t)));\n\t}\n\n\treturn ret;\n}"
 }

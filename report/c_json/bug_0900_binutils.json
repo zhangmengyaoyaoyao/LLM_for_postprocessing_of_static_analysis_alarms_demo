@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset added: [16, +oo] (⇐ [0, +oo] + [16, +oo]) Size: [0, +oo] by call to `bfd_check_format_matches`.",
     "Code_line": "  if (bfd_check_format_matches (abfd, bfd_object, &matching))",
     "Code_function": "display_object_bfd (bfd *abfd)\n{\n  char **matching;\n\n  if (bfd_check_format_matches (abfd, bfd_object, &matching))\n    {\n      dump_bfd (abfd);\n      return;\n    }\n\n  if (bfd_get_error () == bfd_error_file_ambiguously_recognized)\n    {\n      nonfatal (bfd_get_filename (abfd));\n      list_matching_formats (matching);\n      free (matching);\n      return;\n    }\n\n  if (bfd_get_error () != bfd_error_file_not_recognized)\n    {\n      nonfatal (bfd_get_filename (abfd));\n      return;\n    }\n\n  if (bfd_check_format_matches (abfd, bfd_core, &matching))\n    {\n      dump_bfd (abfd);\n      return;\n    }\n\n  nonfatal (bfd_get_filename (abfd));\n\n  if (bfd_get_error () == bfd_error_file_ambiguously_recognized)\n    {\n      list_matching_formats (matching);\n      free (matching);\n    }\n}"
 }

@@ -2,6 +2,7 @@
     "Project": "tiff",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset: [3, +oo] (⇐ [0, +oo] + 3) Size: [0, +oo] by call to `TIFFFetchLongArray`.",
     "Code_line": "        if (v && TIFFFetchLongArray(tif, dir, v)) {",
     "Code_function": "TIFFFetchPerSampleLongs(TIFF* tif, TIFFDirEntry* dir, uint32* pl)\n{\n    uint16 samples = tif->tif_dir.td_samplesperpixel;\n    int status = 0;\n\n    if (CheckDirCount(tif, dir, (uint32) samples, TIFFFieldSet(tif,FIELD_BITSPERSAMPLE))) {\n        uint32 buf[10];\n        uint32* v = buf;\n\n        if (dir->tdir_count > NITEMS(buf))\n            v = (uint32*) _TIFFCheckMalloc(tif, dir->tdir_count, sizeof(uint32),\n                                      \"to fetch per-sample values\");\n        if (v && TIFFFetchLongArray(tif, dir, v)) {\n            uint16 i;\n            int check_count = dir->tdir_count;\n\n            if( samples < check_count )\n                check_count = samples;\n            for (i = 1; i < check_count; i++)\n                if (v[i] != v[0]) {\n\t\t\tTIFFErrorExt(tif->tif_clientdata, tif->tif_name,\n                \"Cannot handle different per-sample values for field \\\"%s\\\"\",\n\t\t\t_TIFFFieldWithTag(tif, dir->tdir_tag)->field_name);\n\t\t\tgoto bad;\n                }\n            *pl = v[0];\n            status = 1;\n        }\n      bad:\n        if (v && v != buf)\n            _TIFFfree(v);\n    }\n    return (status);\n}"
 }

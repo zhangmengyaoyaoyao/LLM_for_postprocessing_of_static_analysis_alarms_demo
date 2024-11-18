@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `proc_data` last assigned on line 290 could be null and is dereferenced at line 291, column 2.",
     "Code_line": "\tproc_data->in_use = 2;",
     "Code_function": "revtwoway_take_control_of(const char *name, awk_input_buf_t *inbuf, awk_output_buf_t *outbuf)\n{\n\ttwo_way_proc_data_t *proc_data;\n\n\t(void) name;\t/* silence warnings */\n\tif (inbuf == NULL || outbuf == NULL)\n\t\treturn awk_false;\n\n\temalloc(proc_data, two_way_proc_data_t *, sizeof(two_way_proc_data_t), \"revtwoway_take_control_of\");\n\tproc_data->in_use = 2;\n\tproc_data->size = 0;\n\tproc_data->len = 0;\n\tproc_data->data = NULL;\n\n\tif (max_fds + 1 == 0)\t/* wrapped. ha! */\n\t\tmax_fds = getdtablesize();\n\n\t/* input side: */\n\tinbuf->get_record = rev2way_get_record;\n\tinbuf->close_func = rev2way_close;\n\tinbuf->fd = max_fds;\n\tinbuf->opaque = proc_data;\n\n\t/* output side: */\n\toutbuf->fp = (FILE *) max_fds++;\n\toutbuf->opaque = proc_data;\n\toutbuf->gawk_fwrite = rev2way_fwrite;\n\toutbuf->gawk_fflush = rev2way_fflush;\n\toutbuf->gawk_ferror = rev2way_ferror;\n\toutbuf->gawk_fclose = rev2way_fclose;\n\toutbuf->redirected = awk_true;\n\n\treturn awk_true;\n}"
 }

@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L1",
+    "Message": "Offset: 2 Size: 2 by call to `minfo`.",
     "Code_line": "    minfo (\")\");",
     "Code_function": "print_wild_statement (lang_wild_statement_type *w,\n\t\t      lang_output_section_statement_type *os)\n{\n  struct wildcard_list *sec;\n\n  print_space ();\n\n  if (w->filenames_sorted)\n    minfo (\"SORT(\");\n  if (w->filename != NULL)\n    minfo (\"%s\", w->filename);\n  else\n    minfo (\"*\");\n  if (w->filenames_sorted)\n    minfo (\")\");\n\n  minfo (\"(\");\n  for (sec = w->section_list; sec; sec = sec->next)\n    {\n      if (sec->spec.sorted)\n\tminfo (\"SORT(\");\n      if (sec->spec.exclude_name_list != NULL)\n\t{\n\t  name_list *tmp;\n\t  minfo (\"EXCLUDE_FILE(%s\", sec->spec.exclude_name_list->name);\n\t  for (tmp = sec->spec.exclude_name_list->next; tmp; tmp = tmp->next)\n\t    minfo (\" %s\", tmp->name);\n\t  minfo (\") \");\n\t}\n      if (sec->spec.name != NULL)\n\tminfo (\"%s\", sec->spec.name);\n      else\n\tminfo (\"*\");\n      if (sec->spec.sorted)\n\tminfo (\")\");\n      if (sec->next)\n\tminfo (\" \");\n    }\n  minfo (\")\");\n\n  print_nl ();\n\n  print_statement_list (w->children.head, os);\n}"
 }

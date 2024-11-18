@@ -2,6 +2,7 @@
     "Project": "bash",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `herestr` last assigned on line 327 could be null and is dereferenced by call to `write()` at line 340, column 7.",
     "Code_line": "  n = write (fd, herestr, herelen);",
     "Code_function": "write_here_string (fd, redirectee)\n     int fd;\n     WORD_DESC *redirectee;\n{\n  char *herestr;\n  int herelen, n, e, old;\n\n  expanding_redir = 1;\n  /* Now that we've changed the variable search order to ignore the temp\n     environment, see if we need to change the cached IFS values. */\n  sv_ifs (\"IFS\");\n  herestr = expand_string_to_string (redirectee->word, 0);\n  expanding_redir = 0;\n  /* Now we need to change the variable search order back to include the temp\n     environment.  We force the temp environment search by forcing\n     executing_builtin to 1.  This is what makes `read' get the right values\n     for the IFS-related cached variables, for example. */\n  old = executing_builtin;\n  executing_builtin = 1;\n  sv_ifs (\"IFS\");\n  executing_builtin = old;\n\n  herelen = STRLEN (herestr);\n\n  n = write (fd, herestr, herelen);\n  if (n == herelen)\n    {\n      n = write (fd, \"\\n\", 1);\n      herelen = 1;\n    }\n  e = errno;\n  FREE (herestr);\n  if (n != herelen)\n    {\n      if (e == 0)\n\te = ENOSPC;\n      return e;\n    }\n  return 0;\n}"
 }

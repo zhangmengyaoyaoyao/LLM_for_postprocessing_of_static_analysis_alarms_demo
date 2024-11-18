@@ -2,6 +2,7 @@
     "Project": "bash",
     "Tool": "Infer",
     "Bug Type": "UNINITIALIZED_VALUE",
+    "Message": "The value read from state_bak.__count was never initialized.",
     "Code_line": "      ADVANCE_CHAR (string, slen, i);",
     "Code_function": "de_backslash (string)\n     char *string;\n{\n  register size_t slen;\n  register int i, j, prev_i;\n  DECLARE_MBSTATE;\n\n  slen = strlen (string);\n  i = j = 0;\n\n  /* Loop copying string[i] to string[j], i >= j. */\n  while (i < slen)\n    {\n      if (string[i] == '\\\\' && (string[i + 1] == '`' || string[i + 1] == '\\\\' ||\n\t\t\t      string[i + 1] == '$'))\n\ti++;\n      prev_i = i;\n      ADVANCE_CHAR (string, slen, i);\n      if (j < prev_i)\n\tdo string[j++] = string[prev_i++]; while (prev_i < i);\n      else\n\tj = i;\n    }\n  string[j] = '\\0';\n\n  return (string);\n}"
 }

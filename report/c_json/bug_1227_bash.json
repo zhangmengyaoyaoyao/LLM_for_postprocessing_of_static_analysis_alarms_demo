@@ -2,6 +2,7 @@
     "Project": "bash",
     "Tool": "Infer",
     "Bug Type": "UNINITIALIZED_VALUE",
+    "Message": "The value read from r was never initialized.",
     "Code_line": "    return r;",
     "Code_function": "wextglob_skipname (pat, dname, flags)\n     wchar_t *pat, *dname;\n     int flags;\n{\n#if EXTENDED_GLOB\n  wchar_t *pp, *pe, *t, n;\n  int r;\n\n  pp = pat + 2;\n  pe = pp + wcslen (pp) - 1;\t/*(*/\n  if (*pe != L')')\n    return 0;\n  if ((t = wcschr (pp, L'|')) == 0)\n    {\n      *pe = L'\\0';\n      r = wchkname (pp, dname); /*(*/\n      *pe = L')';\n      return r;\n    }\n  while (t = glob_patscan_wc (pp, pe, '|'))\n    {\n      n = t[-1];\n      t[-1] = L'\\0';\n      r = wchkname (pp, dname);\n      t[-1] = n;\n      if (r == 0)\n\treturn 0;\n      pp = t;\n    }\n\n  if (pp == pe)\t\t/* glob_patscan_wc might find end of pattern */\n    return r;\n\n  *pe = L'\\0';\n  r = wchkname (pp, dname);\t/*(*/\n  *pe = L')';\n  return r;\n#else\n  return (wchkname (pat, dname));\n#endif\n}"
 }

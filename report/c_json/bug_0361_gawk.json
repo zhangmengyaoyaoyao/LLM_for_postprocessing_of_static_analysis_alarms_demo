@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "CSA",
     "Bug Type": "unix.Malloc",
+    "Message": "Use of memory after it is freed",
     "Code_line": "\t\tc = c->prev;",
     "Code_function": "delete_item(struct list_item *d)\n{\n\tstruct commands_item *c;\n\tint i;\n\n\tif (IS_SUBSCRIPT(d)) {\n\t\tfor (i = 0; i < d->num_subs; i++)\n\t\t\tunref(d->subs[i]);\n\t\tefree(d->subs);\n\t} else if (IS_FIELD(d))\n\t\tunref(d->symbol);\n\n\tif ((d->flags & CUR_IS_ARRAY) == 0)\n\t\tunref(d->cur_value);\n\tif ((d->flags & OLD_IS_ARRAY) == 0)\n\t\tunref(d->old_value);\n\n\t/* delete commands */\n\tfor (c = d->commands.next; c != &d->commands; c = c->next) {\n\t\tc = c->prev;\n\t\tdelete_commands_item(c->next);\n\t}\n\n\tfree_context(d->cndn.ctxt, false);\n\tif (d->cndn.expr != NULL)\n\t\tefree(d->cndn.expr);\n\n\td->next->prev = d->prev;\n\td->prev->next = d->next;\n\tefree(d);\n}"
 }

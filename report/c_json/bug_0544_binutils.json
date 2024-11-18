@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_S2",
+    "Message": "Offset: [`name->len` + 1, +oo] Size: [1, +oo] by call to `sb_add_char`.",
     "Code_line": "\t  sb_add_char (name, in->ptr[idx++]);",
     "Code_function": "get_token (size_t idx, sb *in, sb *name)\n{\n  if (idx < in->len\n      && is_name_beginner (in->ptr[idx]))\n    {\n      sb_add_char (name, in->ptr[idx++]);\n      while (idx < in->len\n\t     && is_part_of_name (in->ptr[idx]))\n\t{\n\t  sb_add_char (name, in->ptr[idx++]);\n\t}\n      if (idx < in->len\n\t     && is_name_ender (in->ptr[idx]))\n\t{\n\t  sb_add_char (name, in->ptr[idx++]);\n\t}\n    }\n  /* Ignore trailing &.  */\n  if (macro_alternate && idx < in->len && in->ptr[idx] == '&')\n    idx++;\n  return idx;\n}"
 }

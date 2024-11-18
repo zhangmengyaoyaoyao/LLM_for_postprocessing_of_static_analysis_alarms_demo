@@ -2,6 +2,7 @@
     "Project": "Zephyr",
     "Tool": "Infer",
     "Bug Type": "Uninitialized Value",
+    "Message": "The value read from rc was never initialized.",
     "Code_line": "\t\treturn (rc) ? 0 : 1;",
     "Code_function": "static int settings_line_raw_read_until(off_t seek, char *out, size_t len_req,\n\t\t\t\t size_t *len_read, char const *until_char,\n\t\t\t\t void *cb_arg)\n{\n\tsize_t rem_size, len;\n\tchar temp_buf[16]; /* buffer for fit read-block-size requirements */\n\tsize_t exp_size, read_size;\n\tu8_t rbs = settings_io_cb.rwbs;\n\toff_t off;\n\tint rc;\n\n\tif (len_req == 0) {\n\t\treturn -EINVAL;\n\t}\n\n\trem_size = len_req;\n\n\twhile (rem_size) {\n\t\toff = seek / rbs * rbs;\n\n\t\tread_size = sizeof(temp_buf);\n\t\texp_size = read_size;\n\n\t\trc = settings_io_cb.read_cb(cb_arg, off, temp_buf, &read_size);\n\t\tif (rc) {\n\t\t\treturn -EIO;\n\t\t}\n\n\t\toff = seek - off;\n\t\tlen = read_size - off;\n\t\tlen = MIN(rem_size, len);\n\n\t\tif (until_char != NULL) {\n\t\t\tchar *pend;\n\t\t\tpend = memchr(&temp_buf[off], *until_char, len);\n\t\t\tif (pend != NULL) {\n\t\t\t\tlen = pend - &temp_buf[off];\n\t\t\t\trc = 1; /* will cause loop expiration */\n\t\t\t}\n\t\t}\n\n\t\tmemcpy(out, &temp_buf[off], len);\n\n\t\trem_size -= len;\n\n\t\tif (exp_size > read_size || rc) {\n\t\t\tbreak;\n\t\t}\n\n\t\tout += len;\n\t\tseek += len;\n\t}\n\n\t*len_read = len_req - rem_size;\n\n\tif (until_char != NULL) {\n\t\treturn (rc) ? 0 : 1;\n\t}\n\n\treturn 0;\n}"
 }

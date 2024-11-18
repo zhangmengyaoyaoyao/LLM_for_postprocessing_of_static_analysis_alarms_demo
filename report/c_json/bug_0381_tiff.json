@@ -2,6 +2,7 @@
     "Project": "tiff",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset: [-1, +oo] Size: [0, +oo] by call to `TIFFReadDirectory`.",
     "Code_line": "\t\t} while (TIFFReadDirectory(in));",
     "Code_function": "main(int argc, char* argv[])\n{\n\tTIFF *in, *out;\n\n\tif (argc < 2) {\n                fprintf(stderr, \"%s\\n\\n\", TIFFGetVersion());\n\t\tfprintf(stderr, \"usage: tiffsplit input.tif [prefix]\\n\");\n\t\treturn (-3);\n\t}\n\tif (argc > 2) {\n\t\tstrncpy(fname, argv[2], sizeof(fname));\n\t\tfname[sizeof(fname) - 1] = '\\0';\n\t}\n\tin = TIFFOpen(argv[1], \"r\");\n\tif (in != NULL) {\n\t\tdo {\n\t\t\tsize_t path_len;\n\t\t\tchar *path;\n\n\t\t\tnewfilename();\n\n\t\t\tpath_len = strlen(fname) + sizeof(TIFF_SUFFIX);\n\t\t\tpath = (char *) _TIFFmalloc(path_len);\n\t\t\tstrncpy(path, fname, path_len);\n\t\t\tpath[path_len - 1] = '\\0';\n\t\t\tstrncat(path, TIFF_SUFFIX, path_len - strlen(path) - 1);\n\t\t\tout = TIFFOpen(path, TIFFIsBigEndian(in)?\"wb\":\"wl\");\n\t\t\t_TIFFfree(path);\n\n\t\t\tif (out == NULL)\n\t\t\t\treturn (-2);\n\t\t\tif (!tiffcp(in, out))\n\t\t\t\treturn (-1);\n\t\t\tTIFFClose(out);\n\t\t} while (TIFFReadDirectory(in));\n\t\t(void) TIFFClose(in);\n\t}\n\treturn (0);\n}"
 }

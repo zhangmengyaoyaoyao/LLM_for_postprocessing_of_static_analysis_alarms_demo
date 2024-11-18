@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset: [2, +oo] (⇐ [0, +oo] + 2) Size: [1, +oo] by call to `append_type`.",
     "Code_line": "      || ! append_type (info, \":\\n\")",
     "Code_function": "pr_fix_visibility (struct pr_handle *info, enum debug_visibility visibility)\n{\n  const char *s = NULL;\n  char *t;\n  unsigned int len;\n\n  assert (info->stack != NULL);\n\n  if (info->stack->visibility == visibility)\n    return TRUE;\n\n  switch (visibility)\n    {\n    case DEBUG_VISIBILITY_PUBLIC:\n      s = \"public\";\n      break;\n    case DEBUG_VISIBILITY_PRIVATE:\n      s = \"private\";\n      break;\n    case DEBUG_VISIBILITY_PROTECTED:\n      s = \"protected\";\n      break;\n    case DEBUG_VISIBILITY_IGNORE:\n      s = \"/* ignore */\";\n      break;\n    default:\n      abort ();\n      return FALSE;\n    }\n\n  /* Trim off a trailing space in the struct string, to make the\n     output look a bit better, then stick on the visibility string.  */\n\n  t = info->stack->type;\n  len = strlen (t);\n  assert (t[len - 1] == ' ');\n  t[len - 1] = '\\0';\n\n  if (! append_type (info, s)\n      || ! append_type (info, \":\\n\")\n      || ! indent_type (info))\n    return FALSE;\n\n  info->stack->visibility = visibility;\n\n  return TRUE;\n}"
 }

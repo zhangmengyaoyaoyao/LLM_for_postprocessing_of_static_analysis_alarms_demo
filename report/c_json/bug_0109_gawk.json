@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `fcall_list` last assigned on line 643 could be null and is dereferenced at line 648, column 2.",
     "Code_line": "\tfcall_list[1] = f;",
     "Code_function": "push_frame(NODE *f)\n{\n\tstatic long max_fcall;\n\n\t/* NB: frame numbering scheme as in GDB. frame_ptr => frame #0. */\n\n\tfcall_count++;\n\tif (fcall_list == NULL) {\n\t\tmax_fcall = 10;\n\t\temalloc(fcall_list, NODE **, (max_fcall + 1) * sizeof(NODE *), \"push_frame\");\n\t} else if (fcall_count == max_fcall) {\n\t\tmax_fcall *= 2;\n\t\terealloc(fcall_list, NODE **, (max_fcall + 1) * sizeof(NODE *), \"push_frame\");\n\t}\n\n\tif (fcall_count > 1)\n\t\tmemmove(fcall_list + 2, fcall_list + 1, (fcall_count - 1) * sizeof(NODE *));\n\tfcall_list[1] = f;\n}"
 }

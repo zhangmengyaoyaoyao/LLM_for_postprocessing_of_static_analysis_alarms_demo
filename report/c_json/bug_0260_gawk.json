@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `sub->sub.val.sp` last assigned on line 3843 could be null and is dereferenced by call to `sprintf()` at line 3847, column 2.",
     "Code_line": "\tsprintf(sub->stptr, \"%s%.*s%s\", pidx1, (int)subsep->stlen,",
     "Code_function": "in_PROCINFO(const char *pidx1, const char *pidx2, NODE **full_idx)\n{\n\tchar *str;\n\tsize_t str_len;\n\tNODE *r, *sub = NULL;\n\tNODE *subsep = SUBSEP_node->var_value;\n\n\t/* full_idx is in+out parameter */\n\n\tif (full_idx)\n\t\tsub = *full_idx;\n\n\tstr_len = strlen(pidx1) + subsep->stlen\t+ strlen(pidx2);\n\tif (sub == NULL) {\n\t\temalloc(str, char *, str_len + 1, \"in_PROCINFO\");\n\t\tsub = make_str_node(str, str_len, ALREADY_MALLOCED);\n\t\tif (full_idx)\n\t\t\t*full_idx = sub;\n\t} else if (str_len != sub->stlen) {\n\t\t/* *full_idx != NULL */\n\n\t\tassert(sub->valref == 1);\n\t\terealloc(sub->stptr, char *, str_len + 1, \"in_PROCINFO\");\n\t\tsub->stlen = str_len;\n\t}\n\n\tsprintf(sub->stptr, \"%s%.*s%s\", pidx1, (int)subsep->stlen,\n\t\t\tsubsep->stptr, pidx2);\n\tr = in_array(PROCINFO_node, sub);\n\tif (! full_idx)\n\t\tunref(sub);\n\treturn r;\n}"
 }

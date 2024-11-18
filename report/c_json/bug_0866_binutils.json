@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset added: [-20, 203] (⇐ [-100, 123] + 80) Size: 4064 by call to `bfd_zalloc`.",
     "Code_line": "  rel_hdr = bfd_zalloc (abfd, amt);",
     "Code_function": "_bfd_elf_init_reloc_shdr (bfd *abfd,\n\t\t\t  struct bfd_elf_section_reloc_data *reldata,\n\t\t\t  asection *asect,\n\t\t\t  bfd_boolean use_rela_p)\n{\n  Elf_Internal_Shdr *rel_hdr;\n  char *name;\n  const struct elf_backend_data *bed = get_elf_backend_data (abfd);\n  bfd_size_type amt;\n\n  amt = sizeof (Elf_Internal_Shdr);\n  BFD_ASSERT (reldata->hdr == NULL);\n  rel_hdr = bfd_zalloc (abfd, amt);\n  reldata->hdr = rel_hdr;\n\n  amt = sizeof \".rela\" + strlen (asect->name);\n  name = (char *) bfd_alloc (abfd, amt);\n  if (name == NULL)\n    return FALSE;\n  sprintf (name, \"%s%s\", use_rela_p ? \".rela\" : \".rel\", asect->name);\n  rel_hdr->sh_name =\n    (unsigned int) _bfd_elf_strtab_add (elf_shstrtab (abfd), name,\n\t\t\t\t\tFALSE);\n  if (rel_hdr->sh_name == (unsigned int) -1)\n    return FALSE;\n  rel_hdr->sh_type = use_rela_p ? SHT_RELA : SHT_REL;\n  rel_hdr->sh_entsize = (use_rela_p\n\t\t\t ? bed->s->sizeof_rela\n\t\t\t : bed->s->sizeof_rel);\n  rel_hdr->sh_addralign = (bfd_vma) 1 << bed->s->log_file_align;\n  rel_hdr->sh_flags = 0;\n  rel_hdr->sh_addr = 0;\n  rel_hdr->sh_size = 0;\n  rel_hdr->sh_offset = 0;\n\n  return TRUE;\n}"
 }

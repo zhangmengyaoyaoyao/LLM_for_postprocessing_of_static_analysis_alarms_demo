@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset added: [1, +oo] Size: [0, +oo] by call to `ldfile_add_library_path`.",
     "Code_line": "\t  ldfile_add_library_path (script_dir, TRUE);",
     "Code_function": "ldfile_find_command_file (const char *name,\n\t\t\t  bfd_boolean default_only,\n\t\t\t  bfd_boolean *sysrooted)\n{\n  search_dirs_type *search;\n  FILE *result = NULL;\n  char *path;\n  static search_dirs_type *script_search;\n\n  if (!default_only)\n    {\n      /* First try raw name.  */\n      result = try_open (name, sysrooted);\n      if (result != NULL)\n\treturn result;\n    }\n\n  if (!script_search)\n    {\n      char *script_dir = find_scripts_dir ();\n      if (script_dir)\n\t{\n\t  search_dirs_type **save_tail_ptr = search_tail_ptr;\n\t  search_tail_ptr = &script_search;\n\t  ldfile_add_library_path (script_dir, TRUE);\n\t  search_tail_ptr = save_tail_ptr;\n\t}\n    }\n\n  /* Temporarily append script_search to the path list so that the\n     paths specified with -L will be searched first.  */\n  *search_tail_ptr = script_search;\n\n  /* Try now prefixes.  */\n  for (search = default_only ? script_search : search_head;\n       search != NULL;\n       search = search->next)\n    {\n      path = concat (search->name, slash, name, (const char *) NULL);\n      result = try_open (path, sysrooted);\n      free (path);\n      if (result)\n\tbreak;\n    }\n\n  /* Restore the original path list.  */\n  *search_tail_ptr = NULL;\n\n  return result;\n}"
 }

@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `syms` last assigned on line 264 could be null and is dereferenced at line 283, column 22.",
     "Code_line": "      asymbol *sym = syms[symcount];",
     "Code_function": "calculate_common_size (bfd *abfd)\n{\n  asymbol **syms = NULL;\n  long storage, symcount;\n\n  common_size = 0;\n  if ((bfd_get_file_flags (abfd) & (EXEC_P | DYNAMIC | HAS_SYMS)) != HAS_SYMS)\n    return;\n\n  storage = bfd_get_symtab_upper_bound (abfd);\n  if (storage < 0)\n    bfd_fatal (bfd_get_filename (abfd));\n  if (storage)\n    syms = (asymbol **) xmalloc (storage);\n\n  symcount = bfd_canonicalize_symtab (abfd, syms);\n  if (symcount < 0)\n    bfd_fatal (bfd_get_filename (abfd));\n\n  while (--symcount >= 0)\n    {\n      asymbol *sym = syms[symcount];\n\n      if (bfd_is_com_section (sym->section)\n\t  && (sym->flags & BSF_SECTION_SYM) == 0)\n\tcommon_size += sym->value;\n    }\n  free (syms);\n}"
 }

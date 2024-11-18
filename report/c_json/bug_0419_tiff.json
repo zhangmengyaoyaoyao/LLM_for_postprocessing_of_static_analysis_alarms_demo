@@ -2,6 +2,7 @@
     "Project": "tiff",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset: [7, +oo] (⇐ [0, +oo] + 7) Size: [0, +oo] by call to `TIFFWriteScanline`.",
     "Code_line": "\t\tif (TIFFWriteScanline(out, outline, i, 0) < 0)",
     "Code_function": "quant(TIFF* in, TIFF* out)\n{\n\tunsigned char\t*outline, *inputline;\n\tregister unsigned char\t*outptr, *inptr;\n\tregister uint32 i, j;\n\tregister int red, green, blue;\n\n\tinputline = (unsigned char *)_TIFFmalloc(TIFFScanlineSize(in));\n\toutline = (unsigned char *)_TIFFmalloc(imagewidth);\n\tfor (i = 0; i < imagelength; i++) {\n\t\tif (TIFFReadScanline(in, inputline, i, 0) <= 0)\n\t\t\tbreak;\n\t\tinptr = inputline;\n\t\toutptr = outline;\n\t\tfor (j = 0; j < imagewidth; j++) {\n\t\t\tred = *inptr++ >> COLOR_SHIFT;\n\t\t\tgreen = *inptr++ >> COLOR_SHIFT;\n\t\t\tblue = *inptr++ >> COLOR_SHIFT;\n\t\t\t*outptr++ = (unsigned char)histogram[red][green][blue];\n\t\t}\n\t\tif (TIFFWriteScanline(out, outline, i, 0) < 0)\n\t\t\tbreak;\n\t}\n\t_TIFFfree(inputline);\n\t_TIFFfree(outline);\n}"
 }

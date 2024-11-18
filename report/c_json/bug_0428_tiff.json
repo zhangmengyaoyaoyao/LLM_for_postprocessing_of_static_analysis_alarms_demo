@@ -2,6 +2,7 @@
     "Project": "tiff",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset: [7, +oo] (⇐ [0, +oo] + 7) Size: [0, +oo] by call to `TIFFWriteScanline`.",
     "Code_line": "\t\t\tif (TIFFWriteScanline(out, buf, row, s) < 0) {",
     "Code_function": "DECLAREcpFunc(cpSeparate2SeparateByRow)\n{\n\ttsize_t scanlinesize = TIFFScanlineSize(in);\n\ttdata_t buf;\n\tuint32 row;\n\ttsample_t s;\n\n\t(void) imagewidth;\n\tbuf = _TIFFmalloc(scanlinesize);\n\tif (!buf)\n\t\treturn 0;\n\t_TIFFmemset(buf, 0, scanlinesize);\n\tfor (s = 0; s < spp; s++) {\n\t\tfor (row = 0; row < imagelength; row++) {\n\t\t\tif (TIFFReadScanline(in, buf, row, s) < 0 && !ignore) {\n\t\t\t\tTIFFError(TIFFFileName(in),\n\t\t\t\t\t  \"Error, can't read scanline %lu\",\n\t\t\t\t\t  (unsigned long) row);\n\t\t\t\tgoto bad;\n\t\t\t}\n\t\t\tif (TIFFWriteScanline(out, buf, row, s) < 0) {\n\t\t\t\tTIFFError(TIFFFileName(out),\n\t\t\t\t\t  \"Error, can't write scanline %lu\",\n\t\t\t\t\t  (unsigned long) row);\n\t\t\t\tgoto bad;\n\t\t\t}\n\t\t}\n\t}\n\t_TIFFfree(buf);\n\treturn 1;\nbad:\n\t_TIFFfree(buf);\n\treturn 0;\n}"
 }

@@ -2,6 +2,7 @@
     "Project": "Zephyr",
     "Tool": "Infer",
     "Bug Type": "Uninitialized Value",
+    "Message": "The value read from rc was never initialized.",
     "Code_line": "\treturn rc;",
     "Code_function": "int boot_request_upgrade(int permanent)\n{\n#ifdef CONFIG_MCUBOOT_TRAILER_SWAP_TYPE\n\tu8_t swap_type;\n#endif\n\tint rc;\n\n\trc = boot_magic_write(FLASH_AREA_IMAGE_SECONDARY);\n\tif (rc) {\n\t\tgoto op_end;\n\t}\n\n\tif (permanent) {\n\t\trc = boot_image_ok_write(FLASH_AREA_IMAGE_SECONDARY);\n\n#ifdef CONFIG_MCUBOOT_TRAILER_SWAP_TYPE\n\t\tif (rc) {\n\t\t\tgoto op_end;\n\t\t}\n\n\t\tswap_type = BOOT_SWAP_TYPE_PERM;\n\t} else {\n\t\tswap_type = BOOT_SWAP_TYPE_TEST;\n\t}\n\n\trc = boot_swap_type_write(FLASH_AREA_IMAGE_SECONDARY, swap_type);\n#else\n\t}\n#endif\nop_end:\n\treturn rc;\n}"
 }

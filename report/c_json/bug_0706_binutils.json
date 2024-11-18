@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "UNINITIALIZED_VALUE",
+    "Message": "The value read from head was never initialized.",
     "Code_line": "  insn->u.esc = head;",
     "Code_function": "dot_cfi_escape (int ignored ATTRIBUTE_UNUSED)\n{\n  struct cfi_escape_data *head, **tail, *e;\n  struct cfi_insn_data *insn;\n\n  if (frchain_now->frch_cfi_data == NULL)\n    {\n      as_bad (_(\"CFI instruction used without previous .cfi_startproc\"));\n      ignore_rest_of_line ();\n      return;\n    }\n\n  /* If the last address was not at the current PC, advance to current.  */\n  if (symbol_get_frag (frchain_now->frch_cfi_data->last_address) != frag_now\n      || S_GET_VALUE (frchain_now->frch_cfi_data->last_address)\n\t != frag_now_fix ())\n    cfi_add_advance_loc (symbol_temp_new_now ());\n\n  tail = &head;\n  do\n    {\n      e = (struct cfi_escape_data *) xmalloc (sizeof (*e));\n      do_parse_cons_expression (&e->exp, 1);\n      *tail = e;\n      tail = &e->next;\n    }\n  while (*input_line_pointer++ == ',');\n  *tail = NULL;\n\n  insn = alloc_cfi_insn_data ();\n  insn->insn = CFI_escape;\n  insn->u.esc = head;\n\n  --input_line_pointer;\n  demand_empty_rest_of_line ();\n}"
 }

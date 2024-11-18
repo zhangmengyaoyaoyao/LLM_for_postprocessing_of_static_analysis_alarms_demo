@@ -2,6 +2,7 @@
     "Project": "bash",
     "Tool": "Infer",
     "Bug Type": "UNINITIALIZED_VALUE",
+    "Message": "The value read from state_bak.__count was never initialized.",
     "Code_line": "      ADVANCE_CHAR (text, tlen, i);",
     "Code_function": "expand_amble (text, tlen, flags)\n     char *text;\n     size_t tlen;\n     int flags;\n{\n  char **result, **partial, **tresult;\n  char *tem;\n  int start, i, c;\n\n  DECLARE_MBSTATE;\n\n  result = (char **)NULL;\n\n  start = i = 0;\n  c = 1;\n  while (c)\n    {\n      c = brace_gobbler (text, tlen, &i, brace_arg_separator);\n#if defined (SHELL)\n      tem = substring (text, start, i);\n#else\n      tem = (char *)xmalloc (1 + (i - start));\n      strncpy (tem, &text[start], (i - start));\n      tem[i- start] = '\\0';\n#endif\n\n      partial = brace_expand (tem);\n\n      if (!result)\n\tresult = partial;\n      else\n\t{\n\t  register int lr, lp, j;\n\n\t  lr = strvec_len (result);\n\t  lp = strvec_len (partial);\n\n\t  tresult = strvec_mresize (result, lp + lr + 1);\n\t  if (tresult == 0)\n\t    {\n\t      internal_error (_(\"brace expansion: cannot allocate memory for %s\"), tem);\n\t      strvec_dispose (result);\n\t      result = (char **)NULL;\n\t      return result;\n\t    }\n\t  else\n\t    result = tresult;\n\n\t  for (j = 0; j < lp; j++)\n\t    result[lr + j] = partial[j];\n\n\t  result[lr + j] = (char *)NULL;\n\t  free (partial);\n\t}\n      free (tem);\n      ADVANCE_CHAR (text, tlen, i);\n      start = i;\n    }\n  return (result);\n}"
 }

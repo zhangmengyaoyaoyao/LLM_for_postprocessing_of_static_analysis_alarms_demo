@@ -2,6 +2,7 @@
     "Project": "Zephyr",
     "Tool": "Infer",
     "Bug Type": "Uninitialized Value",
+    "Message": "The value read from wlk_ate.len was never initialized.",
     "Code_line": "\treturn wlk_ate.len;",
     "Code_function": "ssize_t nvs_read_hist(struct nvs_fs *fs, u16_t id, void *data, size_t len,\n\t\t      u16_t cnt)\n{\n\tint rc;\n\tu32_t wlk_addr, rd_addr;\n\tu16_t cnt_his;\n\tstruct nvs_ate wlk_ate;\n\tsize_t ate_size;\n\n\tif (!fs->ready) {\n\t\tLOG_ERR(\"NVS not initialized\");\n\t\treturn -EACCES;\n\t}\n\n\tate_size = nvs_al_size(fs, sizeof(struct nvs_ate));\n\n\tif (len > (fs->sector_size - 2 * ate_size)) {\n\t\treturn -EINVAL;\n\t}\n\n\tcnt_his = 0U;\n\n\twlk_addr = fs->ate_wra;\n\trd_addr = wlk_addr;\n\n\twhile (cnt_his <= cnt) {\n\t\trd_addr = wlk_addr;\n\t\trc = nvs_prev_ate(fs, &wlk_addr, &wlk_ate);\n\t\tif (rc) {\n\t\t\tgoto err;\n\t\t}\n\t\tif ((wlk_ate.id == id) &&  (!nvs_ate_crc8_check(&wlk_ate))) {\n\t\t\tcnt_his++;\n\t\t}\n\t\tif (wlk_addr == fs->ate_wra) {\n\t\t\tbreak;\n\t\t}\n\t}\n\n\tif (((wlk_addr == fs->ate_wra) && (wlk_ate.id != id)) ||\n\t    (wlk_ate.len == 0U) || (cnt_his < cnt)) {\n\t\treturn -ENOENT;\n\t}\n\n\trd_addr &= ADDR_SECT_MASK;\n\trd_addr += wlk_ate.offset;\n\trc = nvs_flash_rd(fs, rd_addr, data, MIN(len, wlk_ate.len));\n\tif (rc) {\n\t\tgoto err;\n\t}\n\n\treturn wlk_ate.len;\n\nerr:\n\treturn rc;\n}"
 }

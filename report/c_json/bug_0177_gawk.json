@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `str` last assigned on line 1347 could be null and is dereferenced by call to `sprintf()` at line 1348, column 3.",
     "Code_line": "\t\tsprintf(str, \"%0.*g\", PP_PRECISION, n->numbr);",
     "Code_function": "pp_number(NODE *n)\n{\n#define PP_PRECISION 6\n\tchar *str;\n\tsize_t count;\n\n#ifdef HAVE_MPFR\n\tif (is_mpg_float(n)) {\n\t\tcount = mpfr_get_prec(n->mpg_numbr) / 3;\t/* ~ 3.22 binary digits per decimal digit */\n\t\temalloc(str, char *, count, \"pp_number\");\n\t\t/*\n\t\t * 3/2015: Format string used to be \"%0.*R*g\". That padded\n\t\t * with leading zeros. But it doesn't do that for regular\n\t\t * numbers in the non-MPFR case.\n\t\t */\n\t\tmpfr_sprintf(str, \"%.*R*g\", PP_PRECISION, ROUND_MODE, n->mpg_numbr);\n\t} else if (is_mpg_integer(n)) {\n\t\tcount = mpz_sizeinbase(n->mpg_i, 10) + 2;\t/* +1 for sign, +1 for NUL at end */\n\t\temalloc(str, char *, count, \"pp_number\");\n\t\tmpfr_sprintf(str, \"%Zd\", n->mpg_i);\n\t} else\n#endif\n\t{\n\t\tcount = PP_PRECISION + 10;\n\t\temalloc(str, char *, count, \"pp_number\");\n\t\tsprintf(str, \"%0.*g\", PP_PRECISION, n->numbr);\n\t}\n\n\treturn str;\n#undef PP_PRECISION\n}"
 }

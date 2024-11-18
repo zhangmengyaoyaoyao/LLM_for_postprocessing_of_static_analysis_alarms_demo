@@ -2,6 +2,7 @@
     "Project": "Zephyr",
     "Tool": "Infer",
     "Bug Type": "Null Dereference",
+    "Message": "pointer `match` last assigned on line 411 could be null and is dereferenced by call to `is_empty_cmd()` at line 414, column 14.",
     "Code_line": "\t\tis_empty = is_empty_cmd(match);",
     "Code_function": "static void tab_options_print(const struct shell *shell,\n\t\t\t      const struct shell_static_entry *cmd,\n\t\t\t      const char *str, size_t first, size_t cnt,\n\t\t\t      u16_t longest)\n{\n\tconst struct shell_static_entry *match;\n\tsize_t str_len = shell_strlen(str);\n\tsize_t idx = first;\n\n\t/* Printing all matching commands (options). */\n\ttab_item_print(shell, SHELL_INIT_OPTION_PRINTER, longest);\n\n\twhile (cnt) {\n\t\tbool is_empty;\n\n\t\t/* shell->ctx->active_cmd can be safely used outside of command\n\t\t * context to save stack\n\t\t */\n\t\tshell_cmd_get(shell, cmd ? cmd->subcmd : NULL, cmd ? 1 : 0,\n\t\t\t      idx, &match, &shell->ctx->active_cmd);\n\t\tidx++;\n\t\tis_empty = is_empty_cmd(match);\n\t\tif (is_empty || (str && match->syntax &&\n\t\t    !is_completion_candidate(match->syntax, str, str_len))) {\n\t\t\tcontinue;\n\t\t}\n\n\t\ttab_item_print(shell, match->syntax, longest);\n\t\tcnt--;\n\t}\n\n\tcursor_next_line_move(shell);\n\tshell_print_prompt_and_cmd(shell);\n}"
 }

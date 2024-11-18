@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset: [2, +oo] (⇐ [0, +oo] + 2) Size: [1, +oo] by call to `append_type`.",
     "Code_line": "      if (info->parameter != 1 && ! append_type (info, \", \"))",
     "Code_function": "tg_function_parameter (void *p, const char *name, enum debug_parm_kind kind,\n\t\t       bfd_vma val ATTRIBUTE_UNUSED)\n{\n  struct pr_handle *info = (struct pr_handle *) p;\n  char *t;\n\n  if (kind == DEBUG_PARM_REFERENCE\n      || kind == DEBUG_PARM_REF_REG)\n    {\n      if (! pr_reference_type (p))\n\treturn FALSE;\n    }\n\n  if (! substitute_type (info, name))\n    return FALSE;\n\n  t = pop_type (info);\n  if (t == NULL)\n    return FALSE;\n\n  if (! info->stack->method)\n    {\n      if (info->parameter != 1 && ! append_type (info, \", \"))\n\treturn FALSE;\n\n      if (kind == DEBUG_PARM_REG || kind == DEBUG_PARM_REF_REG)\n\tif (! append_type (info, \"register \"))\n\t  return FALSE;\n\n      if (! append_type (info, t))\n\treturn FALSE;\n    }\n\n  free (t);\n\n  ++info->parameter;\n\n  return TRUE;\n}"
 }

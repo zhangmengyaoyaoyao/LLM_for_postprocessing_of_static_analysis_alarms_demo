@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset added: 24 Size: [0, 24].",
     "Code_line": "\tmemset(fp, '\\0', sizeof(struct fdesc));",
     "Code_function": "func_use(const char *name, enum defref how)\n{\n\tstruct fdesc *fp;\n\tint len;\n\tint ind;\n\n\tlen = strlen(name);\n\tind = hash(name, len, HASHSIZE, NULL);\n\n\tfor (fp = ftable[ind]; fp != NULL; fp = fp->next)\n\t\tif (strcmp(fp->name, name) == 0)\n\t\t\tgoto update_value;\n\n\t/* not in the table, fall through to allocate a new one */\n\n\temalloc(fp, struct fdesc *, sizeof(struct fdesc), \"func_use\");\n\tmemset(fp, '\\0', sizeof(struct fdesc));\n\temalloc(fp->name, char *, len + 1, \"func_use\");\n\tstrcpy(fp->name, name);\n\tfp->next = ftable[ind];\n\tftable[ind] = fp;\n\nupdate_value:\n\tif (how == FUNC_DEFINE)\n\t\tfp->defined++;\n\telse if (how == FUNC_EXT) {\n\t\tfp->defined++;\n\t\tfp->extension++;\n\t} else\n\t\tfp->used++;\n}"
 }

@@ -2,6 +2,7 @@
     "Project": "bash",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L1",
+    "Message": "Offset: 2 Size: 2 by call to `assoc_to_string`.",
     "Code_line": "    t = assoc_to_string (h2, \" \", 0);",
     "Code_function": "assoc_modcase (h, pat, modop, mflags)\n     HASH_TABLE *h;\n     char *pat;\n     int modop;\n     int mflags;\n{\n  BUCKET_CONTENTS *tlist;\n  int i, slen;\n  HASH_TABLE *h2;\n  char\t*t, *sifs, *ifs;\n\n  if (h == 0 || assoc_empty (h))\n    return ((char *)NULL);\n\n  h2 = assoc_copy (h);\n  for (i = 0; i < h2->nbuckets; i++)\n    for (tlist = hash_items (i, h2); tlist; tlist = tlist->next)\n      {\n\tt = sh_modcase ((char *)tlist->data, pat, modop);\n\tFREE (tlist->data);\n\ttlist->data = t;\n      }\n\n  if (mflags & MATCH_QUOTED)\n    assoc_quote (h2);\n  else\n    assoc_quote_escapes (h2);\n\n  if (mflags & MATCH_STARSUB)\n    {\n      assoc_remove_quoted_nulls (h2);\n      sifs = ifs_firstchar ((int *)NULL);\n      t = assoc_to_string (h2, sifs, 0);\n      free (sifs);\n    }\n  else if (mflags & MATCH_QUOTED)\n    {\n      /* ${array[@]} */\n      sifs = ifs_firstchar (&slen);\n      ifs = getifs ();\n      if (ifs == 0 || *ifs == 0)\n\t{\n\t  if (slen < 2)\n\t    sifs = xrealloc (sifs, 2);\n\t  sifs[0] = ' ';\n\t  sifs[1] = '\\0';\n\t}\n      t = assoc_to_string (h2, sifs, 0);\n      free(sifs);\n    }\n  else\n    t = assoc_to_string (h2, \" \", 0);\n\n  assoc_dispose (h2);\n\n  return t;\n}"
 }

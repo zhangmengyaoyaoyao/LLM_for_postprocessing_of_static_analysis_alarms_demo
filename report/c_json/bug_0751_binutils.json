@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset: [3, +oo] (⇐ [0, +oo] + 3) Size: [1, +oo] by call to `append_type`.",
     "Code_line": "      if (! append_type (info, \" /*\"))",
     "Code_function": "pr_start_struct_type (void *p, const char *tag, unsigned int id,\n\t\t      bfd_boolean structp, unsigned int size)\n{\n  struct pr_handle *info = (struct pr_handle *) p;\n\n  info->indent += 2;\n\n  if (! push_type (info, structp ? \"struct \" : \"union \"))\n    return FALSE;\n  if (tag != NULL)\n    {\n      if (! append_type (info, tag))\n\treturn FALSE;\n    }\n  else\n    {\n      char idbuf[20];\n\n      sprintf (idbuf, \"%%anon%u\", id);\n      if (! append_type (info, idbuf))\n\treturn FALSE;\n    }\n\n  if (! append_type (info, \" {\"))\n    return FALSE;\n  if (size != 0 || tag != NULL)\n    {\n      char ab[30];\n\n      if (! append_type (info, \" /*\"))\n\treturn FALSE;\n\n      if (size != 0)\n\t{\n\t  sprintf (ab, \" size %u\", size);\n\t  if (! append_type (info, ab))\n\t    return FALSE;\n\t}\n      if (tag != NULL)\n\t{\n\t  sprintf (ab, \" id %u\", id);\n\t  if (! append_type (info, ab))\n\t    return FALSE;\n\t}\n      if (! append_type (info, \" */\"))\n\treturn FALSE;\n    }\n  if (! append_type (info, \"\\n\"))\n    return FALSE;\n\n  info->stack->visibility = DEBUG_VISIBILITY_PUBLIC;\n\n  return indent_type (info);\n}"
 }

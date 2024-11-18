@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_S2",
+    "Message": "Offset added: [`sp->sub.nodep.reserved` + 1, `sp->sub.nodep.reserved` + 1] (⇐ 1 + `sp->sub.nodep.reserved`) Size: [0, `sp->sub.nodep.reserved` + 3].",
     "Code_line": "\tmemcpy(p + 1, sp->pp_str, len);",
     "Code_function": "pp_parenthesize(NODE *sp)\n{\n\tchar *p = sp->pp_str;\n\tsize_t len = sp->pp_len;\n\n\temalloc(p, char *, len + 3, \"pp_parenthesize\");\n\t*p = '(';\n\tmemcpy(p + 1, sp->pp_str, len);\n\tp[len + 1] = ')';\n\tp[len + 2] = '\\0';\n\tif ((sp->flags & CAN_FREE) != 0)\n\t\tefree(sp->pp_str);\n\tsp->pp_str = p;\n\tsp->pp_len += 2;\n\tsp->flags |= CAN_FREE;\n}"
 }

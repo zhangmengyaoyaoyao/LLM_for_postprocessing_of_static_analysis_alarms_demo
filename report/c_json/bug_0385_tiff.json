@@ -2,6 +2,7 @@
     "Project": "tiff",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L1",
+    "Message": "Offset: 8 Size: 3.",
     "Code_line": "\tYb =  matrix[6] * X + matrix[7] * Y + matrix[8] * Z;",
     "Code_function": "TIFFXYZToRGB(TIFFCIELabToRGB *cielab, float X, float Y, float Z,\n\t     uint32 *r, uint32 *g, uint32 *b)\n{\n\tint i;\n\tfloat Yr, Yg, Yb;\n\tfloat *matrix = &cielab->display.d_mat[0][0];\n\n\t/* Multiply through the matrix to get luminosity values. */\n\tYr =  matrix[0] * X + matrix[1] * Y + matrix[2] * Z;\n\tYg =  matrix[3] * X + matrix[4] * Y + matrix[5] * Z;\n\tYb =  matrix[6] * X + matrix[7] * Y + matrix[8] * Z;\n\n\t/* Clip input */\n\tYr = TIFFmax(Yr, cielab->display.d_Y0R);\n\tYg = TIFFmax(Yg, cielab->display.d_Y0G);\n\tYb = TIFFmax(Yb, cielab->display.d_Y0B);\n\n\t/* Avoid overflow in case of wrong input values */\n\tYr = TIFFmin(Yr, cielab->display.d_YCR);\n\tYg = TIFFmin(Yg, cielab->display.d_YCG);\n\tYb = TIFFmin(Yb, cielab->display.d_YCB);\n\n\t/* Turn luminosity to colour value. */\n\ti = (int)((Yr - cielab->display.d_Y0R) / cielab->rstep);\n\ti = TIFFmin(cielab->range, i);\n\t*r = RINT(cielab->Yr2r[i]);\n\n\ti = (int)((Yg - cielab->display.d_Y0G) / cielab->gstep);\n\ti = TIFFmin(cielab->range, i);\n\t*g = RINT(cielab->Yg2g[i]);\n\n\ti = (int)((Yb - cielab->display.d_Y0B) / cielab->bstep);\n\ti = TIFFmin(cielab->range, i);\n\t*b = RINT(cielab->Yb2b[i]);\n\n\t/* Clip output. */\n\t*r = TIFFmin(*r, cielab->display.d_Vrwr);\n\t*g = TIFFmin(*g, cielab->display.d_Vrwg);\n\t*b = TIFFmin(*b, cielab->display.d_Vrwb);\n}"
 }

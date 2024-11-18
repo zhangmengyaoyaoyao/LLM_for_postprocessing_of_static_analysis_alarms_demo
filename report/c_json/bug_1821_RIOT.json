@@ -2,6 +2,7 @@
     "Project": "RIOT",
     "Tool": "Infer",
     "Bug Type": "Buffer Overrun L3",
+    "Message": "Offset added: 20 Size: [0, +oo].",
     "Code_line": "    memcpy(digest, ctx->state, 20);",
     "Code_function": "void sha1_final(sha1_context *ctx, void *digest)\n{\n    /* Pad to complete the last block */\n    sha1_pad(ctx);\n\n    /* Swap byte order back */\n    for (int i = 0; i < 5; i++) {\n        ctx->state[i] =\n            (((ctx->state[i]) << 24) & 0xff000000)\n            | (((ctx->state[i]) << 8) & 0x00ff0000)\n            | (((ctx->state[i]) >> 8) & 0x0000ff00)\n            | (((ctx->state[i]) >> 24) & 0x000000ff);\n    }\n\n    /* Copy the content of the hash (20 characters) */\n    memcpy(digest, ctx->state, 20);\n}"
 }

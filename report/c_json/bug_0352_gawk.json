@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "CSA",
     "Bug Type": "core.NullDereference",
+    "Message": "Dereference of null pointer (loaded from variable 'cp')",
     "Code_line": "\t*cp = '\\0';",
     "Code_function": "wstr2str(NODE *n)\n{\n\tsize_t result;\n\tsize_t length;\n\twchar_t *wp;\n\tmbstate_t mbs;\n\tchar *newval, *cp;\n\n\tassert(n->valref == 1);\n\tassert((n->flags & WSTRCUR) != 0);\n\n\t/*\n\t * Convert the wide chars in t1->wstptr back into m.b. chars.\n\t * This is pretty grotty, but it's the most straightforward\n\t * way to do things.\n\t */\n\tmemset(& mbs, 0, sizeof(mbs));\n\n\tlength = n->wstlen;\n\temalloc(newval, char *, (length * gawk_mb_cur_max) + 2, \"wstr2str\");\n\n\twp = n->wstptr;\n\tfor (cp = newval; length > 0; length--) {\n\t\tresult = wcrtomb(cp, *wp, & mbs);\n\t\tif (result == (size_t) -1)\t/* what to do? break seems best */\n\t\t\tbreak;\n\t\tcp += result;\n\t\twp++;\n\t}\n\t*cp = '\\0';\n\n\tefree(n->stptr);\n\tn->stptr = newval;\n\tn->stlen = cp - newval;\n\n\treturn n;\n}"
 }

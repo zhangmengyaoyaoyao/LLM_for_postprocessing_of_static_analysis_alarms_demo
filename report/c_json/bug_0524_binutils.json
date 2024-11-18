@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L1",
+    "Message": "Offset: [9, +oo] (⇐ [7, +oo] + 2) Size: 1 by call to `ctor_prio`.",
     "Code_line": "  prio1 = ctor_prio (n1);",
     "Code_function": "ctor_cmp (const void *p1, const void *p2)\n{\n  const struct set_element * const *pe1 =\n      (const struct set_element * const *) p1;\n  const struct set_element * const *pe2 =\n      (const struct set_element * const *) p2;\n  const char *n1;\n  const char *n2;\n  int prio1;\n  int prio2;\n\n  n1 = (*pe1)->name;\n  if (n1 == NULL)\n    n1 = \"\";\n  n2 = (*pe2)->name;\n  if (n2 == NULL)\n    n2 = \"\";\n\n  /* We need to sort in reverse order by priority.  When two\n     constructors have the same priority, we should maintain their\n     current relative position.  */\n\n  prio1 = ctor_prio (n1);\n  prio2 = ctor_prio (n2);\n\n  /* We sort in reverse order because that is what g++ expects.  */\n  if (prio1 < prio2)\n    return 1;\n  else if (prio1 > prio2)\n    return -1;\n\n  /* Force a stable sort.  */\n\n  if (pe1 < pe2)\n    return -1;\n  else if (pe1 > pe2)\n    return 1;\n  else\n    return 0;\n}"
 }

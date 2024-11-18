@@ -2,6 +2,7 @@
     "Project": "RIOT",
     "Tool": "Infer",
     "Bug Type": "Buffer Overrun L3",
+    "Message": "Offset: [0, 6] Size: [0, 7] by call to `ccnl_fib_rem_entry`.",
     "Code_line": "            int res = ccnl_fib_rem_entry(&ccnl_relay, prefix, NULL);",
     "Code_function": "int _ccnl_fib(int argc, char **argv)\n{\n    if (argc < 2) {\n        ccnl_fib_show(&ccnl_relay);\n    }\n    else if ((argc == 3) && (strncmp(argv[1], \"del\", 3) == 0)) {\n        int suite = CCNL_SUITE_NDNTLV;\n        if (strchr(argv[2], '/')) {\n            struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[2], suite, NULL);\n            if (!prefix) {\n                puts(\"Error: prefix could not be created!\");\n                return -1;\n            }\n            int res = ccnl_fib_rem_entry(&ccnl_relay, prefix, NULL);\n            ccnl_prefix_free(prefix);\n            return res;\n        }\n        else {\n            struct ccnl_face_s *face = _intern_face_get(argv[2]);\n            if (face == NULL) {\n                printf(\"There is no face for address %s\\n\", argv[1]);\n                return -1;\n            }\n            int res = ccnl_fib_rem_entry(&ccnl_relay, NULL, face);\n            return res;\n        }\n    }\n    else if ((argc == 4) && (strncmp(argv[1], \"add\", 3) == 0)) {\n        if (_intern_fib_add(argv[2], argv[3]) < 0) {\n            _ccnl_fib_usage(argv[0]);\n            return -1;\n        }\n    }\n    else {\n        _ccnl_fib_usage(argv[0]);\n        return -1;\n    }\n    return 0;\n}"
 }

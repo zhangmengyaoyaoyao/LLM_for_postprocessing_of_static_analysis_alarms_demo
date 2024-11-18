@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L1",
+    "Message": "Offset: -1 Size: 1.",
     "Code_line": "\t\t\t*--val = '=';",
     "Code_function": "load_environ()\n{\n#if ! (defined(VMS) && defined(__DECC))\n\textern char **environ;\n#endif\n\tchar *var, *val;\n\tNODE **aptr;\n\tint i;\n\tNODE *tmp;\n\tstatic bool been_here = false;\n\n\tif (been_here)\n\t\treturn ENVIRON_node;\n\n\tbeen_here = true;\n\n\tENVIRON_node = install_symbol(estrdup(\"ENVIRON\", 7), Node_var_array);\n\tfor (i = 0; environ[i] != NULL; i++) {\n\t\tstatic char nullstr[] = \"\";\n\n\t\tvar = environ[i];\n\t\tval = strchr(var, '=');\n\t\tif (val != NULL)\n\t\t\t*val++ = '\\0';\n\t\telse\n\t\t\tval = nullstr;\n\t\ttmp = make_string(var, strlen(var));\n\t\taptr = assoc_lookup(ENVIRON_node, tmp);\n\t\tunref(tmp);\n\t\tunref(*aptr);\n\t\t*aptr = make_string(val, strlen(val));\n\t\t(*aptr)->flags |= MAYBE_NUM;\n\n\t\t/* restore '=' so that system() gets a valid environment */\n\t\tif (val != nullstr)\n\t\t\t*--val = '=';\n\t}\n\t/*\n\t * Put AWKPATH and AWKLIBPATH into ENVIRON if not already there.\n\t * This allows querying it from within awk programs.\n\t *\n\t * October 2014:\n\t * If their values are \"\", override with the default values;\n\t * since 2.10 AWKPATH used default value if environment's\n\t * value was \"\".\n\t */\n\tpath_environ(\"AWKPATH\", defpath);\n\tpath_environ(\"AWKLIBPATH\", deflibpath);\n\treturn ENVIRON_node;\n}"
 }

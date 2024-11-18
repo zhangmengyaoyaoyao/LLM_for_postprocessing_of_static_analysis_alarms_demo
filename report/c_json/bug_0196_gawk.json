@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `curr_ctxt` last assigned on line 1597 could be null and is dereferenced by call to `pop_context()` at line 1599, column 2.",
     "Code_line": "\tpop_context();  /* switch to prev context */",
     "Code_function": "condition_triggered(struct condition *cndn)\n{\n\tNODE *r;\n\tint di;\n\n\tassert(cndn != NULL);\n\tif (cndn->code == NULL)\n\t\treturn true;\n\n\tpush_context(cndn->ctxt);\n\tr = execute_code((volatile INSTRUCTION *) cndn->code);\n\tpop_context();  /* switch to prev context */\n\tif (r == NULL)      /* fatal error */\n\t\treturn false;   /* not triggered */\n\n\tforce_number(r);\n\tdi = ! iszero(r);\n\tDEREF(r);\n\treturn di;\n}"
 }

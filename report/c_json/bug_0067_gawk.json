@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `the_dir` last assigned on line 287 could be null and is dereferenced at line 288, column 2.",
     "Code_line": "\tthe_dir->dp = dp;",
     "Code_function": "dir_take_control_of(awk_input_buf_t *iobuf)\n{\n\tDIR *dp;\n\topen_directory_t *the_dir;\n\tsize_t size;\n\n\terrno = 0;\n#ifdef HAVE_FDOPENDIR\n\tdp = fdopendir(iobuf->fd);\n#else\n\tdp = opendir(iobuf->name);\n\tif (dp != NULL)\n\t\tiobuf->fd = dirfd(dp);\n#endif\n\tif (dp == NULL) {\n\t\twarning(ext_id, _(\"dir_take_control_of: opendir/fdopendir failed: %s\"),\n\t\t\t\tstrerror(errno));\n\t\tupdate_ERRNO_int(errno);\n\t\treturn awk_false;\n\t}\n\n\temalloc(the_dir, open_directory_t *, sizeof(open_directory_t), \"dir_take_control_of\");\n\tthe_dir->dp = dp;\n\tsize = sizeof(struct dirent) + 21 /* max digits in inode */ + 2 /* slashes */;\n\temalloc(the_dir->buf, char *, size, \"dir_take_control_of\");\n\n\tiobuf->opaque = the_dir;\n\tiobuf->get_record = dir_get_record;\n\tiobuf->close_func = dir_close;\n\n\treturn awk_true;\n}"
 }

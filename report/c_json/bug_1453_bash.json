@@ -2,6 +2,7 @@
     "Project": "bash",
     "Tool": "Infer",
     "Bug Type": "UNINITIALIZED_VALUE",
+    "Message": "The value read from state_bak.__count was never initialized.",
     "Code_line": "\t    ADVANCE_CHAR (s, len, i);",
     "Code_function": "chk_arithsub (s, len)\n     const char *s;\n     int len;\n{\n  int i, count;\n  DECLARE_MBSTATE;\n\n  i = count = 0;\n  while (i < len)\n    {\n      if (s[i] == LPAREN)\n\tcount++;\n      else if (s[i] == RPAREN)\n\t{\n\t  count--;\n\t  if (count < 0)\n\t    return 0;\n\t}\n\n      switch (s[i])\n\t{\n\tdefault:\n\t  ADVANCE_CHAR (s, len, i);\n\t  break;\n\n\tcase '\\\\':\n\t  i++;\n\t  if (s[i])\n\t    ADVANCE_CHAR (s, len, i);\n\t  break;\n\n\tcase '\\'':\n\t  i = skip_single_quoted (s, len, ++i);\n\t  break;\n\n\tcase '\"':\n\t  i = skip_double_quoted ((char *)s, len, ++i);\n\t  break;\n\t}\n    }\n\n  return (count == 0);\n}"
 }

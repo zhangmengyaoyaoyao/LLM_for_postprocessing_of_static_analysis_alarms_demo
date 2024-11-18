@@ -2,6 +2,7 @@
     "Project": "bash",
     "Tool": "Infer",
     "Bug Type": "UNINITIALIZED_VALUE",
+    "Message": "The value read from state_bak.__count was never initialized.",
     "Code_line": "      COPY_CHAR_P (t, s, send);",
     "Code_function": "quote_assign (string)\n     const char *string;\n{\n  size_t slen;\n  int saw_eq;\n  char *temp, *t, *subs;\n  const char *s, *send;\n  int ss, se;\n  DECLARE_MBSTATE;\n\n  slen = strlen (string);\n  send = string + slen;\n\n  t = temp = (char *)xmalloc (slen * 2 + 1);\n  saw_eq = 0;\n  for (s = string; *s; )\n    {\n      if (*s == '=')\n\tsaw_eq = 1;\n      if (saw_eq == 0 && *s == '[')\t\t/* looks like a subscript */\n\t{\n\t  ss = s - string;\n\t  se = skipsubscript (string, ss, 0);\n\t  subs = substring (s, ss, se);\n\t  *t++ = '\\\\';\n\t  strcpy (t, subs);\n\t  t += se - ss;\n\t  *t++ = '\\\\';\n\t  *t++ = ']';\n\t  s += se + 1;\n\t  free (subs);\n\t  continue;\n\t}\n      if (saw_eq == 0 && (glob_char_p (s) || isifs (*s)))\n\t*t++ = '\\\\';\n\n      COPY_CHAR_P (t, s, send);\n    }\n  *t = '\\0';\n  return temp;\n}"
 }

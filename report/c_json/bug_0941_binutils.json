@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "UNINITIALIZED_VALUE",
+    "Message": "The value read from type was never initialized.",
     "Code_line": "      (*pargs)[*pcount] = type;",
     "Code_function": "stab_demangle_arg (struct stab_demangle_info *minfo, const char **pp,\n\t\t   debug_type **pargs, unsigned int *pcount,\n\t\t   unsigned int *palloc)\n{\n  const char *start;\n  debug_type type;\n\n  start = *pp;\n  if (! stab_demangle_type (minfo, pp,\n\t\t\t    pargs == NULL ? (debug_type *) NULL : &type)\n      || ! stab_demangle_remember_type (minfo, start, *pp - start))\n    return FALSE;\n\n  if (pargs != NULL)\n    {\n      if (type == DEBUG_TYPE_NULL)\n\treturn FALSE;\n\n      if (*pcount + 1 >= *palloc)\n\t{\n\t  *palloc += 10;\n\t  *pargs = ((debug_type *)\n\t\t    xrealloc (*pargs, *palloc * sizeof **pargs));\n\t}\n      (*pargs)[*pcount] = type;\n      ++*pcount;\n    }\n\n  return TRUE;\n}"
 }

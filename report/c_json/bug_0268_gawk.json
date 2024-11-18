@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset added: 33 (⇐ 1 + 32) Size: [0, +oo] by call to `bcalloc`.",
     "Code_line": "\t(void) list_append(def, instruction(Op_push_i));",
     "Code_function": "mk_function(INSTRUCTION *fi, INSTRUCTION *def)\n{\n\tNODE *thisfunc;\n\n\tthisfunc = fi->func_body;\n\tassert(thisfunc != NULL);\n\n\tif (do_optimize && def->lasti->opcode == Op_pop) {\n\t\t/* tail call which does not return any value. */\n\n\t\tINSTRUCTION *t;\n\n\t\tfor (t = def->nexti; t->nexti != def->lasti; t = t->nexti)\n\t\t\t;\n\t\tif (t->opcode == Op_func_call\n\t\t    && strcmp(t->func_name, thisfunc->vname) == 0)\n\t\t\t(t + 1)->tail_call = true;\n\t}\n\n\t/* add an implicit return at end;\n\t * also used by 'return' command in debugger\n\t */\n\n\t(void) list_append(def, instruction(Op_push_i));\n\tdef->lasti->memory = dupnode(Nnull_string);\n\t(void) list_append(def, instruction(Op_K_return));\n\n\tif (do_pretty_print)\n\t\t(void) list_prepend(def, instruction(Op_exec_count));\n\n\t/* fi->opcode = Op_func */\n\t(fi + 1)->firsti = def->nexti;\n\t(fi + 1)->lasti = def->lasti;\n\t(fi + 2)->first_line = fi->source_line;\n\t(fi + 2)->last_line = lastline;\n\tfi->nexti = def->nexti;\n\tbcfree(def);\n\n\t(void) list_append(rule_list, fi + 1);\t/* debugging */\n\n\t/* update lint table info */\n\tfunc_use(thisfunc->vname, FUNC_DEFINE);\n\n\t/* remove params from symbol table */\n\tremove_params(thisfunc);\n\treturn fi;\n}"
 }

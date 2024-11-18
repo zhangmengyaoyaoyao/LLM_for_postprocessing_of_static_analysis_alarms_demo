@@ -2,6 +2,7 @@
     "Project": "bash",
     "Tool": "Infer",
     "Bug Type": "UNINITIALIZED_VALUE",
+    "Message": "The value read from state_bak.__count was never initialized.",
     "Code_line": "\t    ADVANCE_CHAR (string, slen, sindex);",
     "Code_function": "unquoted_member (character, string)\n     int character;\n     char *string;\n{\n  size_t slen;\n  int sindex, c;\n  DECLARE_MBSTATE;\n\n  slen = strlen (string);\n  sindex = 0;\n  while (c = string[sindex])\n    {\n      if (c == character)\n\treturn (1);\n\n      switch (c)\n\t{\n\tdefault:\n\t  ADVANCE_CHAR (string, slen, sindex);\n\t  break;\n\n\tcase '\\\\':\n\t  sindex++;\n\t  if (string[sindex])\n\t    ADVANCE_CHAR (string, slen, sindex);\n\t  break;\n\n\tcase '\\'':\n\t  sindex = skip_single_quoted (string, slen, ++sindex);\n\t  break;\n\n\tcase '\"':\n\t  sindex = skip_double_quoted (string, slen, ++sindex);\n\t  break;\n\t}\n    }\n  return (0);\n}"
 }

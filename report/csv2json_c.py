@@ -39,6 +39,6 @@ def excel_to_json(excel_file, output_dir, columns):
 # 使用示例
 excel_file = "report/c_raw/c.xlsx"  # 替换为你的 Excel 文件路径
 output_dir = "report/c_json"  # 输出 JSON 文件的目录
-columns = ["Project", "Tool", "Bug Type", "Code_line", "Code_function"]  # 需要保留的列
+columns = ["Project", "Tool", "Bug Type", "Message", "Code_line", "Code_function"]  # 需要保留的列
 
 excel_to_json(excel_file, output_dir, columns)

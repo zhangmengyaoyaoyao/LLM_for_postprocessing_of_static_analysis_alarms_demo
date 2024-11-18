@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset: [-1, +oo] Size: [120, +oo] by call to `scan_unit_for_symbols`.",
     "Code_line": "\t  && ! scan_unit_for_symbols (unit))",
     "Code_function": "comp_unit_maybe_decode_line_info (struct comp_unit *unit,\n\t\t\t\t  struct dwarf2_debug *stash)\n{\n  if (unit->error)\n    return FALSE;\n\n  if (! unit->line_table)\n    {\n      if (! unit->stmtlist)\n\t{\n\t  unit->error = 1;\n\t  return FALSE;\n\t}\n\n      unit->line_table = decode_line_info (unit, stash);\n\n      if (! unit->line_table)\n\t{\n\t  unit->error = 1;\n\t  return FALSE;\n\t}\n\n      if (unit->first_child_die_ptr < unit->end_ptr\n\t  && ! scan_unit_for_symbols (unit))\n\t{\n\t  unit->error = 1;\n\t  return FALSE;\n\t}\n    }\n\n  return TRUE;\n}"
 }

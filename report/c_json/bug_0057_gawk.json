@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_S2",
+    "Message": "Offset added: [`symbol->sub.nodep.name->strlen` + 1, `symbol->sub.nodep.name->strlen` + 1] Size: [0, 8⋅`symbol->sub.nodep.name->strlen` + 2056].",
     "Code_line": "\t\tmemcpy(aname, symbol->vname, alen + 1);",
     "Code_function": "make_aname(const NODE *symbol)\n{\n\tstatic char *aname = NULL;\n\tstatic size_t alen;\n\tstatic size_t max_alen;\n#define SLEN 256\n\n\tif (symbol->parent_array != NULL) {\n\t\tsize_t slen;\n\n\t\t(void) make_aname(symbol->parent_array);\n\t\tslen = strlen(symbol->vname);\t/* subscript in parent array */\n\t\tif (alen + slen + 4 > max_alen) {\t\t/* sizeof(\"[\\\"\\\"]\") = 4 */\n\t\t\tmax_alen = alen + slen + 4 + SLEN;\n\t\t\terealloc(aname, char *, (max_alen + 1) * sizeof(char *), \"make_aname\");\n\t\t}\n\t\talen += sprintf(aname + alen, \"[\\\"%s\\\"]\", symbol->vname);\n\t} else {\n\t\talen = strlen(symbol->vname);\n\t\tif (aname == NULL) {\n\t\t\tmax_alen = alen + SLEN;\n\t\t\temalloc(aname, char *, (max_alen + 1) * sizeof(char *), \"make_aname\");\n\t\t} else if (alen > max_alen) {\n\t\t\tmax_alen = alen + SLEN;\n\t\t\terealloc(aname, char *, (max_alen + 1) * sizeof(char *), \"make_aname\");\n\t\t}\n\t\tmemcpy(aname, symbol->vname, alen + 1);\n\t}\n\treturn aname;\n}"
 }

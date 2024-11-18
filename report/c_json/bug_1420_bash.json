@@ -2,6 +2,7 @@
     "Project": "bash",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `v` last assigned on line 2793 could be null and is dereferenced at line 2801, column 3.",
     "Code_line": "  VUNSETATTR (v, att_invisible);",
     "Code_function": "bind_int_variable (lhs, rhs)\n     char *lhs, *rhs;\n{\n  register SHELL_VAR *v;\n  int isint, isarr, implicitarray;\n\n  isint = isarr = implicitarray = 0;\n#if defined (ARRAY_VARS)\n  if (valid_array_reference (lhs))\n    {\n      isarr = 1;\n      v = array_variable_part (lhs, (char **)0, (int *)0);\n    }\n  else\n#endif\n    v = find_variable (lhs);\n\n  if (v)\n    {\n      isint = integer_p (v);\n      VUNSETATTR (v, att_integer);\n#if defined (ARRAY_VARS)\n      if (array_p (v) && isarr == 0)\n\timplicitarray = 1;\n#endif\n    }\n\n#if defined (ARRAY_VARS)\n  if (isarr)\n    v = assign_array_element (lhs, rhs, 0);\n  else if (implicitarray)\n    v = bind_array_variable (lhs, 0, rhs, 0);\n  else\n#endif\n    v = bind_variable (lhs, rhs, 0);\n\n  if (v && isint)\n    VSETATTR (v, att_integer);\n\n  VUNSETATTR (v, att_invisible);\n\n  return (v);\n}"
 }

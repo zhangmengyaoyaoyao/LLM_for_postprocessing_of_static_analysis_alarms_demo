@@ -2,6 +2,7 @@
     "Project": "gawk",
     "Tool": "Infer",
     "Bug Type": "NULL_DEREFERENCE",
+    "Message": "pointer `cs` last assigned on line 5742 could be null and is dereferenced at line 5743, column 2.",
     "Code_line": "\tcs->fd = fd;",
     "Code_function": "push_cmd_src(\n\tint fd,\n\tbool istty,\n\tchar * (*readfunc)(const char *),\n\tint (*closefunc)(int),\n\tint ctype,\n\tint eofstatus)\n{\n\tstruct command_source *cs;\n\temalloc(cs, struct command_source *, sizeof(struct command_source), \"push_cmd_src\");\n\tcs->fd = fd;\n\tcs->is_tty = istty;\n\tcs->read_func = readfunc;\n\tcs->close_func = closefunc;\n\tcs->cmd = ctype;\n\n\t/* eof_status = EXIT_FATAL     - exit with status EXIT_FATAL on EOF or error.\n\t *            = EXIT_FAILURE   - exit status EXIT_FAILURE on error.\n\t *            = EXIT_SUCCESS   - don't exit on EOF or error.\n\t */\n\tcs->eof_status = eofstatus;\n\tcs->str = NULL;\n\tcs->next = cmd_src;\n\tcmd_src = cs;\n\n\tinput_fd = fd;\n\tinput_from_tty = istty;\n\tread_a_line = readfunc;\n}"
 }

@@ -2,6 +2,7 @@
     "Project": "Zephyr",
     "Tool": "Infer",
     "Bug Type": "Null Dereference",
+    "Message": "pointer `context` last assigned on line 1720 could be null and is dereferenced at line 1734, column 7.",
     "Code_line": "\tif (!context->recv_cb) {",
     "Code_function": "enum net_verdict net_context_packet_received(struct net_conn *conn,\n\t\t\t\t\t     struct net_pkt *pkt,\n\t\t\t\t\t     union net_ip_header *ip_hdr,\n\t\t\t\t\t     union net_proto_header *proto_hdr,\n\t\t\t\t\t     void *user_data)\n{\n\tstruct net_context *context = find_context(conn);\n\tenum net_verdict verdict = NET_DROP;\n\n\tNET_ASSERT(context);\n\tNET_ASSERT(net_pkt_iface(pkt));\n\n\tk_mutex_lock(&context->lock, K_FOREVER);\n\n\tnet_context_set_iface(context, net_pkt_iface(pkt));\n\tnet_pkt_set_context(pkt, context);\n\n\t/* If there is no callback registered, then we can only drop\n\t * the packet.\n\t */\n\tif (!context->recv_cb) {\n\t\tgoto unlock;\n\t}\n\n\tif (net_context_get_ip_proto(context) == IPPROTO_TCP) {\n\t\tnet_stats_update_tcp_recv(net_pkt_iface(pkt),\n\t\t\t\t\t  net_pkt_remaining_data(pkt));\n\t}\n\n\tcontext->recv_cb(context, pkt, ip_hdr, proto_hdr, 0, user_data);\n\n#if defined(CONFIG_NET_CONTEXT_SYNC_RECV)\n\tk_sem_give(&context->recv_data_wait);\n#endif /* CONFIG_NET_CONTEXT_SYNC_RECV */\n\n\tverdict = NET_OK;\n\nunlock:\n\tk_mutex_unlock(&context->lock);\n\n\treturn verdict;\n}"
 }

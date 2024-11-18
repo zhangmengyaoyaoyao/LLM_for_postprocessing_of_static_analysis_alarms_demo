@@ -2,6 +2,7 @@
     "Project": "binutils",
     "Tool": "Infer",
     "Bug Type": "BUFFER_OVERRUN_L3",
+    "Message": "Offset added: 2 Size: [1, +oo] by call to `string_prepend`.",
     "Code_line": "\t      string_prepend (declp, \"::\");",
     "Code_function": "arm_special (const char **mangled, string *declp)\n{\n  int n;\n  int success = 1;\n  const char *scan;\n\n  if (strncmp (*mangled, ARM_VTABLE_STRING, ARM_VTABLE_STRLEN) == 0)\n    {\n      /* Found a ARM style virtual table, get past ARM_VTABLE_STRING\n         and create the decl.  Note that we consume the entire mangled\n\t input string, which means that demangle_signature has no work\n\t to do.  */\n      scan = *mangled + ARM_VTABLE_STRLEN;\n      while (*scan != '\\0')        /* first check it can be demangled */\n        {\n          n = consume_count (&scan);\n          if (n == -1)\n\t    {\n\t      return (0);           /* no good */\n\t    }\n          scan += n;\n          if (scan[0] == '_' && scan[1] == '_')\n\t    {\n\t      scan += 2;\n\t    }\n        }\n      (*mangled) += ARM_VTABLE_STRLEN;\n      while (**mangled != '\\0')\n\t{\n\t  n = consume_count (mangled);\n          if (n == -1\n\t      || n > (long) strlen (*mangled))\n\t    return 0;\n\t  string_prependn (declp, *mangled, n);\n\t  (*mangled) += n;\n\t  if ((*mangled)[0] == '_' && (*mangled)[1] == '_')\n\t    {\n\t      string_prepend (declp, \"::\");\n\t      (*mangled) += 2;\n\t    }\n\t}\n      string_append (declp, \" virtual table\");\n    }\n  else\n    {\n      success = 0;\n    }\n  return (success);\n}"
 }

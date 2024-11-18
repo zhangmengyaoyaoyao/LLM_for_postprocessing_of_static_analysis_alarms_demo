@@ -2,6 +2,7 @@ import glob
 from http import HTTPStatus
 import json
 import os
+import time
 import dashscope
 import sys
 
@@ -24,7 +25,7 @@ def call_with_messages(messages):
         result_format='message',  # set the result to be "message" format.
     )
     if response.status_code == HTTPStatus.OK:
-        print(response)
+        return response
     else:
         print('Request id: %s, Status code: %s, error code: %s, error message: %s' % (
             response.request_id, response.status_code,
@@ -32,9 +33,12 @@ def call_with_messages(messages):
         ))
 
 
-def process_spotbugs_project_files(project_name, base_dir="report/spotbugs_json"):
+def process_spotbugs_project_files(model, tool, prompts_technique, project_name):
+    # 调用限流
+    count = 0
+    
     # 构建项目路径
-    project_path = os.path.join(base_dir, project_name)
+    project_path = os.path.join("report", tool, project_name)
 
     # 获取该项目下的所有 JSON 文件路径
     json_files = sorted(glob.glob(os.path.join(project_path, "*.json")))
@@ -42,6 +46,14 @@ def process_spotbugs_project_files(project_name, base_dir="report/spotbugs_json"
     if not json_files:
         print(f"No JSON files found for project {project_name} in {project_path}.")
         return
+    
+
+    # 存储输出的路径
+    output_dir = os.path.join("response", model, tool, prompts_technique, project_name)
+    os.makedirs(output_dir, exist_ok=True)
+
+    #temp
+    json_files = json_files[340:]
 
     # 依次处理每个 JSON 文件
     for json_file in json_files:
@@ -51,22 +63,49 @@ def process_spotbugs_project_files(project_name, base_dir="report/spotbugs_json"
 
         # 转换 JSON 为字符串
         json_content = json.dumps(data, indent=2)
-
+            
         # 设置提示词内容
+        if(tool != 'spotbugs'):
+            tool = json_content["Tool"]
+            project_name = json_content["Project"]
+        constructor.setGeneralInfo(tool, project_name)
         constructor.setWarning(json_content)
-        constructor.setGeneralInfo('SpotBugs', project_name)
 
         # 调用模型
         response = call_with_messages(constructor.construct_zero_shot())
+        content = response["output"]["choices"][0]["message"]["content"]
+
+        # 写入到文本文件
+        # 提取文件名（去掉路径和扩展名）
+        base_name = os.path.splitext(os.path.basename(json_file))[0]
+
+        # 构造 .txt 文件路径
+        txt_file = os.path.join(output_dir, f"{base_name}.txt")
+        with open(txt_file, "w", encoding="utf-8") as f:
+            f.write(content)
 
         #print(f"Response for {json_file}: {response}")
+        print(f"store to: {output_dir}/{base_name}.txt")
+
+
+        count += 1
+        if count == 8:
+            print("Pausing for 35 seconds...")
+            time.sleep(35)
+            count = 0
 
 
 if __name__ == '__main__':
     # 项目列表
     projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
+    #prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "critique", "self_heuristic"]
+    prompts_techniques = ["one_shot"]
+
+    tool = "spotbugs"
+    model='llama3-70b-instruct'
 
     # 依次处理所有项目
     for project in projects:
-        print(f"Processing project: {project}")
-        process_spotbugs_project_files(project)
+        for prompts_technique in prompts_techniques:
+            print(f"Processing project {project} with {prompts_technique}")
+            process_spotbugs_project_files(model, tool, prompts_technique, project)
