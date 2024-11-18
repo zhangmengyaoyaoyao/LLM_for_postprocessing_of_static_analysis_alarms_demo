@@ -1,10 +1,5 @@
-expertise = """\
-Static analysis tools often generate false positives in the following situations:
-1. Missing context
-2. Path insensitivity
-3. Loop and recursion handling issues
-4. False positives caused by macro or template code
-5. Dependent external code libraries cannot be analyzed
-6. Insufficient analysis of multithreading or asynchronous operations
-7. False positives caused by function pointers or callbacks
+expertise_expertise = """\
+An actionable warning signals an issue needing resolution. \
+If a warning is no longer present in a later revision,  it's assumed to have been addressed or fixed, meaning it was actionable. \
+If it persists, it’s likely unactionable, indicating no real issue was found.
 """

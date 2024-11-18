@@ -1,7 +1,6 @@
-review_instrction = """\
-Review your previous answers and identify any problems with them.\
+critique_USER1 = """\
+Review your previous answers and identify any problems with them.
 """
-
-improve_instruction = """\
-Based on the problems you found, improve your answers.\
+critique_USER2 = """\
+Based on the problems you found, improve your answer.
 """

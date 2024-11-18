@@ -1,7 +1,7 @@
-heuristic_instruction1 = """\
-I will give you several bug reports and you will analyze them one-by-one, step-by-step, to know if it is a real bug or a false alarm.\
+heuristic_USER1 = """\
+Based on the examples provided to you, please summarize the features of actionable warnings.
 """
 
-heuristic_instruction2 = """\
-Based on the information provided and the analysis we did, please summerize the features of real bugs and false alarms.\
+heuristic_USER2 = """\
+Based ont the information you summarized, please decide whether this warning is actionable or not. Your answer should end with "@@ actionable @@",  "@@ unactionable @@" or "@@ unknown @@"(if you are uncertain). 
 """

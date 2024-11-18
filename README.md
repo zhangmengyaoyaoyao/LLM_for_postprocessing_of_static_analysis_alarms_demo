@@ -27,3 +27,9 @@ json格式：report/spotbugs_json
 ## C/C++
 ### 格式转换
 report/csv2json_c.py: 转换为json格式
+
+# TODO
+1、提示词的example以md形式改写
+2、目前只尝试运行了zero-shot模板
+3、设置每分钟调用10次的限制
+4、提取回答中的结果
