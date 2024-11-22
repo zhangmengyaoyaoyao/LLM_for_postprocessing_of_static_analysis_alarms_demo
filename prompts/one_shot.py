@@ -1,3 +1,8 @@
+one_shot_prompt_USER1= """\
+# Task Description
+Please decide whether this warning is actionable or not.
+"""
+
 one_shot_example = """\
 
 # example1
@@ -15,5 +20,10 @@ one_shot_example = """\
 ```
 
 ## Your Answer
-@@@ unactionable @@@
+//your reason
+@@ unactionable @@
+"""
+
+one_shot_prompt_USER2= """\
+In the last line of your answer, you should conclude with "@@ actionable @@", "@@ unactionable @@" or "@@ unknown @@"(if you are uncertain).
 """

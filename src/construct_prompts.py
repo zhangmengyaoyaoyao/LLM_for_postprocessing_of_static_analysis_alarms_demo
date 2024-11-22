@@ -9,11 +9,23 @@ def setWarning(warningNow):
 def setGeneralInfo(toolNow, projectNow):
     general_info.setGeneralInfo(toolNow, projectNow)
 
+# def construct_warning():
+#     messages = []
+
+#     user_message =  warning
+#     messages.append({'role': 'user', 'content': user_message})
+#     #test
+#     #print("input_warning:" + user_message)
+#     return messages
+
+
 def construct_zero_shot():
     messages = []
 
     user_message =  zero_shot.zero_shot_prompt_USER + warning
     messages.append({'role': 'user', 'content': user_message})
+    #test
+    #print("input_zero_shot:" + user_message)
 
     return messages
 
@@ -21,8 +33,10 @@ def construct_zero_shot():
 def construct_one_shot():
     messages = []
 
-    user_message =  zero_shot.zero_shot_prompt_USER+one_shot.one_shot_example + warning
+    user_message =  one_shot.one_shot_prompt_USER1+one_shot.one_shot_example+one_shot.one_shot_prompt_USER2 + warning
     messages.append({'role': 'user', 'content': user_message})
+    #test
+    #print("input_one_shot:" + user_message)
 
     return messages
 
