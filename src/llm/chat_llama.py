@@ -53,7 +53,8 @@ def process_spotbugs_project_files(model, tool, prompts_technique, project_name)
     os.makedirs(output_dir, exist_ok=True)
 
     #temp
-    json_files = json_files[311:]
+    # if(prompts_technique == 'general_info'):
+    #     json_files = json_files[517:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -122,7 +123,7 @@ if __name__ == '__main__':
     # 项目列表
     projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
     #prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
-    prompts_techniques = ["one_shot"]
+    prompts_techniques = ["few_shot"]
 
     tool = "spotbugs"
     model='llama3-70b-instruct'

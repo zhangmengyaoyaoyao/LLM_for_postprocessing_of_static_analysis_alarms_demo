@@ -1,0 +1,9 @@
+This warning is classified as "QF_QUESTIONABLE_FOR_LOOP" by SpotBugs, which means it's a potentially dodgy code. The warning is pointing to the for loop condition `pow <= Const.MAX_ACC_FLAG_I`. 
+
+Upon closer inspection, the loop variable `i` is not being used in the loop condition, instead, the variable `pow` is being used. The loop will continue as long as `pow` is less than or equal to `Const.MAX_ACC_FLAG_I`. 
+
+However, `pow` is being left-shifted by 1 in each iteration (`pow <<= 1;`), which means it's being multiplied by 2. This could potentially lead to an infinite loop if `Const.MAX_ACC_FLAG_I` is a large value, because `pow` will eventually exceed `Integer.MAX_VALUE` and wrap around to a negative value, causing the loop to run indefinitely.
+
+Therefore, this warning is actionable, as it highlights a potential bug in the code.
+
+@@ actionable @@

@@ -1,0 +1,20 @@
+This warning is reporting a potential unconfirmed cast from `Constant` to `ConstantDouble` in the line `return addDouble(((ConstantDouble) c).getBytes());`. 
+
+The warning is actionable because the code is using a switch statement to check the type of the `Constant` object, but it's not checking if the object is actually an instance of `ConstantDouble` before casting it. 
+
+If the object is not an instance of `ConstantDouble`, this will throw a `ClassCastException` at runtime. 
+
+To fix this, the code should add a check to ensure that the object is an instance of `ConstantDouble` before casting it, for example:
+
+```java
+case Const.CONSTANT_Double:
+    if (c instanceof ConstantDouble) {
+        return addDouble(((ConstantDouble) c).getBytes());
+    } else {
+        throw new IllegalArgumentException("Expected ConstantDouble, but got " + c.getClass());
+    }
+```
+
+This will prevent the `ClassCastException` and provide a more informative error message if the object is not of the expected type.
+
+@@ actionable @@

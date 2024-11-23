@@ -45,6 +45,7 @@ This warning is actionable because it points to a specific line of code (`System
 已解决 4、提取回答中的结果到excel中
 已解决 5、c中tool和projectname需要从json中提取，这样才能区分开zero-shot和general-info
 已实验 6、每次都有提供提示词吗——是的，否则没有taskdescription
+7、比较时去除训练集
 
 变量：
 llm
