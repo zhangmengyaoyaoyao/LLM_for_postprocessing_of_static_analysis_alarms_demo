@@ -70,7 +70,6 @@ def construct_expertise():
     user_message =  zero_shot.zero_shot_prompt_USER + expertise.expertise_expertise + warning
     messages.append({'role': 'user', 'content': user_message})
     print("exper")
-    print(messages)
 
     return messages
 

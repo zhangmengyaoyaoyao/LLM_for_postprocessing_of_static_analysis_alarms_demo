@@ -15,7 +15,8 @@ few_shot_example1 = """\
 ```
 
 ## Your Answer
-@@@ actionable @@@
+//your reason
+@@ actionable @@
 """
 
 
@@ -37,7 +38,8 @@ few_shot_example2 = """\
 ```
 
 ## Your Answer
-@@@ actionable @@@
+//your reason
+@@ actionable @@
 """
 
 few_shot_example3 = """\
@@ -57,7 +59,8 @@ few_shot_example3 = """\
 ```
 
 ## Your Answer
-@@@ unactionable @@@
+//your reason
+@@ unactionable @@
 """
 
 
@@ -78,5 +81,6 @@ few_shot_example4 = """\
 ```
 
 ## Your Answer
-@@@ unactionable @@@
+//your reason
+@@ unactionable @@
 """

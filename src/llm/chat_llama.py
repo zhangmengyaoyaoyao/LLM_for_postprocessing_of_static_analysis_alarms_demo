@@ -15,23 +15,34 @@ import construct_prompts as constructor
 
 
 def call_with_messages(messages):
+    # 保存所有轮次的消息
+    all_messages = []
 
-    # messages = [{'role': 'system', 'content': 'You are a helpful assistant.'},
-    #             {'role': 'user', 'content': '介绍一下自己'}]
-    response = dashscope.Generation.call(
-        #api_key=os.getenv('DASHSCOPE_API_KEY'),
-        api_key = 'sk-127b61202c714dcca246d6802542ae62',
-        model='llama3.1-70b-instruct',
-        messages=messages,
-        result_format='message',  # set the result to be "message" format.
-    )
-    if response.status_code == HTTPStatus.OK:
-        return response
-    else:
-        print('Request id: %s, Status code: %s, error code: %s, error message: %s' % (
-            response.request_id, response.status_code,
-            response.code, response.message
-        ))
+    for message in messages:
+        # 将当前消息合并到历史消息中
+        all_messages.extend(message)
+        print(all_messages)
+        
+        response = dashscope.Generation.call(
+            #api_key=os.getenv('DASHSCOPE_API_KEY'),
+            api_key='sk-fa045925bf2b4460a14876f2a3d84bf7',
+            model='llama3.1-70b-instruct',
+            messages=all_messages,
+            result_format='message',  # 设置结果为 "message" 格式
+        )
+        
+        if response.status_code == HTTPStatus.OK:
+            # 将模型生成的回复添加到消息中以供下一轮使用
+            generated_message = response["output"]["choices"][0]["message"]  # 假设最后一条消息是模型生成的
+            all_messages.append(generated_message)
+        else:
+            print('Request id: %s, Status code: %s, error code: %s, error message: %s' % (
+                response.request_id, response.status_code,
+                response.code, response.message
+            ))
+            return  # 如果出错，退出函数
+
+    return response
 
 
 def process_spotbugs_project_files(model, tool, prompts_technique, project_name):
@@ -53,8 +64,7 @@ def process_spotbugs_project_files(model, tool, prompts_technique, project_name)
     os.makedirs(output_dir, exist_ok=True)
 
     #temp
-    # if(prompts_technique == 'general_info'):
-    #     json_files = json_files[517:]
+    json_files = json_files[94:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):

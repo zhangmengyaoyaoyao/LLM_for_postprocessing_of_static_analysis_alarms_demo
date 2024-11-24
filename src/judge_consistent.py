@@ -34,5 +34,5 @@ def update_consistent_column(input_excel):
     print(f"处理完成，结果已更新到 {input_excel}")
 
 # 使用示例
-input_excel = "response/llama3-70b-instruct/spotbugs/zero_shot_bcel.xlsx"  # 替换为你的 Excel 文件路径
+input_excel = "response/llama3-70b-instruct/spotbugs/expertise_bcel.xlsx"  # 替换为你的 Excel 文件路径
 update_consistent_column(input_excel)
