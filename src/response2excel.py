@@ -44,6 +44,11 @@ def process_txt_files(folder_path, output_excel):
     print(f"数据已保存到 {output_excel}")
 
 # 使用示例
-folder_path = "response/llama3-70b-instruct/spotbugs/expertise/bcel"  # 替换为你的文件夹路径
-output_excel = "response/llama3-70b-instruct/spotbugs/expertise_bcel.xlsx"  # 替换为保存Excel的路径
-process_txt_files(folder_path, output_excel)
+#prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
+prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought"]
+
+for prompts_technique in prompts_techniques:
+    print(prompts_technique)
+    folder_path = f"response/llama3-70b-instruct/spotbugs/{prompts_technique}/bcel"  # 替换为你的文件夹路径
+    output_excel = f"response/llama3-70b-instruct/spotbugs/{prompts_technique}_bcel.xlsx"  # 替换为保存Excel的路径
+    process_txt_files(folder_path, output_excel)

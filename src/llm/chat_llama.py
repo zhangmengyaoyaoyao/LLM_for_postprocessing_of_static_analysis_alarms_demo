@@ -13,42 +13,123 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 import construct_prompts as constructor
 
+def call_with_message(messages):
 
-def call_with_messages(messages):
+    response = dashscope.Generation.call(
+        api_key=os.getenv('DASHSCOPE_API_KEY'),
+        model='llama3.1-70b-instruct',
+        messages=messages,
+        result_format='message',  # set the result to be "message" format.
+    )
+    if response.status_code == HTTPStatus.OK:
+        return response
+    else:
+        print('Request id: %s, Status code: %s, error code: %s, error message: %s' % (
+            response.request_id, response.status_code,
+            response.code, response.message
+        ))
+
+def call_with_3messages(messages):
+
+    if not isinstance(messages, tuple):
+        success = False
+        while not success:
+            response = dashscope.Generation.call(
+                #api_key=os.getenv('DASHSCOPE_API_KEY'),
+                api_key='sk-ca20bc30dd254138b642e46fd563598a',
+                model='llama3.1-70b-instruct',
+                messages=messages,
+                result_format='message',  # set the result to be "message" format.
+            )
+            if response.status_code == HTTPStatus.OK:
+                success = True
+                return response
+            else:
+                print('Request id: %s, Status code: %s, error code: %s, error message: %s' % (
+                    response.request_id, response.status_code,
+                    response.code, response.message
+                ))
+    else:
+        history_response = []
+        # 如果是多轮对话
+        # 展开元组为单个列表
+        messages = [msg for sublist in messages for msg in sublist]
+        # 保存所有轮次的消息
+        message_with_historys = []
+        print("Processing multiple rounds of messages")
+
+        for message in messages:
+            print("Processing message----", message)
+            print("complete-----", message_with_historys)
+            message_with_historys.append(message)
+            seccuss = False
+            while not seccuss:
+                response = dashscope.Generation.call(
+                    api_key='sk-ca20bc30dd254138b642e46fd563598a',
+                    model='llama3.1-70b-instruct',
+                    messages=message_with_historys,  # 当前轮的消息
+                    result_format='message',  # 设置结果为 "message" 格式
+                )
+
+                if response.status_code == HTTPStatus.OK:
+                    generated_message = response["output"]["choices"][0]["message"]
+                    message_with_historys.append(generated_message)  # 将模型生成的回复加入历史
+                    history_response.append(generated_message)
+                    seccuss = True
+                else:
+                    print('Request id: %s, Status code: %s, error code: %s, error message: %s' % (
+                        response.request_id, response.status_code,
+                        response.code, response.message
+                    ))
+                    print("retry in 3sec")
+                    time.sleep(3)
+        print("/////////////////historyhere////////////////////", history_response) 
+        return response, history_response
+    
+def call_with_2messages(messages):
+    history_response = []
+    # 如果是多轮对话
+    # 展开元组为单个列表
+    messages = [msg for sublist in messages for msg in sublist]
     # 保存所有轮次的消息
-    all_messages = []
+    message_with_historys = []
+    print("Processing multiple rounds of 3messages")
+    count = 0
 
     for message in messages:
-        # 将当前消息合并到历史消息中
-        all_messages.extend(message)
-        print(all_messages)
-        
-        response = dashscope.Generation.call(
-            #api_key=os.getenv('DASHSCOPE_API_KEY'),
-            api_key='sk-fa045925bf2b4460a14876f2a3d84bf7',
-            model='llama3.1-70b-instruct',
-            messages=all_messages,
-            result_format='message',  # 设置结果为 "message" 格式
-        )
-        
-        if response.status_code == HTTPStatus.OK:
-            # 将模型生成的回复添加到消息中以供下一轮使用
-            generated_message = response["output"]["choices"][0]["message"]  # 假设最后一条消息是模型生成的
-            all_messages.append(generated_message)
-        else:
-            print('Request id: %s, Status code: %s, error code: %s, error message: %s' % (
-                response.request_id, response.status_code,
-                response.code, response.message
-            ))
-            return  # 如果出错，退出函数
+        print("Processing message----", message)
+        if count is 0:
+            message_with_historys.append(message)
+            count += 1
+            continue
+        message_with_historys.append(message)
+        print("complete-----", message_with_historys)
+        seccuss = False
+        while not seccuss:
+            response = dashscope.Generation.call(
+                api_key='sk-ca20bc30dd254138b642e46fd563598a',
+                model='llama3.1-70b-instruct',
+                messages=message_with_historys,  # 当前轮的消息
+                result_format='message',  # 设置结果为 "message" 格式
+            )
 
-    return response
-
+            if response.status_code == HTTPStatus.OK:
+                generated_message = response["output"]["choices"][0]["message"]
+                message_with_historys.append(generated_message)  # 将模型生成的回复加入历史
+                history_response.append(generated_message)
+                seccuss = True
+            else:
+                print('Request id: %s, Status code: %s, error code: %s, error message: %s' % (
+                    response.request_id, response.status_code,
+                    response.code, response.message
+                ))
+                print("retry in 3sec")
+                time.sleep(3)
+        count += 1
+    print("/////////////////historyhere////////////////////", history_response) 
+    return response, history_response
 
 def process_spotbugs_project_files(model, tool, prompts_technique, project_name):
-    # 调用限流
-    count = 0
-    
     # 构建项目路径
     project_path = os.path.join("report", tool, project_name)
 
@@ -64,7 +145,8 @@ def process_spotbugs_project_files(model, tool, prompts_technique, project_name)
     os.makedirs(output_dir, exist_ok=True)
 
     #temp
-    json_files = json_files[94:]
+    if prompts_technique is "critique":
+        json_files = json_files[448:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -85,19 +167,19 @@ def process_spotbugs_project_files(model, tool, prompts_technique, project_name)
         flag_noResponse = True
         while flag_noResponse:
             if prompts_technique == "one_shot":
-                response = call_with_messages(constructor.construct_one_shot())
+                response = call_with_message(constructor.construct_one_shot())
             elif prompts_technique == "few_shot":
-                response = call_with_messages(constructor.construct_few_shot())
+                response = call_with_message(constructor.construct_few_shot())
             elif prompts_technique == "general_info":
-                response = call_with_messages(constructor.construct_general_info())
+                response = call_with_message(constructor.construct_general_info())
             elif prompts_technique == "expertise":
-                response = call_with_messages(constructor.construct_expertise())
+                response = call_with_message(constructor.construct_expertise())
             elif prompts_technique == "chain_of_thought":
-                response = call_with_messages(constructor.construct_chain)
+                response = call_with_message(constructor.construct_chain())
             elif prompts_technique == "critique":
-                response = call_with_messages(constructor.construct_critique())
+                response, history_response = call_with_3messages(constructor.construct_critique())
             elif prompts_technique == "self_heuristic":
-                response = call_with_messages(constructor.construct_heuristic())
+                response, history_response = call_with_2messages(constructor.construct_heuristic())
             else:
                 print("fail to find this prompts_technique:" + prompts_technique)
 
@@ -118,6 +200,16 @@ def process_spotbugs_project_files(model, tool, prompts_technique, project_name)
         txt_file = os.path.join(output_dir, f"{base_name}.txt")
         with open(txt_file, "w", encoding="utf-8") as f:
             f.write(content)
+        
+        print("///////historyresponse///////", history_response)
+        if history_response is not []:
+            txt_file = os.path.join(output_dir, f"{base_name}_history.txt")
+            # Open the file in append mode ("a") instead of write mode ("w")
+            with open(txt_file, "a", encoding="utf-8") as f:
+                for history in history_response:
+                    f.write(history.content + "\n\n\n")
+            print(f"history store to: {output_dir}/{base_name}_history.txt")
+            
 
         print(f"store to: {output_dir}/{base_name}.txt")
 
@@ -131,9 +223,12 @@ def process_spotbugs_project_files(model, tool, prompts_technique, project_name)
 
 if __name__ == '__main__':
     # 项目列表
-    projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
+    #projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
+    projects = ["bcel"]
     #prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
-    prompts_techniques = ["few_shot"]
+    prompts_techniques = ["critique","self_heuristic"]
+    # prompts_techniques = ["critique"]
+
 
     tool = "spotbugs"
     model='llama3-70b-instruct'

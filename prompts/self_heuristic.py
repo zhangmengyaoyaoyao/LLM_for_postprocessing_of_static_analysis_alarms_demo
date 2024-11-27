@@ -1,5 +1,5 @@
 heuristic_USER1 = """\
-Based on the examples provided to you, please summarize the features of actionable warnings.
+Based on the examples provided to you, please summarize the features of unactionable warnings.
 """
 
 heuristic_USER2 = """\

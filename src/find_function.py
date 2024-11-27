@@ -1,3 +1,7 @@
+LEFT_BRACE = "{"
+RIGHT_BRACE = "}"
+
+
 # c_file_path 文件路径
 # line_number 行号
 # function_name 函数名
@@ -24,6 +28,7 @@ def find_function(c_file_path, line_number, function_name):
             print("out")
             break
         stripped_line = lines[i]  # 去掉前导空白字符
+        #todo1:stripped_line = lines[i].strip()
         if stripped_line.startswith(LEFT_BRACE):  # 只匹配顶格的左大括号
             func_start = i
             print("func_start:" + str(func_start))
@@ -57,6 +62,7 @@ def find_function(c_file_path, line_number, function_name):
         return func_start + 1, None  # 没找到匹配的右大括号
 
     # 3. 从 func_start 行向前查找，找到第一个包含 function_name 的行（不区分大小写）
+    #todo2:要区分大小写？
     new_func_start = None
     function_name_lower = function_name.lower()
     for i in range(func_start - 1, -1, -1):
@@ -69,3 +75,8 @@ def find_function(c_file_path, line_number, function_name):
         new_func_start = func_start  # 如果没有找到包含函数名的行，默认起始行为左大括号所在行
 
     return new_func_start + 1, func_end + 1  # 行号从 1 开始
+
+
+#todo3:如果匹配的{}在注释中
+
+#todo4:函数体开始的{一定换行后定格吗

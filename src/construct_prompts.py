@@ -46,6 +46,8 @@ def construct_few_shot():
 
     user_message =  zero_shot.zero_shot_prompt_USER + few_shot.few_shot_example1 + few_shot.few_shot_example2 + few_shot.few_shot_example3 + few_shot.few_shot_example4 + warning
     messages.append({'role': 'user', 'content': user_message})
+    #test
+    print("con fs")
 
     return messages
 
@@ -79,6 +81,8 @@ def construct_chain():
 
     user_message =  chain_of_thought.chain_prompt_USER + warning
     messages.append({'role': 'user', 'content': user_message})
+    #test
+    print("con COT")
 
     return messages
 

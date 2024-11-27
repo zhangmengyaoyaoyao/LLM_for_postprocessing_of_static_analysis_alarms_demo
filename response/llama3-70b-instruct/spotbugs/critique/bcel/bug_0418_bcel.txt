@@ -1,0 +1,50 @@
+This warning is suggesting that an anonymous inner class should be static, which could potentially improve performance. The warning is specifically highlighting the anonymous inner class defined in the `return new ClassFile() {... }` block.
+
+To address this warning, the anonymous inner class could be refactored into a static nested class. This would involve defining a new static class within the outer class, and moving the implementation of the `ClassFile` interface to this new class.
+
+For example, the code could be refactored as follows:
+```java
+private static class MyClassFile implements ClassFile {
+    @Override
+    public String getBase() {
+        return resolved.getFileName().toString();
+    }
+
+    @Override
+    public InputStream getInputStream() throws IOException {
+        return Files.newInputStream(resolved);
+    }
+
+    @Override
+    public String getPath() {
+        return resolved.toString();
+    }
+
+    @Override
+    public long getSize() {
+        try {
+            return Files.size(resolved);
+        } catch (final IOException e) {
+            return 0;
+        }
+    }
+
+    @Override
+    public long getTime() {
+        try {
+            return Files.getLastModifiedTime(resolved).toMillis();
+        } catch (final IOException e) {
+            return 0;
+        }
+    }
+}
+
+//...
+
+return new MyClassFile();
+```
+By making this change, the anonymous inner class is replaced with a static nested class, which should address the warning.
+
+Therefore, I would classify this warning as actionable, as it provides enough information to make a specific change to the code to improve performance.
+
+@@ actionable @@
