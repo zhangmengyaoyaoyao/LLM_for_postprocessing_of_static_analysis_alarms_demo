@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "SF_SWITCH_NO_DEFAULT",
+  "priority": "2",
+  "rank": "19",
+  "project": "bcel",
+  "warning_line": "switch (i.getOpcode()) {\ncase Const.JSR:\ncase Const.GOTO:\nmax_additional_bytes += 2;\nbreak;\ncase Const.TABLESWITCH:\ncase Const.LOOKUPSWITCH:\nmax_additional_bytes += 3;\n",
+  "warning_method": "public void setPositions(final boolean check) {\nint max_additional_bytes = 0;\nint additional_bytes = 0;\nint index = 0;\nint count = 0;\nint[] pos = new int[length];\nif (check) {\nfor (InstructionHandle ih = start; ih != null; ih = ih.getNext()) {\nInstruction i = ih.getInstruction();\nif (i instanceof BranchInstruction) {\nInstruction inst = ((BranchInstruction) i).getTarget().getInstruction();\nif (!contains(inst)) {\nthrow new ClassGenException(\"Branch target of \" + Const.getOpcodeName(i.getOpcode()) + \":\" + inst + \" not in instruction list\");\n}\nif (i instanceof Select) {\nInstructionHandle[] targets = ((Select) i).getTargets();\nfor (InstructionHandle target : targets) {\ninst = target.getInstruction();\nif (!contains(inst)) {\nthrow new ClassGenException(\"Branch target of \" + Const.getOpcodeName(i.getOpcode()) + \":\" + inst + \" not in instruction list\");\n}\n}\n}\nif (!(ih instanceof BranchHandle)) {\nthrow new ClassGenException(\"Branch instruction \" + Const.getOpcodeName(i.getOpcode()) + \":\" + inst + \" not contained in BranchHandle.\");\n}\n}\n}\n}\nfor (InstructionHandle ih = start; ih != null; ih = ih.getNext()) {\nInstruction i = ih.getInstruction();\nih.setPosition(index);\npos[count++] = index;\nswitch(i.getOpcode()) {\ncase Const.JSR:\ncase Const.GOTO:\nmax_additional_bytes += 2;\nbreak;\ncase Const.TABLESWITCH:\ncase Const.LOOKUPSWITCH:\nmax_additional_bytes += 3;\nbreak;\n}\nindex += i.getLength();\n}\nfor (InstructionHandle ih = start; ih = ih.getNext()) {\nadditional_bytes += ih.updatePosition(additional_bytes, max_additional_bytes);\n}\nindex = count = 0;\nfor (InstructionHandle ih = start; ih != null; ih = ih.getNext()) {\nInstruction i = ih.getInstruction();\nih.setPosition(index);\npos[count++] = index;\nindex += i.getLength();\n}\nbyte_positions = new int[count];\nSystem.arraycopy(pos, 0, byte_positions, 0, count);\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates that there is a switch statement without a default case. This could potentially lead to undefined behavior if the switch expression does not match any of the cases. Since the method `setPositions` is processing instructions and setting positions based on the opcode, missing a default case could cause issues if an unexpected opcode is encountered. This is a potential oversight that could be fixed by adding a default case to handle any unexpected opcodes. Therefore, the warning is actionable.
+
+@@ actionable @@

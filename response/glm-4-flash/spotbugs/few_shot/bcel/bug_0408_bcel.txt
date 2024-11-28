@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "BC_UNCONFIRMED_CAST",
+  "priority": "3",
+  "rank": "20",
+  "project": "bcel",
+  "warning_line": "_out.println(\"il.append(new IINC(\" + i.getIndex() + \", \" + ((IINC) i).getIncrement()\n",
+  "warning_method": "@Override\npublic void visitLocalVariableInstruction(final LocalVariableInstruction i) {\nfinal short opcode = i.getOpcode();\nfinal Type type = i.getType(_cp);\nif (opcode == Const.IINC) {\n_out.println(\"il.append(new IINC(\" + i.getIndex() + \", \" + ((IINC) i).getIncrement() + \"));\");\n} else {\nfinal String kind = (opcode < Const.ISTORE) ? \"Load\" : \"Store\";\n_out.println(\"il.append(_factory.create\" + kind + \"(\" + BCELifier.printType(type) + \", \" + i.getIndex() + \"));\");\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates an unconfirmed cast, which suggests that the code is attempting to cast an object to a type `IINC` without verifying if the object is indeed of that type. This could lead to a `ClassCastException` at runtime. Since this is a potential runtime error, it is important to address the issue to prevent unexpected behavior. The code should include a check to ensure that the object is of the correct type before casting.
+
+@@ actionable @@

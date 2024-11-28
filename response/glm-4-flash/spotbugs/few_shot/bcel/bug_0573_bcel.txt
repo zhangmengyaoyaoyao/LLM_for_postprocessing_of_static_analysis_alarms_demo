@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "BC_UNCONFIRMED_CAST",
+  "priority": "3",
+  "rank": "20",
+  "project": "bcel",
+  "warning_line": "return new CHECKCAST(cp.addClass(((ObjectType) dest_type).getClassName()));\n",
+  "warning_method": "public Instruction createCast(final Type src_type, final Type dest_type) {\nif ((src_type instanceof BasicType) && (dest_type instanceof BasicType)) {\nbyte dest = dest_type.getType();\nbyte src = src_type.getType();\nif (dest == Const.T_LONG && (src == Const.T_CHAR || src == Const.T_BYTE || src == Const.T_SHORT)) {\nsrc = Const.T_INT;\n}\nString name = \"org.apache.commons.bcel6.generic.\" + short_names[src - Const.T_CHAR] + \"2\" + short_names[dest - Const.T_CHAR];\nInstruction i = null;\ntry {\ni = (Instruction) java.lang.Class.forName(name).newInstance();\n} catch (Exception e) {\nthrow new RuntimeException(\"Could not find instruction: \" + name, e);\n}\nreturn i;\n} else if ((src_type instanceof ReferenceType) && (dest_type instanceof ReferenceType)) {\nif (dest_type instanceof ArrayType) {\nreturn new CHECKCAST(cp.addArrayClass((ArrayType) dest_type));\n}\nreturn new CHECKCAST(cp.addClass(((ObjectType) dest_type).getClassName()));\n} else {\nthrow new RuntimeException(\"Can not cast \" + src_type + \" to \" + dest_type);\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates an unconfirmed cast, which could potentially lead to a `ClassCastException` at runtime. This is a critical issue because it can cause the application to behave unexpectedly or crash. The code should be reviewed and the cast confirmed or handled appropriately to prevent runtime errors. Therefore, the warning is actionable.
+
+@@ actionable @@

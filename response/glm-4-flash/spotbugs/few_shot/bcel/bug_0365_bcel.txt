@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "DLS_DEAD_LOCAL_STORE",
+  "priority": "3",
+  "rank": "20",
+  "project": "bcel",
+  "warning_line": "index += unwrap(consumed_chars); \n",
+  "warning_method": "public static String signatureToString(final String signature, final boolean chopit) {\nString type = \"\";\nString typeParams = \"\";\nint index = 0;\nif (signature.charAt(0) == '<') {\ntypeParams = typeParamTypesToString(signature, chopit);\nindex += unwrap(consumed_chars);\n}\nif (signature.charAt(index) == '(') {\ntype = typeParams + typeSignaturesToString(signature.substring(index), chopit, ')');\nindex += unwrap(consumed_chars);\ntype = type + typeSignatureToString(signature.substring(index), chopit);\nindex += unwrap(consumed_chars);\nreturn type;\n}\ntype = typeSignatureToString(signature.substring(index), chopit);\nindex += unwrap(consumed_chars);\nif ((typeParams.length() == 0) && (index == signature.length())) {\nreturn type;\n}\nfinal StringBuilder typeClass = new StringBuilder(typeParams);\ntypeClass.append(\" extends \");\ntypeClass.append(type);\nif (index < signature.length()) {\ntypeClass.append(\" implements \");\ntypeClass.append(typeSignatureToString(signature.substring(index), chopit));\nindex += unwrap(consumed_chars);\n}\nwhile (index < signature.length()) {\ntypeClass.append(\", \");\ntypeClass.append(typeSignatureToString(signature.substring(index), chopit));\nindex += unwrap(consumed_chars);\n}\nreturn typeClass.toString();\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates a "Dead Local Store" (DLS), which means that the variable `index` is assigned a value but is never used after the assignment. This could be a mistake or an oversight in the code. Since the variable `index` is used in multiple places and the warning does not indicate any logical error in the code, it is likely an artifact of the code's complexity rather than a critical issue. However, if the variable is not needed, it could be removed to clean up the code and potentially improve performance. Therefore, the warning is actionable but may not require immediate action unless it is part of a larger refactoring effort.
+
+@@ actionable @@

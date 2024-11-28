@@ -1,0 +1,17 @@
+The warning from SpotBugs indicates a "BC_UNCONFIRMED_CAST" in the `addFloat` method of the `bcel` project. The warning is on the line where a cast to `ConstantFloat` is performed and then the `getBytes()` method is called on the result of the cast.
+
+```java
+return addFloat(((ConstantFloat) c).getBytes());
+```
+
+The issue here is that the `getBytes()` method is being called on the result of casting the `Constant` object to `ConstantFloat`. This is problematic because `ConstantFloat` does not have a `getBytes()` method; instead, it has a `getBytes()` method on the `Constant` class itself. The correct code should be:
+
+```java
+return addFloat(c.getBytes());
+```
+
+This warning is actionable because it points to a clear mistake in the code that could lead to a `NullPointerException` if `c` is not actually an instance of `ConstantFloat`. The warning suggests that the code is attempting to cast `c` to `ConstantFloat` and then calling `getBytes()` on the result of the cast, which is incorrect.
+
+If this warning is fixed in a later revision of the code, it would be an indication that the issue was addressed. If it persists, it would be reasonable to conclude that the issue was not properly resolved.
+
+@@ actionable @@

@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD",
+  "priority": "2",
+  "rank": "17",
+  "project": "bcel",
+  "warning_line": "Frame._this = null;\n",
+  "warning_method": "@Override\npublic void visitINVOKESPECIAL(INVOKESPECIAL o) {\nif (o.getMethodName(cpg).equals(Constants.CONSTRUCTOR_NAME)) {\nUninitializedObjectType t = (UninitializedObjectType) stack().peek(o.getArgumentTypes(cpg).length);\nif (t == Frame.getThis()) {\nFrame._this = null;\n}\nstack().initializeObject(t);\nlocals().initializeObject(t);\n}\nstack().pop();\nfor (int i = 0; i < o.getArgumentTypes(cpg).length; i++) {\nstack().pop();\n}\nif (o.getReturnType(cpg) != Type.VOID) {\nType t = o.getReturnType(cpg);\nif (t.equals(Type.BOOLEAN) || t.equals(Type.CHAR) || t.equals(Type.BYTE) || t.equals(Type.SHORT)) {\nt = Type.INT;\n}\nstack().push(t);\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates that a static variable `_this` is being set from an instance method, which is generally considered bad practice as it can lead to unexpected behavior and is against the principle of encapsulation. This could potentially cause issues in the code where the static variable is accessed later on. Therefore, it is advisable to refactor the code to avoid this practice.
+
+@@ actionable @@

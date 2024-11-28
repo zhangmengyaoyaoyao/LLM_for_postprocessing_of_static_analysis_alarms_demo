@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "BC_UNCONFIRMED_CAST",
+  "priority": "3",
+  "rank": "20",
+  "project": "bcel",
+  "warning_line": "return addLong(((ConstantLong) c).getBytes());\n",
+  "warning_method": "public int addConstant(final Constant c, final ConstantPoolGen cp) {\nfinal Constant[] constants = cp.getConstantPool().getConstantPool();\nswitch(c.getTag()) {\ncase Const.CONSTANT_String:\n{\nfinal ConstantString s = (ConstantString) c;\nfinal ConstantUtf8 u8 = (ConstantUtf8) constants[s.getStringIndex()];\nreturn addString(u8.getBytes());\n}\ncase Const.CONSTANT_Long:\n{\nfinal ConstantLong l = (ConstantLong) c;\nreturn addLong(l.getBytes());\n}\n// Other cases omitted for brevity\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates an unconfirmed cast from `Constant` to `ConstantLong`. This could potentially lead to a `ClassCastException` at runtime if the object is not actually an instance of `ConstantLong`. Since the cast is not confirmed and could cause runtime errors, it is advisable to address this issue to prevent potential bugs. Therefore, the warning is actionable.
+
+@@ actionable @@

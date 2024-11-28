@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "BC_UNCONFIRMED_CAST",
+  "priority": "3",
+  "rank": "20",
+  "project": "bcel",
+  "warning_line": "str = String.valueOf(((ConstantFloat) c).getBytes());\n",
+  "warning_method": "public String constantToString(Constant c) throws ClassFormatException {\nString str;\nint i;\nfinal byte tag = c.getTag();\nswitch(tag) {\ncase Const.CONSTANT_Class:\ni = ((ConstantClass) c).getNameIndex();\nc = getConstant(i, Const.CONSTANT_Utf8);\nstr = Utility.compactClassName(((ConstantUtf8) c).getBytes(), false);\nbreak;\ncase Const.CONSTANT_String:\ni = ((ConstantString) c).getStringIndex();\nc = getConstant(i, Const.CONSTANT_Utf8);\nstr = \"\\\"\" + escape(((ConstantUtf8) c).getBytes()) + \"\\\"\";\nbreak;\ncase Const.CONSTANT_Utf8:\nstr = ((ConstantUtf8) c).getBytes();\nbreak;\ncase Const.CONSTANT_Double:\nstr = String.valueOf(((ConstantDouble) c).getBytes());\nbreak;\ncase Const.CONSTANT_Float:\nstr = String.valueOf(((ConstantFloat) c).getBytes());\nbreak;\ncase Const.CONSTANT_Long:\nstr = String.valueOf(((ConstantLong) c).getBytes());\nbreak;\ncase Const.CONSTANT_Integer:\nstr = String.valueOf(((ConstantInteger) c).getBytes());\nbreak;\ncase Const.CONSTANT_NameAndType:\nstr = constantToString(((ConstantNameAndType) c).getNameIndex(), Const.CONSTANT_Utf8) + \" \" + constantToString(((ConstantNameAndType) c).getSignatureIndex(), Const.CONSTANT_Utf8);\nbreak;\ncase Const.CONSTANT_InterfaceMethodref:\ncase Const.CONSTANT_Methodref:\ncase Const.CONSTANT_Fieldref:\nstr = constantToString(((ConstantCP) c).getClassIndex(), Const.CONSTANT_Class) + \".\" + constantToString(((ConstantCP) c).getNameAndTypeIndex(), Const.CONSTANT_NameAndType);\nbreak;\ncase Const.CONSTANT_MethodHandle:\nfinal ConstantMethodHandle cmh = (ConstantMethodHandle) c;\nstr = Const.getMethodHandleName(cmh.getReferenceKind()) + \" \" + constantToString(cmh.getReferenceIndex(), getConstant(cmh.getReferenceIndex()).getTag());\nbreak;\ncase Const.CONSTANT_MethodType:\nfinal ConstantMethodType cmt = (ConstantMethodType) c;\nstr = constantToString(cmt.getDescriptorIndex(), Const.CONSTANT_Utf8);\nbreak;\ncase Const.CONSTANT_InvokeDynamic:\nfinal ConstantInvokeDynamic cid = (ConstantInvokeDynamic) c;\nstr = cid.getBootstrapMethodAttrIndex() + \":\" + constantToString(cid.getNameAndTypeIndex(), Const.CONSTANT_NameAndType);\nbreak;\ncase Const.CONSTANT_Module:\ni = ((ConstantModule) c).getNameIndex();\nc = getConstant(i, Const.CONSTANT_Utf8);\nstr = Utility.compactClassName(((ConstantUtf8) c).getBytes(), false);\nbreak;\ncase Const.CONSTANT_Package:\ni = ((ConstantPackage) c).getNameIndex();\nc = getConstant(i, Const.CONSTANT_Utf8);\nstr = Utility.compactClassName(((ConstantUtf8) c).getBytes(), false);\nbreak;\ndefault:\n// Never reached\nthrow new IllegalArgumentException(\"Unknown constant type \" + tag);\n}\nreturn str;\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates an unconfirmed cast from `Constant` to `ConstantFloat`. This is actionable because the cast is not guaranteed to be safe, and it could lead to a `ClassCastException` at runtime if `c` is not actually an instance of `ConstantFloat`. The method should include a check to ensure that `c` is of the correct type before performing the cast. 
+
+@@ actionable @@

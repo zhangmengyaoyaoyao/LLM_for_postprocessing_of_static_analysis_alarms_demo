@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "DLS_DEAD_LOCAL_STORE",
+  "priority": "3",
+  "rank": "20",
+  "project": "bcel",
+  "warning_line": "objref = GENERIC_ARRAY;\n",
+  "warning_method": "@Override\npublic void visitINVOKEINTERFACE(final INVOKEINTERFACE o) {\nfinal int count = o.getCount();\nif (count == 0) {\nconstraintViolated(o, \"The 'count' argument must not be 0.\");\n}\n// TODO: Do we want to do anything with it?\nfinal Type t = o.getType(cpg);\nif (t instanceof ObjectType) {\nfinal String name = ((ObjectType) t).getClassName();\nfinal Verifier v = VerifierFactory.getVerifier(name);\nfinal VerificationResult vr = v.doPass2();\nif (vr.getStatus() != VerificationResult.VERIFIED_OK) {\nconstraintViolated(o, \"Class '\" + name + \"' is referenced, but cannot be loaded and resolved: '\" + vr + \"'.\");\n}\n}\nfinal Type[] argtypes = o.getArgumentTypes(cpg);\nfinal int nargs = argtypes.length;\nfor (int i = nargs - 1; i >= 0; i--) {\nfinal Type fromStack = stack().peek((nargs - 1) - i);\nType fromDesc = argtypes[i];\nif (fromDesc == Type.BOOLEAN || fromDesc == Type.BYTE || fromDesc == Type.CHAR || fromDesc == Type.SHORT) {\nfromDesc = Type.INT;\n}\nif (!fromStack.equals(fromDesc)) {\nif (fromStack instanceof ReferenceType && fromDesc instanceof ReferenceType) {\nfinal ReferenceType rFromStack = (ReferenceType) fromStack;\n// TODO: This can only be checked when using Staerk-et-al's \"set of object types\"\nreferenceTypeIsInitialized(o, rFromStack);\n} else {\nconstraintViolated(o, \"Expecting a '\" + fromDesc + \"' but found a '\" + fromStack + \"' on the stack.\");\n}\n}\n}\nType objref = stack().peek(nargs);\nif (objref == Type.NULL) {\nreturn;\n}\nif (!(objref instanceof ReferenceType)) {\nconstraintViolated(o, \"Expecting a reference type as 'objectref' on the stack, not a '\" + objref + \"'.\");\n}\nreferenceTypeIsInitialized(o, (ReferenceType) objref);\nif (!(objref instanceof ObjectType)) {\nif (!(objref instanceof ArrayType)) {\nconstraintViolated(o, \"Expecting an ObjectType as 'objectref' on the stack, not a '\" + objref + \"'.\");\n} else {\nobjref = GENERIC_ARRAY;\n}\n}\n// TODO: This can only be checked if we're using Staerk-et-al's \"set of object types\"\nint counted_count = 1;\nfor (int i = 0; i < nargs; i++) {\ncounted_count += argtypes[i].getSize();\n}\nif (count != counted_count) {\nconstraintViolated(o, \"The 'count' argument should probably read '\" + counted_count + \"' but is '\" + count + \"'.\");\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates a "Dead Local Store" (DLS), which means that the variable `objref` is assigned a value but is never used. This could be a mistake or an oversight in the code. Since the variable is assigned a value that is likely intended to be used later, but is not, this could potentially indicate a bug or an inefficiency in the code. It is advisable to investigate why `objref` is being assigned and whether it is necessary. If it is not used, the assignment should be removed or the variable should be used appropriately.
+
+@@ actionable @@

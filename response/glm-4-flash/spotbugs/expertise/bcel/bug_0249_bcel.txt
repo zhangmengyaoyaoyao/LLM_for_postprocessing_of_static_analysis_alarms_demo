@@ -1,0 +1,18 @@
+The warning provided by SpotBugs is related to a potential bad practice involving a signed bit check. The warning is generated on the line where `obj.getAccessFlags()` is used in a bitwise AND operation with a bitmask. The warning suggests that the result of this operation is being compared to a value that could potentially be negative if the access flags are negative.
+
+The warning is actionable because it points out a potential issue with the code that could lead to incorrect behavior if the access flags are negative. The bitwise AND operation with a bitmask is used to isolate specific access flags, but if the access flags are negative, the result of the bitwise AND operation could be negative, which is not a valid access flag value.
+
+To resolve this issue, the code should ensure that the access flags are non-negative before performing the bitwise AND operation. This can be done by using a bitwise OR operation with the bitmask and the maximum possible value of access flags, which is `0x7fff` (all bits set except for the sign bit).
+
+Here is an example of how the code could be modified:
+
+```java
+int accessFlags = obj.getAccessFlags();
+if ((accessFlags & ~(Const.ACC_PUBLIC | Const.ACC_PRIVATE | Const.ACC_PROTECTED | Const.ACC_STATIC | Const.ACC_FINAL | Const.ACC_SYNCHRONIZED | Const.ACC_NATIVE | Const.ACC_ABSTRACT | Const.ACC_STRICT)) > 0) {
+    // Handle the warning condition
+}
+```
+
+By ensuring that `accessFlags` is non-negative before the bitwise operation, the potential for a negative result is eliminated.
+
+@@ actionable @@

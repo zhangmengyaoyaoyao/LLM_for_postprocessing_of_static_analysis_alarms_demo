@@ -1,0 +1,67 @@
+## Bug Report
+```json
+{
+    "category": "I18N",
+    "vtype": "DM_DEFAULT_ENCODING",
+    "priority": "1",
+    "rank": "19",
+    "project": "mavendp",
+    "warning_line": "try ( FileWriter writer = new FileWriter( file, append ) )",
+    "warning_method": "public static synchronized void write(String string, File file, boolean append, Log log) throws IOException { file.getParentFile().mkdirs(); try (FileWriter writer = new FileWriter(file, append)) { writer.write(string); } }"
+}
+```
+
+## Your Answer
+// The warning suggests that the default encoding is being used, which might not be appropriate for internationalization. This could lead to encoding issues when dealing with non-ASCII characters. It is advisable to explicitly set the encoding to a standard like UTF-8 to ensure compatibility across different locales. Therefore, the warning is actionable.
+@@ actionable @@ 
+
+## Bug Report
+```json
+{
+    "category": "MALICIOUS_CODE",
+    "vtype": "EI_EXPOSE_REP",
+    "priority": "2",
+    "rank": "18",
+    "project": "net",
+    "warning_line": "return this.rootCause;",
+    "warning_method": "public Throwable getRootCause() { return this.rootCause; }"
+}
+```
+
+## Your Answer
+// The warning indicates that the method is exposing a representation of an object that should not be exposed. This could potentially lead to security vulnerabilities if the object contains sensitive information. It is important to review the code and ensure that the object is not being exposed in an insecure manner. Therefore, the warning is actionable.
+@@ actionable @@ 
+
+## Bug Report
+```json
+{
+    "category": "DODGY_CODE",
+    "vtype": "REC_CATCH_EXCEPTION",
+    "priority": "3",
+    "rank": "20",
+    "project": "configuration",
+    "warning_line": "catch (Exception e)",
+    "warning_method": "public InputSource resolveEntity(String publicId, String systemId) throws SAXException { String resolved = resolver.getResolvedEntity(publicId, systemId); if (resolved != null) { String badFilePrefix = \"file://\"; String correctFilePrefix = \"file:///\"; if (resolved.startsWith(badFilePrefix) && !resolved.startsWith(correctFilePrefix)) { resolved = correctFilePrefix + resolved.substring(badFilePrefix.length()); } try { InputSource iSource = new InputSource(resolved); iSource.setPublicId(publicId); URL url = new URL(resolved); InputStream iStream = url.openStream(); iSource.setByteStream(iStream); return iSource; } catch (Exception e) { log.debug(\"Failed to create InputSource for \" + resolved + \" (\" + e.toString() + \")\"); return null; } } return null; }"
+}
+```
+
+## Your Answer
+// The warning suggests that a generic Exception is being caught, which is not a best practice as it can mask other exceptions that should be handled separately. However, the method already includes a log statement that provides some level of debugging information. While it is still recommended to handle specific exceptions, the current implementation does not seem to cause immediate harm, and the warning might be less critical. Therefore, the warning is actionable but may not be urgent.
+@@ actionable @@ 
+
+## Bug Report
+```json
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "project",
+    "warning_line": "return this.rootCause;",
+    "warning_method": "public Throwable getRootCause() { return this.rootCause; }"
+}
+```
+
+## Your Answer
+// The warning indicates that the method might be ignoring an exception, which is a bad practice. However, the method is returning the root cause of an exception, which is a common and useful operation. Without additional context, it is unclear whether this is a genuine issue or a false positive. Therefore, the warning is unknown.
+@@ unknown @@

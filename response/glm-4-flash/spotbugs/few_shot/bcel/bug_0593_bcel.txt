@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "BC_UNCONFIRMED_CAST",
+  "priority": "3",
+  "rank": "20",
+  "project": "bcel",
+  "warning_line": "type = ((NEWARRAY) i).getType();\n",
+  "warning_method": "@Override\npublic void visitAllocationInstruction(final AllocationInstruction i) {\nType type;\nif (i instanceof CPInstruction) {\ntype = ((CPInstruction) i).getType(_cp);\n} else {\ntype = ((NEWARRAY) i).getType();\n}\nshort opcode = ((Instruction) i).getOpcode();\nint dim = 1;\nswitch(opcode) {\ncase Const.NEW:\n_out.println(\"il.append(_factory.createNew(\\\"\" + ((ObjectType) type).getClassName() + \"\\\"));\");\nbreak;\ncase Const.MULTIANEWARRAY:\ndim = ((MULTIANEWARRAY) i).getDimensions();\ncase Const.ANEWARRAY:\ncase Const.NEWARRAY:\nif (type instanceof ArrayType) {\ntype = ((ArrayType) type).getBasicType();\n}\n_out.println(\"il.append(_factory.createNewArray(\" + BCELifier.printType(type) + \", (short) \" + dim + \"));\");\nbreak;\ndefault:\nthrow new RuntimeException(\"Oops: \" + opcode);\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates an unconfirmed cast, which could potentially lead to a `ClassCastException` at runtime if the object being cast is not of the expected type. This is a common issue in Java, where unchecked casts are allowed but can lead to runtime errors. The method `visitAllocationInstruction` is casting an `i` object to `NEWARRAY` without checking if `i` is indeed an instance of `NEWARRAY`. This could be a mistake or a design choice, but without additional context, it's difficult to determine the intent. It is advisable to review the code and add a type check or use a more specific cast if the intent is to cast to `NEWARRAY`. Therefore, the warning is actionable.
+
+@@ actionable @@

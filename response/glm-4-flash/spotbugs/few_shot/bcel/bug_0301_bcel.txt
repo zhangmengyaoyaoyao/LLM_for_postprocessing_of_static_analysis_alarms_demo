@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "BC_UNCONFIRMED_CAST",
+  "priority": "3",
+  "rank": "20",
+  "project": "bcel",
+  "warning_line": "str = constantToString(((ConstantNameAndType) c).getNameIndex(),\n",
+  "warning_method": "public String constantToString(Constant c) throws ClassFormatException {\nString str;\nint i;\nfinal byte tag = c.getTag();\nswitch(tag) {\ncase Const.CONSTANT_Class:\ni = ((ConstantClass) c).getNameIndex();\nc = getConstant(i, Const.CONSTANT_Utf8);\nstr = Utility.compactClassName(((ConstantUtf8) c).getBytes(), false);\nbreak;\ncase Const.CONSTANT_String:\ni = ((ConstantString) c).getStringIndex();\nc = getConstant(i, Const.CONSTANT_Utf8);\nstr = \"\\\"\" + escape(((ConstantUtf8) c).getBytes()) + \"\\\"\";\nbreak;\ncase Const.CONSTANT_Utf8:\nstr = ((ConstantUtf8) c).getBytes();\nbreak;\ncase Const.CONSTANT_Double:\nstr = String.valueOf(((ConstantDouble) c).getBytes());\nbreak;\ncase Const.CONSTANT_Float:\nstr = String.valueOf(((ConstantFloat) c).getBytes());\nbreak;\ncase Const.CONSTANT_Long:\nstr = String.valueOf(((ConstantLong) c).getBytes());\nbreak;\ncase Const.CONSTANT_Integer:\nstr = String.valueOf(((ConstantInteger) c).getBytes());\nbreak;\ncase Const.CONSTANT_NameAndType:\nstr = constantToString(((ConstantNameAndType) c).getNameIndex(), Const.CONSTANT_Utf8) + \" \" + constantToString(((ConstantNameAndType) c).getSignatureIndex(), Const.CONSTANT_Utf8);\nbreak;\ncase Const.CONSTANT_InterfaceMethodref:\n// ... other cases ... \ncase Const.CONSTANT_MethodHandle:\nfinal ConstantMethodHandle cmh = (ConstantMethodHandle) c;\nstr = Const.getMethodHandleName(cmh.getReferenceKind()) + \" \" + constantToString(cmh.getReferenceIndex(), getConstant(cmh.getReferenceIndex()).getTag());\nbreak;\ncase Const.CONSTANT_MethodType:\nfinal ConstantMethodType cmt = (ConstantMethodType) c;\nstr = constantToString(cmt.getDescriptorIndex(), Const.CONSTANT_Utf8);\nbreak;\ncase Const.CONSTANT_InvokeDynamic:\n// ... other cases ... \ncase Const.CONSTANT_Module:\ni = ((ConstantModule) c).getNameIndex();\nc = getConstant(i, Const.CONSTANT_Utf8);\nstr = Utility.compactClassName(((ConstantUtf8) c).getBytes(), false);\nbreak;\ncase Const.CONSTANT_Package:\ni = ((ConstantPackage) c).getNameIndex();\nc = getConstant(i, Const.CONSTANT_Utf8);\nstr = Utility.compactClassName(((ConstantUtf8) c).getBytes(), false);\nbreak;\ndefault:\n// Never reached\nthrow new IllegalArgumentException(\"Unknown constant type \" + tag);\n}\nreturn str;\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates an unconfirmed cast, which suggests that the code is attempting to cast an object to a specific type without first confirming that the object is indeed of that type. This can lead to a `ClassCastException` at runtime. The warning is actionable because it suggests that the code should include a check to ensure that the object is of the expected type before performing the cast. This would prevent the potential runtime error and improve the robustness of the code.
+
+@@ actionable @@

@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "BC_UNCONFIRMED_CAST",
+  "priority": "3",
+  "rank": "20",
+  "project": "bcel",
+  "warning_line": "ConstantCP m = (ConstantCP) c;\n",
+  "warning_method": "public int addConstant(Constant c, ConstantPoolGen cp) {\nConstant[] constants = cp.getConstantPool().getConstantPool();\nswitch(c.getTag()) {\ncase Const.CONSTANT_String:\n{\nConstantString s = (ConstantString) c;\nConstantUtf8 u8 = (ConstantUtf8) constants[s.getStringIndex()];\nreturn addString(u8.getBytes());\n}\ncase Const.CONSTANT_Class:\n{\nConstantClass s = (ConstantClass) c;\nConstantUtf8 u8 = (ConstantUtf8) constants[s.getNameIndex()];\nreturn addClass(u8.getBytes());\n}\ncase Const.CONSTANT_NameAndType:\n{\nConstantNameAndType n = (ConstantNameAndType) c;\nConstantUtf8 u8 = (ConstantUtf8) constants[n.getNameIndex()];\nConstantUtf8 u8_2 = (ConstantUtf8) constants[n.getSignatureIndex()];\nConstantUtf8 u8_3 = (ConstantUtf8) constants[n.getSignatureIndex()];\n// ... code omitted for brevity ... \n}\ndefault:\n// ... code omitted for brevity ... \n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates an "unconfirmed cast" which suggests that the code is attempting to cast an object to a type (`ConstantCP`) without first confirming that the object is indeed of that type. This can lead to a `ClassCastException` at runtime if the object is not of the expected type. Since this is a potential runtime error, it is important to verify the type of the object before casting. The code should include a type check or use a more generic type that can handle the expected types. Therefore, the warning is actionable.
+
+@@ actionable @@

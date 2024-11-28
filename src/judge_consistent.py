@@ -35,7 +35,7 @@ def update_consistent_column(input_excel):
 
 # 使用示例
 #prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
-prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought"]
+prompts_techniques = ["self_heuristic"]
 
 for prompts_technique in prompts_techniques:
     print(prompts_technique)

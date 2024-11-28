@@ -13,10 +13,12 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 import construct_prompts as constructor
 
+key = "sk-cc6a4cec5214465b88c4526069c3a3b3"
+
 def call_with_message(messages):
 
     response = dashscope.Generation.call(
-        api_key=os.getenv('DASHSCOPE_API_KEY'),
+        api_key=key,
         model='llama3.1-70b-instruct',
         messages=messages,
         result_format='message',  # set the result to be "message" format.
@@ -36,7 +38,7 @@ def call_with_3messages(messages):
         while not success:
             response = dashscope.Generation.call(
                 #api_key=os.getenv('DASHSCOPE_API_KEY'),
-                api_key='sk-ca20bc30dd254138b642e46fd563598a',
+                api_key=key,
                 model='llama3.1-70b-instruct',
                 messages=messages,
                 result_format='message',  # set the result to be "message" format.
@@ -65,7 +67,7 @@ def call_with_3messages(messages):
             seccuss = False
             while not seccuss:
                 response = dashscope.Generation.call(
-                    api_key='sk-ca20bc30dd254138b642e46fd563598a',
+                    api_key=key,
                     model='llama3.1-70b-instruct',
                     messages=message_with_historys,  # 当前轮的消息
                     result_format='message',  # 设置结果为 "message" 格式
@@ -98,7 +100,7 @@ def call_with_2messages(messages):
 
     for message in messages:
         print("Processing message----", message)
-        if count is 0:
+        if count == 0:
             message_with_historys.append(message)
             count += 1
             continue
@@ -107,7 +109,7 @@ def call_with_2messages(messages):
         seccuss = False
         while not seccuss:
             response = dashscope.Generation.call(
-                api_key='sk-ca20bc30dd254138b642e46fd563598a',
+                api_key=key,
                 model='llama3.1-70b-instruct',
                 messages=message_with_historys,  # 当前轮的消息
                 result_format='message',  # 设置结果为 "message" 格式
@@ -145,8 +147,7 @@ def process_spotbugs_project_files(model, tool, prompts_technique, project_name)
     os.makedirs(output_dir, exist_ok=True)
 
     #temp
-    if prompts_technique is "critique":
-        json_files = json_files[448:]
+    json_files = json_files[341:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -165,8 +166,11 @@ def process_spotbugs_project_files(model, tool, prompts_technique, project_name)
         constructor.setWarning(json_content)
 
         flag_noResponse = True
+        history_response = []
         while flag_noResponse:
-            if prompts_technique == "one_shot":
+            if prompts_technique == "zero_shot":
+                response = call_with_message(constructor.construct_zero_shot())
+            elif prompts_technique == "one_shot":
                 response = call_with_message(constructor.construct_one_shot())
             elif prompts_technique == "few_shot":
                 response = call_with_message(constructor.construct_few_shot())
@@ -201,8 +205,8 @@ def process_spotbugs_project_files(model, tool, prompts_technique, project_name)
         with open(txt_file, "w", encoding="utf-8") as f:
             f.write(content)
         
-        print("///////historyresponse///////", history_response)
-        if history_response is not []:
+        if prompts_technique == "critique" or prompts_technique == "self_heuristic":
+            print("///////historyresponse///////", history_response)
             txt_file = os.path.join(output_dir, f"{base_name}_history.txt")
             # Open the file in append mode ("a") instead of write mode ("w")
             with open(txt_file, "a", encoding="utf-8") as f:
@@ -226,9 +230,7 @@ if __name__ == '__main__':
     #projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
     projects = ["bcel"]
     #prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
-    prompts_techniques = ["critique","self_heuristic"]
-    # prompts_techniques = ["critique"]
-
+    prompts_techniques = ["self_heuristic"]
 
     tool = "spotbugs"
     model='llama3-70b-instruct'

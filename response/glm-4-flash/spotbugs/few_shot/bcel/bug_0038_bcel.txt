@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "ST_WRITE_TO_STATIC_FROM_INSTANCE_METHOD",
+  "priority": "2",
+  "rank": "17",
+  "project": "bcel",
+  "warning_line": "Frame._this = null;\n",
+  "warning_method": "@Override\npublic VerificationResult do_verify() {\nif (!myOwner.doPass3a(method_no).equals(VerificationResult.VR_OK)) {\nreturn VerificationResult.VR_NOTYET;\n}\nJavaClass jc;\ntry {\njc = Repository.lookupClass(myOwner.getClassName());\n} catch (ClassNotFoundException e) {\n// FIXME: maybe not the best way to handle this\nthrow new AssertionViolatedException(\"Missing class: \" + e, e);\n}\nConstantPoolGen constantPoolGen = new ConstantPoolGen(jc.getConstantPool());\nInstConstraintVisitor icv = new InstConstraintVisitor();\nicv.setConstantPoolGen(constantPoolGen);\nExecutionVisitor ev = new ExecutionVisitor();\nev.setConstantPoolGen(constantPoolGen);\nMethod[] methods = jc.getMethods();\ntry {\nMethodGen mg = new MethodGen(methods[method_no], myOwner.getClassName(), constantPoolGen);\nicv.setMethodGen(mg);\nif (!(mg.isAbstract() || mg.isNative())) {\nControlFlowGraph cfg = new ControlFlowGraph(mg);\nFrame f = new Frame(mg.getMaxLocals(), mg.getMaxStack());\nif (!mg.isStatic()) {\nif (mg.getName().equals(Constants.CONSTRUCTOR_NAME)) {\nFrame.setThis(new UninitializedObjectType(ObjectType.getInstance(jc.getClassName())));\nf.getLocals().set(0, Frame._this);\n} else {\nFrame._this = null;\nf.getLocals().set(0, ObjectType.getInstance(jc.getClassName()));\n}\n}\nType[] argtypes = mg.getArgumentTypes();\nint twoslotoffset = 0;\nfor (int j = 0; j < argtypes.length; j++) {\nif (argtypes[j] == Type.SHORT || argtypes[j] == Type.BYTE || argtypes[j] == Type.CHAR || argtypes[j] == Type.BOOLEAN) {\nargtypes[j] = Type.INT;\n}\nf.getLocals().set(twoslotoffset + j + (mg.isStatic() ? 0 : 1), argtypes[j]);\nif (argtypes[j].getSize() == 2) {\ntwoslotoffset++;\nf.getLocals().set(twoslotoffset + j + (mg.isStatic() ? 0 : 1), Type.UNKNOWN);\n}\n}\ncirculationPump(mg, cfg, cfg.contextOf(mg.getInstructionList().getStart()), f, icv, ev);\n}\n} catch (VerifierConstraintViolatedException ce) {\nce.extendMessage(\"Constraint violated in method '\" + methods[method_no] + \"':\\n\", \"\");\nreturn new VerificationResult(VerificationResult.VERIFIED_REJECTED, ce.getMessage());\n} catch (RuntimeException re) {\nStringWriter sw = new StringWriter();\nPrintWriter pw = new PrintWriter(sw);\nre.printStackTrace(pw);\nthrow new AssertionViolatedException(\"Some RuntimeException occured while verify()ing class '\" + jc.getClassName() + \"', method '\" + methods[method_no] + \"'. Original RuntimeException's stack trace:\\n---\\n\" + sw + \"---\\n\", re);\n}\nreturn VerificationResult.VR_OK;\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates that a static variable `_this` is being set from an instance method, which is generally considered bad practice as it can lead to unexpected behavior and is not thread-safe. This is a potential issue that should be addressed to ensure the correct and safe operation of the code. The priority is set to 2, suggesting that it is a moderate-severity issue. Therefore, the warning is actionable.
+
+@@ actionable @@
