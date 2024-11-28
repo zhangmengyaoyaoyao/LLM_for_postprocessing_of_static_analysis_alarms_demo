@@ -82,12 +82,12 @@ def call_with_2messages(messages):
     count = 0
 
     for message in messages:
-        print("Processing message----", message)
         if count == 0:
             message_with_historys.append(message)
             count += 1
             continue
         message_with_historys.append(message)
+        print("Processing message----", message)
         print("complete-----", message_with_historys)
         seccuss = False
         while not seccuss:
@@ -107,6 +107,7 @@ def call_with_2messages(messages):
                 print("generated_message is None")
             else:
                 generated_message = {'role': 'assistant', 'content': response.choices[0].message.content}
+                print("generated_message" , generated_message)
                 message_with_historys.append(generated_message)  # 将模型生成的回复加入历史
                 history_response.append(generated_message)
                 seccuss = True
@@ -131,8 +132,8 @@ def process_spotbugs_project_files(model, tool, prompts_technique, project_name)
     os.makedirs(output_dir, exist_ok=True)
 
     #temp
-    if prompts_technique == "general_info":
-        json_files = json_files[578:]
+    if prompts_technique == "critique":
+        json_files = json_files[214:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -210,8 +211,7 @@ if __name__ == '__main__':
     #projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
     projects = ["bcel"]
     #prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
-    prompts_techniques = ["critique"]
-    # prompts_techniques = ["self_heuristic"]
+    prompts_techniques = ["critique","self_heuristic"]
 
 
     tool = "spotbugs"
