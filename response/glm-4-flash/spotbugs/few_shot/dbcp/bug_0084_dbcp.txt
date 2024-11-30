@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "REC_CATCH_EXCEPTION",
+  "priority": "3",
+  "rank": "20",
+  "project": "dbcp",
+  "warning_line": "} catch (final Exception e) {\n",
+  "warning_method": "@Override\npublic boolean validateObject(final PooledObject<PooledConnectionAndInfo> p) {\ntry {\nvalidateLifetime(p);\n} catch (final Exception e) {\nreturn false;\n}\nboolean valid = false;\nfinal PooledConnection pconn = p.getObject().getPooledConnection();\nConnection conn = null;\nvalidatingSet.add(pconn);\nif (null == validationQuery) {\nDuration timeoutDuration = validationQueryTimeoutDuration;\nif (timeoutDuration.isNegative()) {\ntimeoutDuration = Duration.ZERO;\n}\ntry {\nconn = pconn.getConnection();\nvalid = conn.isValid((int) timeoutDuration.getSeconds());\n} catch (final SQLException e) {\nvalid = false;\n} finally {\nUtils.closeQuietly((AutoCloseable) conn);\nvalidatingSet.remove(pconn);\n}\n} else {\nStatement stmt = null;\nResultSet rset = null;\nvalidatingSet.add(pconn);\ntry {\nconn = pconn.getConnection();\nstmt = conn.createStatement();\nrset = stmt.executeQuery(validationQuery);\nvalid = rset.next();\nif (rollbackAfterValidation) {\nconn.rollback();\n}\n} catch (final Exception e) {\nvalid = false;\n} finally {\nUtils.closeQuietly((AutoCloseable) rset);\nUtils.closeQuietly((AutoCloseable) stmt);\nUtils.closeQuietly((AutoCloseable) conn);\nvalidatingSet.remove(pconn);\n}\n}\nreturn valid;\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates that an exception is being caught without any logging or further handling. This can lead to silent failures and make debugging difficult. It is generally a good practice to log exceptions or perform some form of recovery action. Therefore, this warning is actionable.
+
+@@ actionable @@

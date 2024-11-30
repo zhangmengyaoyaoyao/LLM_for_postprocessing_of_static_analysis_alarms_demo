@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "BAD_PRACTICE",
+  "vtype": "RV_RETURN_VALUE_IGNORED_BAD_PRACTICE",
+  "priority": "2",
+  "rank": "16",
+  "project": "mavendp",
+  "warning_line": "deleteTarget.delete();\n",
+  "warning_method": "private void refreshDependenciesForProject(MavenProject project, List<String> exclusionPatterns) throws ArtifactResolutionException, MojoFailureException {\nMap<String, Artifact> deps = createArtifactMap(project);\nif (deps.isEmpty()) {\ngetLog().info(\"Nothing to do for project: \" + project.getId());\nreturn;\n}\nif (!exclusionPatterns.isEmpty()) {\nfor (String excludedKey : exclusionPatterns) {\nif (GROUP_ID_FUZZINESS.equals(resolutionFuzziness)) {\nverbose(\"Excluding groupId: \" + excludedKey + \" from refresh operation for project: \" + project.getId());\nfor (Iterator<Map.Entry<String, Artifact>> deps_it = deps.entrySet().iterator(); deps_it.hasNext(); ) {\nMap.Entry<String, Artifact> dependency = deps_it.next();\nArtifact artifact = dependency.getValue();\nif (artifact.getGroupId().equals(excludedKey)) {\ndeps_it.remove();\n}\n}\n} else {\nverbose(\"Excluding: \" + excludedKey + \" from refresh operation for project: \" + project.getId());\ndeps.remove(excludedKey);\n}\n}\n}\nverbose(\"Processing dependencies for project: \" + project.getId());\nList<Artifact> missingArtifacts = new ArrayList<Artifact>();\nfor (Map.Entry<String, Artifact> entry : deps.entrySet()) {\nArtifact artifact = entry.getValue();\nverbose(\"Processing artifact: \" + artifact.getId());\nFile deleteTarget = findDeleteTarget(artifact);\nverbose(\"Deleting: \" + deleteTarget);\nif (deleteTarget.isDirectory()) {\ntry {\nFileUtils.deleteDirectory(deleteTarget);\n} catch (IOException e) {\nthrow new MojoFailureException(this, \"Cannot delete dependency from the local repository: \" + artifact.getId(), \"Failed to delete: \" + deleteTarget);\n}\n} else {\ndeleteTarget.delete();\n}\nif (reResolve) {\nverbose(\"Re-resolving.\");\nartifact.setResolved(false);\ntry {\nresolver.resolveAlways(artifact, project.getRemoteArtifactRepositories(), localRepository);\n} catch (ArtifactResolutionException e) {\ngetLog().debug(e.getMessage());\nmissingArtifacts.add(artifact);\n} catch (ArtifactNotFoundException e) {\ngetLog().debug(e.getMessage());\nmissingArtifacts.add(artifact);\n}\n}\n}\nif (missingArtifacts.size() > 0) {\nString message = \"required artifacts missing:\\n\";\nfor (Artifact missingArtifact : missingArtifacts) {\nmessage += \"  \" + missingArtifact.getId() + \"\\n\";\n}\nmessage += \"\\nfor the artifact:\";\nthrow new ArtifactResolutionException(message, project.getArtifact(), project.getRemoteArtifactRepositories());\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates that the return value of `deleteTarget.delete()` is ignored, which is a bad practice. This could potentially lead to issues if the deletion is not successful, as there is no way to check the result of the deletion. It is advisable to handle the return value of `deleteTarget.delete()` to ensure that the deletion is successful. Therefore, the warning is actionable.
+
+@@ actionable @@

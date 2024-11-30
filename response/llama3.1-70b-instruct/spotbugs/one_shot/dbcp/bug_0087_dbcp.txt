@@ -1,0 +1,19 @@
+@@ actionable @@
+This warning is actionable because it indicates a potential SQL injection vulnerability. The `validationQuery` is being passed directly to `stmt.executeQuery()` without any sanitization or parameterization. This could allow an attacker to inject malicious SQL code if they can control the `validationQuery` string.
+
+To fix this issue, the `validationQuery` should be parameterized or sanitized to prevent any user-controlled input from being executed as SQL code. This could involve using a prepared statement with parameter placeholders, or using a library that provides SQL injection protection. 
+
+For example, the code could be modified to use a prepared statement like this:
+
+```java
+PreparedStatement pstmt = conn.prepareStatement(validationQuery);
+ResultSet rset = pstmt.executeQuery();
+```
+
+However, even this is not safe if `validationQuery` is not a constant string. A safer approach would be to use a constant query with parameter placeholders, like this:
+
+```java
+PreparedStatement pstmt = conn.prepareStatement("SELECT 1 FROM DUAL WHERE ? = ?");
+pstmt.setString(1, "some_value");
+ResultSet rset = pstmt.executeQuery();
+```

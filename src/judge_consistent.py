@@ -39,5 +39,5 @@ prompts_techniques = ["self_heuristic"]
 
 for prompts_technique in prompts_techniques:
     print(prompts_technique)
-    input_excel = f"response/llama3-70b-instruct/spotbugs/{prompts_technique}_bcel.xlsx"  # 替换为你的 Excel 文件路径
+    input_excel = f"response/llama3.1-70b-instruct/spotbugs/{prompts_technique}_bcel.xlsx"  # 替换为你的 Excel 文件路径
     update_consistent_column(input_excel)

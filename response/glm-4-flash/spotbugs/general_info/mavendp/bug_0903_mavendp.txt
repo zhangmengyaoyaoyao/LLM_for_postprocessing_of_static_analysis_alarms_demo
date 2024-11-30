@@ -1,0 +1,20 @@
+The warning from SpotBugs indicates that a return value is ignored, specifically in the method `applyDependencyManagementDfs`. The warning is on the line where `node.getDependency().setArtifact(node.getDependency().getArtifact().setProperties(artifactProperties));` is called.
+
+This warning is actionable because it suggests that the method `setProperties` is being called on an object that is not being used after the call. If the intention was to update the artifact properties and then use the updated artifact, the code should be modified to assign the result of `setProperties` back to the artifact variable.
+
+Here is the relevant part of the code with the warning:
+
+```java
+node.getDependency().setArtifact(node.getDependency().getArtifact().setProperties(artifactProperties));
+```
+
+The above line can be improved by assigning the result of `setProperties` to a variable, like so:
+
+```java
+Artifact updatedArtifact = node.getDependency().getArtifact().setProperties(artifactProperties);
+node.getDependency().setArtifact(updatedArtifact);
+```
+
+This change ensures that the updated artifact is used in subsequent operations.
+
+@@ actionable @@

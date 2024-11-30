@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "BAD_PRACTICE",
+  "vtype": "RV_RETURN_VALUE_IGNORED_BAD_PRACTICE",
+  "priority": "2",
+  "rank": "16",
+  "project": "mavendp",
+  "warning_line": "marker.createNewFile();\n",
+  "warning_method": "@Override\npublic void setMarker() throws MojoExecutionException {\nFile marker = getMarkerFile();\nFile clearMarker = getMarkerFile(!this.resolved);\ntry {\nmarker.getParentFile().mkdirs();\n} catch (NullPointerException e) {\n}\ntry {\nmarker.createNewFile();\nif (clearMarker.exists()) {\nif (!clearMarker.delete()) {\nclearMarker.deleteOnExit();\n}\n}\n} catch (IOException e) {\nthrow new MojoExecutionException(\"Unable to create Marker: \" + marker.getAbsolutePath(), e);\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates that the return value of `marker.createNewFile()` is being ignored. This is a bad practice as it could potentially lead to unexpected behavior or resource leaks if the method fails. The method `createNewFile()` returns a boolean indicating whether the file was successfully created or not. Ignoring this return value could mask errors or lead to the assumption that the file was created when it was not. Therefore, it is advisable to check the return value and handle the case where the file creation fails appropriately.
+
+@@ actionable @@

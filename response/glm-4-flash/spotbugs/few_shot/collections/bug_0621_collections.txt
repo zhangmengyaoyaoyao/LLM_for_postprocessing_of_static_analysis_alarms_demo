@@ -1,0 +1,108 @@
+## example1
+## Bug Report
+```json
+{
+    "category": "I18N",
+    "vtype": "DM_DEFAULT_ENCODING",
+    "priority": "1",
+    "rank": "19",
+    "project": "mavendp",
+    "warning_line": "try ( FileWriter writer = new FileWriter( file, append ) )",
+    "warning_method": "public static synchronized void write(String string, File file, boolean append, Log log) throws IOException {
+file.getParentFile().mkdirs();
+try (FileWriter writer = new FileWriter(file, append)) {
+writer.write(string);
+}
+}"
+}
+```
+
+## Your Answer
+The warning is about the default encoding being used, which can lead to issues with internationalization. This is a common issue that can be addressed by specifying the encoding explicitly. Therefore, the warning is actionable.
+
+@@ actionable @@ 
+
+## example2
+## Bug Report
+```json
+{
+    "category": "MALICIOUS_CODE",
+    "vtype": "EI_EXPOSE_REP",
+    "priority": "2",
+    "rank": "18",
+    "project": "net",
+    "warning_line": "return this.rootCause;",
+    "warning_method": "public Throwable getRootCause() {
+return this.rootCause;
+}"
+}
+```
+
+## Your Answer
+The warning indicates that the method is exposing a representation of an object that should not be exposed. This is a potential security risk and should be addressed. Therefore, the warning is actionable.
+
+@@ actionable @@ 
+
+## example3
+## Bug Report
+```json
+{
+    "category": "DODGY_CODE",
+    "vtype": "REC_CATCH_EXCEPTION",
+    "priority": "3",
+    "rank": "20",
+    "project": "configuration",
+    "warning_line": "catch (Exception e)",
+    "warning_method": "public InputSource resolveEntity(String publicId, String systemId) throws SAXException {
+String resolved = resolver.getResolvedEntity(publicId, systemId);
+if (resolved != null) {
+String badFilePrefix = \"file://\";
+String correctFilePrefix = \"file:///\";
+if (resolved.startsWith(badFilePrefix) && !resolved.startsWith(correctFilePrefix)) {
+resolved = correctFilePrefix + resolved.substring(badFilePrefix.length());
+}
+try {
+InputSource iSource = new InputSource(resolved);
+iSource.setPublicId(publicId);
+URL url = new URL(resolved);
+InputStream iStream = url.openStream();
+iSource.setByteStream(iStream);
+return iSource;
+} catch (Exception e) {
+log.debug(\"Failed to create InputSource for \" + resolved + \" (\" + e.toString() + \")\");
+return null;
+}
+}
+return null;
+}"
+}
+```
+
+## Your Answer
+The warning is about catching a generic `Exception` without handling it properly. While it is generally good practice to handle exceptions more specifically, the method already includes a debug log statement, which is a form of handling. Therefore, the warning is not actionable in this context.
+
+@@ unactionable @@ 
+
+## example4
+## Bug Report
+```json
+{
+    "category": "BAD_PRACTICE",
+    "vtype": "DE_MIGHT_IGNORE",
+    "priority": "3",
+    "rank": "19",
+    "project": "pool",
+    "warning_line": "}",
+    "warning_method": "public void invalidateObject(final K key, final V value) {
+try {
+pool.invalidateObject(key, value);
+} catch (Exception e) {
+// No action taken
+}"
+}
+```
+
+## Your Answer
+The warning is about potentially ignoring exceptions, which is a bad practice. The method should handle the exception in some way, such as logging it or rethrowing it. Therefore, the warning is actionable.
+
+@@ actionable @@

@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "CORRECTNESS",
+  "vtype": "NP_NULL_PARAM_DEREF",
+  "priority": "2",
+  "rank": "8",
+  "project": "mavendp",
+  "warning_line": "List<Artifact> artList = new ArrayList<Artifact>( artifacts );\n",
+  "warning_method": "public void execute() throws MojoExecutionException {\nif (cpFile != null) {\ngetLog().warn(\"The parameter cpFile is deprecated. Use outputFile instead.\");\nthis.outputFile = cpFile;\n}\nisFileSepSet = StringUtils.isNotEmpty(fileSeparator);\nisPathSepSet = StringUtils.isNotEmpty(pathSeparator);\nif (attach && StringUtils.isEmpty(localRepoProperty)) {\nlocalRepoProperty = \"${M2_REPO}\";\n}\nSet<Artifact> artifacts = getResolvedDependencies(true);\nif (artifacts == null || artifacts.isEmpty()) {\ngetLog().info(\"No dependencies found.\");\n}\nList<Artifact> artList = new ArrayList<Artifact>( artifacts );\nStringBuffer sb = new StringBuffer();\nfor (Artifact art : artList) {\nsb.append(art.getId()).append(\"\\n\");\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates that the `artifacts` parameter is dereferenced as null when creating a new `ArrayList`. This is actionable because it suggests that the `artifacts` collection is potentially null, which could lead to a `NullPointerException` at runtime. The code should be reviewed to ensure that `artifacts` is not null before attempting to create the `ArrayList`.
+
+@@ actionable @@

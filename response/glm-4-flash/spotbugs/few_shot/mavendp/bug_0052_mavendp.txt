@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "I18N",
+  "vtype": "DM_DEFAULT_ENCODING",
+  "priority": "1",
+  "rank": "19",
+  "project": "mavendp",
+  "warning_line": "outputWriter = new FileWriter( outputFile );\n",
+  "warning_method": "public void execute() throws MojoExecutionException {\nWriter outputWriter = null;\ntry {\nSet plugins = resolvePluginArtifacts();\nif (this.outputFile != null) {\noutputFile.getParentFile().mkdirs();\noutputWriter = new FileWriter(outputFile);\n}\nfor (Iterator i = plugins.iterator(); i.hasNext(); ) {\nArtifact plugin = (Artifact) i.next();\nString logStr = \"Plugin Resolved: \" + DependencyUtil.getFormattedFileName(plugin, false);\nif (!silent) {\nthis.getLog().info(logStr);\n}\nif (outputWriter != null) {\noutputWriter.write(logStr + \"\\n\");\n}\nif (!excludeTransitive) {\nSet transitiveDependencies = this.resolveArtifactDependencies(plugin);\nfor (Iterator transIter = transitiveDependencies.iterator(); transIter.hasNext(); ) {\nArtifact transitiveDep = (Artifact) transIter.next();\nString transDepStr = \"    Transitive Dependency Resolved: \" + DependencyUtil.getFormattedFileName(transitiveDep, false);\nif (!silent) {\nthis.getLog().info(transDepStr);\n}\nif (outputWriter != null) {\noutputWriter.write(transDepStr + \"\\n\");\n}\n}\n}\n}\n} catch (IOException e) {\nthrow new MojoExecutionException(\"Error writing to file\", e);\n} catch (ArtifactResolutionException e) {\nthrow new MojoExecutionException(\"Error resolving artifacts\", e);\n} catch (ArtifactNotFoundException e) {\nthrow new MojoExecutionException(\"Artifact not found\", e);\n} catch (ProjectBuildingException e) {\nthrow new MojoExecutionException(\"Error building project\", e);\n} catch (InvalidDependencyVersionException e) {\nthrow new MojoExecutionException(\"Invalid dependency version\", e);\n} finally {\nif (outputWriter != null) {\noutputWriter.close();\n}\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning is actionable because it is related to the "DM_DEFAULT_ENCODING" category, which typically indicates that the default encoding is being used for file I/O operations. This can lead to issues with character encoding, especially when dealing with files that contain non-ASCII characters. The warning suggests that the encoding should be explicitly specified to avoid potential encoding issues. Explicitly setting the encoding in the `FileWriter` constructor can help prevent such issues. Therefore, the warning is actionable.
+
+@@ actionable @@

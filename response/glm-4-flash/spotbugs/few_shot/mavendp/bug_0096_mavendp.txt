@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "NP_NULL_ON_SOME_PATH_FROM_RETURN_VALUE",
+  "priority": "2",
+  "rank": "13",
+  "project": "mavendp",
+  "warning_line": "if ( parent.list().length < 2 )\n",
+  "warning_method": "private File findDeleteTarget(Artifact artifact) {\nFile deleteTarget = artifact.getFile();\nif (GROUP_ID_FUZZINESS.equals(resolutionFuzziness)) {\ndeleteTarget = deleteTarget.getParentFile().getParentFile();\ndeleteTarget = deleteTarget.getParentFile();\nString[] path = localRepository.pathOf(artifact).split(\"\\\\/\");\nint groupParts = path.length - 4;\nFile parent = deleteTarget.getParentFile();\nint count = 0;\nwhile (count++ < groupParts) {\nif (parent.list().length < 2) {\ndeleteTarget = parent;\nparent = deleteTarget.getParentFile();\n} else {\nbreak;\n}\n}\n} else if (ARTIFACT_ID_FUZZINESS.equals(resolutionFuzziness)) {\ndeleteTarget = deleteTarget.getParentFile().getParentFile();\n} else if (VERSION_FUZZINESS.equals(resolutionFuzziness)) {\ndeleteTarget = deleteTarget.getParentFile();\n}\nreturn deleteTarget;\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates that the `parent.list()` method could return `null`, which would cause a `NullPointerException` when accessed. This is a potential issue that could lead to runtime errors. The code should be reviewed and modified to handle the case where `parent.list()` returns `null`. This could involve adding null checks or using a different method to determine the length of the list.
+
+@@ actionable @@

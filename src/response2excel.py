@@ -182,13 +182,13 @@ def process_txt_files_with_2history(folder_path, output_excel):
 
 # for prompts_technique in prompts_techniques:
 #     print(prompts_technique)
-#     folder_path = f"response/llama3-70b-instruct/spotbugs/{prompts_technique}/bcel"  # 替换为你的文件夹路径
-#     output_excel = f"response/llama3-70b-instruct/spotbugs/{prompts_technique}_bcel.xlsx"  # 替换为保存Excel的路径
+#     folder_path = f"response/llama3.1-70b-instruct/spotbugs/{prompts_technique}/bcel"  # 替换为你的文件夹路径
+#     output_excel = f"response/llama3.1-70b-instruct/spotbugs/{prompts_technique}_bcel.xlsx"  # 替换为保存Excel的路径
 #     process_txt_files(folder_path, output_excel)
 
 prompts_technique = "self_heuristic"
-folder_path = f"response/llama3-70b-instruct/spotbugs/{prompts_technique}/bcel"  # 替换为你的文件夹路径
-output_excel = f"response/llama3-70b-instruct/spotbugs/{prompts_technique}_bcel.xlsx"  # 替换为保存Excel的路径
+folder_path = f"response/llama3.1-70b-instruct/spotbugs/{prompts_technique}/bcel"  # 替换为你的文件夹路径
+output_excel = f"response/llama3.1-70b-instruct/spotbugs/{prompts_technique}_bcel.xlsx"  # 替换为保存Excel的路径
 if prompts_technique == "critique":
     process_txt_files_with_3history(folder_path, output_excel)
 elif prompts_technique == "self_heuristic":

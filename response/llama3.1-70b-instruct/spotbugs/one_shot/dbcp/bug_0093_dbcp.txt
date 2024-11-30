@@ -1,0 +1,24 @@
+@@ actionable @@
+This warning is actionable because it indicates a potential SQL injection vulnerability. The warning "SQL_NONCONSTANT_STRING_PASSED_TO_EXECUTE" suggests that a non-constant string is being passed to the `executeQuery` method, which could allow an attacker to inject malicious SQL code. 
+
+To fix this issue, the code should be modified to use a prepared statement with parameterized queries instead of directly executing a string. This would prevent an attacker from injecting malicious SQL code. 
+
+For example, the code could be modified as follows:
+
+```java
+@Override
+public ResultSet executeQuery(final String sql) throws SQLException {
+    checkOpen();
+    setLastUsedInParent();
+    try {
+        PreparedStatement statement = connection.prepareStatement(sql);
+        // set parameters if any
+        return DelegatingResultSet.wrapResultSet(this, statement.executeQuery());
+    } catch (final SQLException e) {
+        handleException(e);
+        throw new AssertionError();
+    }
+}
+```
+
+This modification would make the code more secure and prevent potential SQL injection attacks.

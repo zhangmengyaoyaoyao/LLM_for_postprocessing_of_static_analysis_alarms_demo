@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "CORRECTNESS",
+  "vtype": "NP_NULL_PARAM_DEREF",
+  "priority": "2",
+  "rank": "8",
+  "project": "mavendp",
+  "warning_line": "List<Artifact> artList = new ArrayList<Artifact>( artifacts );\n",
+  "warning_method": "protected void doExecute() throws MojoExecutionException {\nif (cpFile != null) {\ngetLog().warn(\"The parameter cpFile is deprecated. Use outputFile instead.\");\nthis.outputFile = cpFile;\n}\nisFileSepSet = StringUtils.isNotEmpty(fileSeparator);\nisPathSepSet = StringUtils.isNotEmpty(pathSeparator);\nif (attach && StringUtils.isEmpty(localRepoProperty)) {\nlocalRepoProperty = \"${M2_REPO}\";\n}\nSet<Artifact> artifacts = getResolvedDependencies(true);\nif (artifacts == null || artifacts.isEmpty()) {\ngetLog().info(\"No dependencies found.\");\n}\nList<Artifact> artList = new ArrayList<Artifact>(artifacts);\nStringBuilder sb = new StringBuilder();\nIterator<Artifact> i = artList.iterator();\nif (i.hasNext()) {\nappendArtifactPath(i.next(), sb);\nwhile (i.hasNext()) {\nsb.append(isPathSepSet ? this.pathSeparator : File.pathSeparator);\nappendArtifactPath(i.next(), sb);\n}\n}\nString cpString = sb.toString();\nif (cpString.isEmpty()) {\ngetLog().info(\"No artifacts to copy.\");\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates that the `artifacts` parameter is potentially null, which would lead to a `NullPointerException` when creating a new `ArrayList` with `new ArrayList<Artifact>(artifacts)`. This is a direct issue that could cause the application to crash or behave unexpectedly. Therefore, it is important to check if `artifacts` is null before attempting to create the `ArrayList`.
+
+@@ actionable @@

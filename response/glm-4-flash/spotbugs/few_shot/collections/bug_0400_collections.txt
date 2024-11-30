@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "BC_UNCONFIRMED_CAST",
+  "priority": "3",
+  "rank": "20",
+  "project": "collections",
+  "warning_line": "final ReferenceEntry<K, V> refEntry = (ReferenceEntry<K, V>) entry;\n",
+  "warning_method": "protected void purge(final Reference<?> ref) {\nfinal int hash = ref.hashCode();\nfinal int index = hashIndex(hash, data.length);\nHashEntry<K, V> previous = null;\nHashEntry<K, V> entry = data[index];\nwhile (entry != null) {\nfinal ReferenceEntry<K, V> refEntry = (ReferenceEntry<K, V>) entry;\nif (refEntry.purge(ref)) {\nif (previous == null) {\ndata[index] = entry.next;\n} else {\nprevious.next = entry.next;\n}\nthis.size--;\nrefEntry.onPurge();\nreturn;\n}\nprevious = entry;\nentry = entry.next;\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates an unchecked cast from `Object` to `ReferenceEntry<K, V>`. This is a potential runtime error if `entry` is not actually an instance of `ReferenceEntry<K, V>`. Since the cast is not confirmed and could lead to a `ClassCastException`, it is advisable to verify the type before casting or to use a safer casting method like `instanceof`. This warning is actionable because it suggests a fix that can prevent a runtime error.
+
+@@ actionable @@

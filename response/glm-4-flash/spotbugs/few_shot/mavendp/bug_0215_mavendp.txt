@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "BAD_PRACTICE",
+  "vtype": "SE_COMPARATOR_SHOULD_BE_SERIALIZABLE",
+  "priority": "3",
+  "rank": "20",
+  "project": "mavendp",
+  "warning_line": "@Mojo( name = \"build-classpath\", requiresDependencyResolution = ResolutionScope.TEST, defaultPhase = LifecyclePhase.GENERATE_SOURCES, threadSafe = true )\n// CHECKSTYLE_ON: LineLength\npublic class BuildClasspathMojo\nextends AbstractDependencyFilterMojo\nimplements Comparator<Artifact>\n{\n@Parameter( property = \"outputEncoding\", defaultValue = \"${project.reporting.outputEncoding}\" )\nprivate String outputEncoding;\n@Parameter( property = \"mdep.stripVersion\", defaultValue = \"false\" )\nprivate boolean stripVersion = false;\n@Parameter( property = \"mdep.stripClassifier\", defaultValue = \"false\" )\nprivate boolean stripClassifier = false;\n@Parameter( property = \"mdep.prefix\" )\nprivate String prefix;\n@Parameter( property = \"mdep.outputProperty\" )\nprivate String outputProperty;\n@Parameter( property = \"mdep.outputFile\" )\nprivate File outputFile;\n@Parameter( property = \"mdep.regenerateFile\", defaultValue = \"false\" )\nprivate boolean regenerateFile;\n@Parameter( property = \"mdep.fileSeparator\", defaultValue = \"\" )\nprivate String fileSeparator;\n@Parameter( property = \"mdep.pathSeparator\", defaultValue = \"\" )\nprivate String pathSeparator;\n@Parameter( property = \"mdep.localRepoProperty\", defaultValue = \"\" )\nprivate String localRepoProperty;\n@Parameter( defaultValue = \"false\" )\nprivate boolean attach;\n@Parameter( property = \"mdep.outputFilterFile\", defaultValue = \"false\" )\nprivate boolean outputFilterFile;\n@Parameter( property = \"mdep.useBaseVersion\", defaultValue = \"true\" )\nprivate boolean useBaseVersion = true;\n@Component\nprivate MavenProjectHelper projectHelper;\n@Component\nprivate RepositoryManager repositoryManager;\n@Override\nprotected void doExecute() throws MojoExecutionException {\n// Method implementation...\n}\n// Other methods...\n@Override\npublic int compare(Artifact art1, Artifact art2) {\n// Method implementation...\n}\n// Other methods...\n}",
+  "warning_method": "@Override\nprotected void doExecute() throws MojoExecutionException {\n// Method implementation...\n}\n@Override\npublic int compare(Artifact art1, Artifact art2) {\n// Method implementation...\n}\n// Other methods...\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates that the `Comparator<Artifact>` used in the `BuildClasspathMojo` class should be serializable. This is because the `Comparator` might be used in a context where it needs to be serialized, such as when using RMI or when passing it across a network. If the `Comparator` is not serializable, it could lead to serialization exceptions. Since the `Comparator` is part of a Maven plugin, it is likely that it will be used in such contexts. Therefore, addressing this warning would be beneficial to ensure the plugin's robustness and reliability.
+
+@@ actionable @@

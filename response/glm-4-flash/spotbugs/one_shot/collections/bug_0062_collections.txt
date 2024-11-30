@@ -1,0 +1,19 @@
+map;
+```json
+{
+    "category": "DODGY_CODE",
+    "vtype": "BC_UNCONFIRMED_CAST",
+    "priority": "3",
+    "rank": "20",
+    "project": "collections",
+    "warning_line": "return (UnmodifiableMultiValuedMap<K, V>) map;\n",
+    "warning_method": "@SuppressWarnings(\"unchecked\")\npublic static <K, V> UnmodifiableMultiValuedMap<K, V> unmodifiableMultiValuedMap(MultiValuedMap<? extends K, ? extends V> map) {\nif (map instanceof Unmodifiable) {\nreturn (UnmodifiableMultiValuedMap<K, V>) map;\n}\nreturn new UnmodifiableMultiValuedMap<K, V>(map);\n}"
+}
+```
+
+## Your Answer
+The warning indicates that there is an unchecked cast from `MultiValuedMap<? extends K, ? extends V>` to `UnmodifiableMultiValuedMap<K, ? extends V>`. This is a potential issue because the cast is not guaranteed to be safe, as the `MultiValuedMap` might not actually be an instance of `UnmodifiableMultiValuedMap`. The use of `@SuppressWarnings("unchecked")` suggests that this cast is intentional and has been deemed acceptable by the developer, but it could still lead to runtime errors if the cast is incorrect.
+
+Given that the cast is unchecked and could potentially lead to runtime errors, this warning is actionable. It is important to verify the correctness of the cast and, if necessary, handle the potential `ClassCastException` appropriately.
+
+@@ actionable @@
