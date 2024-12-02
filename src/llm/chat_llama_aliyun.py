@@ -13,7 +13,8 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 import construct_prompts as constructor
 
-key = "sk-cc6a4cec5214465b88c4526069c3a3b3"
+# your api key
+key = ""
 
 def call_with_message(messages):
 

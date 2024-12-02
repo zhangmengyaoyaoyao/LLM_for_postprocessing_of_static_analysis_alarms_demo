@@ -16,7 +16,8 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 import construct_prompts as constructor
 
-key = "18f2c750fd94cf998cd783992f97c819.5LiF231eFl2uYNQs"
+# your api key
+key = ""
 url = "https://open.bigmodel.cn/api/paas/v4/"
 model = "glm-4-flash"
 
@@ -35,9 +36,9 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
     output_dir = os.path.join("response", model, tool, prompts_technique, project_name)
     os.makedirs(output_dir, exist_ok=True)
 
-    temp
+    # temp
     if prompts_technique == "chain_of_thought":
-        json_files = json_files[80:]
+        json_files = json_files[292:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -114,11 +115,8 @@ if __name__ == '__main__':
     # 项目列表
     #projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
     # projects = ["mavendp", "collections"]
-    projects = ["collections"]
 
     # prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
-    prompts_techniques = ["chain_of_thought", "critique", "self_heuristic"]
-
 
     tool = "spotbugs"
 

@@ -14,7 +14,8 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 import construct_prompts as constructor
 
-key = "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"
+# your api key
+key = ""
 url = "https://integrate.api.nvidia.com/v1"
 model_fullname="meta/llama-3.1-70b-instruct"
 model = "llama3.1-70b-instruct"
@@ -36,8 +37,8 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
     os.makedirs(output_dir, exist_ok=True)
 
     #temp
-    if prompts_technique == "one_shot":
-        json_files = json_files[140:]
+    if prompts_technique == "self_heuristic" and project_name == "dbcp":
+        json_files = json_files[46:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -101,8 +102,13 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
             txt_file = os.path.join(output_dir, f"{base_name}_history.txt")
             # Open the file in append mode ("a") instead of write mode ("w")
             with open(txt_file, "a", encoding="utf-8") as f:
+                count = 1
                 for history in history_response:
-                    f.write(history.content + "\n\n\n")
+                    f.write(f'response{count}:\n{history["content"]}\n\n\n')
+                    count += 1
+            # with open(txt_file, "a", encoding="utf-8") as f:
+            #     for history in history_response:
+            #         f.write(history.content + "\n\n\n")
             print(f"history store to: {output_dir}/{base_name}_history.txt")
             
 
@@ -113,8 +119,10 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
 if __name__ == '__main__':
     # 项目列表
     #projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
-    projects = ["mavendp", "collections"]
-    prompts_techniques = ["one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
+    projects = ["dbcp"]
+    # 提示词技术列表
+    # prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
+    prompts_techniques = ["self_heuristic"]
 
     tool = "spotbugs"
 

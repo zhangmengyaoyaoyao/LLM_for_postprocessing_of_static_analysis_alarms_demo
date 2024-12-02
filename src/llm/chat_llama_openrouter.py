@@ -14,8 +14,8 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
 import construct_prompts as constructor
 
-# key = "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"
-key = "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"
+# your api key
+key = ""
 url = "https://openrouter.ai/api/v1"
 model_fullname="meta-llama/llama-3.1-70b-instruct:free"
 model = "llama3.1-70b-instruct"
@@ -37,8 +37,8 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
     os.makedirs(output_dir, exist_ok=True)
 
     #temp
-    if prompts_technique == "one_shot":
-        json_files = json_files[120:]
+    if prompts_technique == "chain_of_thought":
+        json_files = json_files[36:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -81,7 +81,7 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
                     return
             except Exception as e:
                 print("Rate limit may exceeded")
-                continue
+                # continue
 
             if response and response.choices and len(response.choices) > 0 and response.choices[0].message:
                 flag_noResponse = False
@@ -119,7 +119,7 @@ if __name__ == '__main__':
     # 项目列表
     #projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
     projects = ["dbcp"]
-    prompts_techniques = [ "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
+    prompts_techniques = ["chain_of_thought", "critique", "self_heuristic"]
 
     tool = "spotbugs"
 

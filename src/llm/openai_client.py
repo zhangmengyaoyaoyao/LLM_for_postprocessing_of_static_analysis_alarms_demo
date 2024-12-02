@@ -68,7 +68,7 @@ def call_with_2messages(key, url, model, messages):
     messages = [msg for sublist in messages for msg in sublist]
     # 保存所有轮次的消息
     message_with_historys = []
-    print("Processing multiple rounds of 3messages")
+    print("Processing multiple rounds of 2messages")
     count = 0
 
     for message in messages:

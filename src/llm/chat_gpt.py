@@ -1,11 +1,11 @@
 from openai import OpenAI
 import openai 
 import os
-#client = OpenAI()
 os.environ["http_proxy"] = "http://localhost:7890"
 os.environ["https_proxy"] = "http://localhost:7890"
 
-openai.api_key="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",
+# your api key
+openai.api_key="",
 client = OpenAI(api_key=openai.api_key)
 
 completion = client.chat.completions.create(

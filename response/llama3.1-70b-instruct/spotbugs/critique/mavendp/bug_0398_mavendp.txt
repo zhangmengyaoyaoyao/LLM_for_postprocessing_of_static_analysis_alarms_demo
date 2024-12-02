@@ -1,0 +1,17 @@
+The warning "RV_RETURN_VALUE_IGNORED_BAD_PRACTICE" is raised because the return value of the `mkdirs()` method is ignored. The `mkdirs()` method returns a boolean value indicating whether the directory was created successfully or not. Ignoring this return value can lead to unexpected behavior if the directory creation fails.
+
+In this specific code, the return value of `mkdirs()` is not used, but the code immediately checks if the directory exists using the `exists()` method. If the directory does not exist, a `MojoExecutionException` is thrown. However, this approach is not entirely robust, as it relies on the subsequent `exists()` check to determine if the directory was created, rather than checking the return value of `mkdirs()` directly.
+
+A better approach would be to check the return value of `mkdirs()` and handle the case where it returns `false`. This would make the code more explicit and easier to understand. For example:
+
+```java
+if (!location.mkdirs()) {
+    throw new MojoExecutionException("Failed to create directory: " + location);
+}
+```
+
+By checking the return value of `mkdirs()` and throwing an exception if it returns `false`, the code can handle the case where the directory creation fails more explicitly and robustly.
+
+Therefore, the warning is actionable, and the code can be improved by checking the return value of `mkdirs()` and handling the case where it returns `false`.
+
+@@ actionable @@

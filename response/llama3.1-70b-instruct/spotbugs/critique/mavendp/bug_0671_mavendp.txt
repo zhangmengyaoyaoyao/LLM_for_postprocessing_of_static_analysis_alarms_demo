@@ -1,0 +1,27 @@
+This warning is related to the use of the default encoding when creating a FileWriter object. The warning suggests that the encoding should be specified explicitly to avoid potential issues with character encoding.
+
+Upon reviewing the code, it appears that the warning is pointing to the line where the FileWriter object is created:
+
+```java
+outputWriter = new FileWriter(outputFile);
+```
+
+However, `FileWriter` does not have a constructor that takes a charset, which means it will always use the default encoding.
+
+To address this warning, a different class should be used, such as `OutputStreamWriter` or `BufferedWriter` with a `FileOutputStream` or `FileChannel`. For example:
+
+```java
+outputWriter = new OutputStreamWriter(new FileOutputStream(outputFile), StandardCharsets.UTF_8);
+```
+
+Alternatively, you can use `Files.newBufferedWriter()` method which allows you to specify the charset:
+
+```java
+outputWriter = Files.newBufferedWriter(outputFile.toPath(), StandardCharsets.UTF_8);
+```
+
+By making this change, the encoding will be explicitly set, avoiding potential issues with character encoding.
+
+Therefore, this warning is actionable, as it points to a specific issue that can be addressed with a code change.
+
+@@ actionable @@

@@ -1,0 +1,18 @@
+This warning is actionable because it indicates a potential security vulnerability. The warning "SQL_PREPARED_STATEMENT_GENERATED_FROM_NONCONSTANT_STRING" suggests that a prepared statement is being generated from a non-constant string, which could lead to SQL injection attacks. This is a specific and identifiable issue that can be addressed by the developer.
+
+To address this warning, the developer should review the code to ensure that the `sql` variable is properly sanitized and validated to prevent SQL injection attacks. Specifically, the developer should consider using a constant string or a parameterized query instead of concatenating user-input data into the SQL string. This can be achieved by using a `PreparedStatement` with parameter placeholders (e.g., `?`) and setting the values using the `setXXX()` methods.
+
+For example, instead of:
+```java
+String sql = "SELECT * FROM users WHERE name = '" + userName + "'";
+return connection.prepareStatement(sql, resultSetType, resultSetConcurrency);
+```
+The developer should use:
+```java
+String sql = "SELECT * FROM users WHERE name = ?";
+PreparedStatement pstmt = connection.prepareStatement(sql, resultSetType, resultSetConcurrency);
+pstmt.setString(1, userName);
+```
+By taking these steps, the developer can mitigate the risk of SQL injection attacks and address the warning.
+
+@@ actionable @@

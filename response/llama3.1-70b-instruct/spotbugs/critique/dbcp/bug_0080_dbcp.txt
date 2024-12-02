@@ -1,0 +1,15 @@
+This warning is actionable because it indicates a potential SQL injection vulnerability. The `prepareStatement` method is generating a prepared statement from a non-constant string `sql`, which could allow an attacker to inject malicious SQL code.
+
+To fix this, the code should use a parameterized query or prepared statement with bind variables to prevent SQL injection. Here are some possible solutions:
+
+* Use a `PreparedStatement` with bind variables, like this:
+```java
+PreparedStatement pstmt = pooledConnection.prepareStatement("SELECT * FROM table WHERE column = ?");
+pstmt.setString(1, sql);
+```
+* Validate and sanitize the input string `sql` to ensure it does not contain malicious code.
+* Use a whitelist to restrict the allowed input values for `sql`.
+
+By taking one of these approaches, the code can prevent SQL injection and ensure that the input string `sql` is properly sanitized.
+
+@@ actionable @@
