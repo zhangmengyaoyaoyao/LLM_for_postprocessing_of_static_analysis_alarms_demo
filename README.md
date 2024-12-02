@@ -2,7 +2,7 @@
 文件夹       | 说明
 ----------- | -----
 prompts  | 存放提示词
-report  | 原始数据。spotbugs/是最终的json格式Java项目警告；c_json预计存放json格式C/C++项目警告，有待完善。
+report  | 原始数据。spotbugs_linked是完整的警告（包含手工标记结果），spotbugs/是最终的json格式Java项目警告；c_json预计存放json格式C/C++项目警告，有待完善。
 response  | LLMs返回的回答，子文件夹名称代表“LLM/prompt_technique/project_name”
 src  | 核心代码
 src/llm  | 从不同平台调用不同LLMs
@@ -39,6 +39,14 @@ key = ""
 运行命令
 ```
 python3 -m src.llm.chat_···.py
+```
+
+## 2.3 数据后处理
+在test/main.py中，修改你要处理的项目名称（projects）、使用的LLM（model）、警告来源静态分析工具（tool）
+
+然后运行
+```
+python3 -m test.main
 ```
 
 # 3 实验方法

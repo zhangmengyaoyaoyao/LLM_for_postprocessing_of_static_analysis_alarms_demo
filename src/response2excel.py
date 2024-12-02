@@ -105,7 +105,10 @@ def process_txt_files_with_3history(folder_path, output_excel):
                         "Content": full_content,
                         "Status": status
                     })
-
+    # 将数据保存到Excel文件
+    df = pd.DataFrame(data)
+    df.to_excel(output_excel, index=False)
+    print(f"数据已保存到 {output_excel}")
 
 
 def process_txt_files_with_2history(folder_path, output_excel):
@@ -165,10 +168,6 @@ def process_txt_files_with_2history(folder_path, output_excel):
                         "Content": full_content,
                         "Status": status
                     })
-
-
-
-    
     # 将数据保存到Excel文件
     df = pd.DataFrame(data)
     df.to_excel(output_excel, index=False)
@@ -176,21 +175,15 @@ def process_txt_files_with_2history(folder_path, output_excel):
 
 
 
+def link_excel(file1, file2):
+    """
+    将 file1 中的所有列粘贴到 file2 中的最后，并保存为新的 Excel 文件。
+    """
+    df1 = pd.read_csv(file1)
+    df2 = pd.read_excel(file2)
 
-# 使用示例
-# prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought"]
+    # 将 file1 中的所有列粘贴到 file2 的后面
+    df2 = pd.concat([df2, df1], axis=1)
 
-# for prompts_technique in prompts_techniques:
-#     print(prompts_technique)
-#     folder_path = f"response/llama3.1-70b-instruct/spotbugs/{prompts_technique}/bcel"  # 替换为你的文件夹路径
-#     output_excel = f"response/llama3.1-70b-instruct/spotbugs/{prompts_technique}_bcel.xlsx"  # 替换为保存Excel的路径
-#     process_txt_files(folder_path, output_excel)
-
-prompts_technique = "self_heuristic"
-folder_path = f"response/llama3.1-70b-instruct/spotbugs/{prompts_technique}/bcel"  # 替换为你的文件夹路径
-output_excel = f"response/llama3.1-70b-instruct/spotbugs/{prompts_technique}_bcel.xlsx"  # 替换为保存Excel的路径
-if prompts_technique == "critique":
-    process_txt_files_with_3history(folder_path, output_excel)
-elif prompts_technique == "self_heuristic":
-    process_txt_files_with_2history(folder_path, output_excel)
-
+    # 将修改后的 DataFrame 保存回 file2
+    df2.to_excel(file2, index=False)

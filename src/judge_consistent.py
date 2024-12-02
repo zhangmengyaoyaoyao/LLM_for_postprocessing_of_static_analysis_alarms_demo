@@ -32,12 +32,3 @@ def update_consistent_column(input_excel):
     # 保存结果到原文件
     df.to_excel(input_excel, index=False)
     print(f"处理完成，结果已更新到 {input_excel}")
-
-# 使用示例
-#prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
-prompts_techniques = ["self_heuristic"]
-
-for prompts_technique in prompts_techniques:
-    print(prompts_technique)
-    input_excel = f"response/llama3.1-70b-instruct/spotbugs/{prompts_technique}_bcel.xlsx"  # 替换为你的 Excel 文件路径
-    update_consistent_column(input_excel)

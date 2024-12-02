@@ -9,8 +9,6 @@ from . import openai_client
 
 # 获取项目根目录
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
-
-# 添加项目根目录到 sys.path
 sys.path.append(project_root)
 import construct_prompts as constructor
 
