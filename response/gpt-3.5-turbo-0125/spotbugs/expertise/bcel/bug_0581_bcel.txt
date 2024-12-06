@@ -1,0 +1,17 @@
+The warning is related to the use of the Double constructor with a double argument. This warning suggests that using the Double constructor with a double argument can be less efficient than using Double.valueOf(double) due to unnecessary boxing and unboxing operations.
+
+In this specific case, the warning occurs in the method getValue() where a new Double object is created using ((org.apache.commons.bcel6.classfile.ConstantDouble) c).getBytes(). To address this warning, you can replace the line:
+
+```java
+return new Double(((org.apache.commons.bcel6.classfile.ConstantDouble) c).getBytes());
+```
+
+with:
+
+```java
+return Double.valueOf(((org.apache.commons.bcel6.classfile.ConstantDouble) c).getBytes());
+```
+
+By using Double.valueOf(double) instead of the Double constructor, unnecessary object creation can be avoided, leading to potentially better performance.
+
+@@ actionable @@

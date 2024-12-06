@@ -1,0 +1,21 @@
+The warning is about an unconfirmed cast of `ConstantDouble` to `Constant`. The code snippet in question is:
+
+```java
+return addDouble(((ConstantDouble) c).getBytes());
+```
+
+In this context, the cast from `Constant` to `ConstantDouble` is assumed to be safe, but it is not confirmed at compile time. This can potentially lead to a `ClassCastException` at runtime if `c` is not actually an instance of `ConstantDouble`.
+
+To address this warning, you should consider adding a check to ensure that `c` is indeed an instance of `ConstantDouble` before performing the cast. This can be done using `instanceof` operator to verify the type before casting.
+
+```java
+if (c instanceof ConstantDouble) {
+    return addDouble(((ConstantDouble) c).getBytes());
+} else {
+    // Handle the case where c is not a ConstantDouble
+}
+```
+
+By adding this check, you can prevent the potential `ClassCastException` and make the code more robust.
+
+@@ actionable @@
