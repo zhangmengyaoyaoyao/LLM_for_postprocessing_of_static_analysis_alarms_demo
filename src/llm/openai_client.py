@@ -16,7 +16,7 @@ def get_response(key, url, model, message, top_p=0.1, temperature=0.1, max_retri
                 messages=message,
                 top_p=top_p,
                 temperature=temperature,
-                max_tokens=4095,
+                max_tokens=4096,
             ) 
             return response
         except openai.error.RateLimitError as e:
