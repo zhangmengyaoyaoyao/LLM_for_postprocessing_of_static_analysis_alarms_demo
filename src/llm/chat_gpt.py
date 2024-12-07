@@ -13,7 +13,7 @@ sys.path.append(project_root)
 import construct_prompts as constructor
 
 # your api key
-key = ""
+key = "sk-ObVryOZtqF8lyqOGBa7e550e116f4671919f6e57CcD34f55"
 url = "https://aihubmix.com/v1"
 model = "gpt-3.5-turbo-0125"
 
@@ -34,8 +34,8 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
     os.makedirs(output_dir, exist_ok=True)
 
     #temp
-    if prompts_technique == "critique" and project_name == "bcel":
-        json_files = json_files[230:]
+    # if prompts_technique == "self_heuristic" and project_name == "collections":
+    #     json_files = json_files[3:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -116,10 +116,10 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
 if __name__ == '__main__':
     # 项目列表
     #projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
-    projects = ["bcel", "dbcp", "collections","mavendp"]
+    projects = ["mavendp"]
     # 提示词技术列表
-    prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
-    # prompts_techniques = ["self_heuristic"]
+    prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought","critique", "self_heuristic"]
+    # prompts_techniques = [ "self_heuristic"]
 
     tool = "spotbugs"
 

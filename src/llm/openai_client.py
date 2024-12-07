@@ -9,7 +9,6 @@ def get_response(key, url, model, message, top_p=0.1, temperature=0.1, max_retri
     
     retries = 0
     while retries < max_retries:
-        print("try for ", retries, " times")
         try:
             response = client.chat.completions.create(
                 model=model,  

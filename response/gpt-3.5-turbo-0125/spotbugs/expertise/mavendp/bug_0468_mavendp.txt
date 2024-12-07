@@ -1,0 +1,28 @@
+The warning indicates a potential `NullPointerException` issue. The method `containsVersion` is trying to compare `recommendedVersion` with `theVersion` without checking if `recommendedVersion` is null. This can lead to a `NullPointerException` if `recommendedVersion` is indeed null.
+
+To address this warning, you should add a null check for `recommendedVersion` before performing the comparison. Here's an example of how you can modify the code:
+
+```java
+public static boolean containsVersion(VersionRange allowedRange, ArtifactVersion theVersion) {
+    ArtifactVersion recommendedVersion = allowedRange.getRecommendedVersion();
+    if (recommendedVersion == null) {
+        @SuppressWarnings("unchecked")
+        List<Restriction> restrictions = allowedRange.getRestrictions();
+        for (Restriction restriction : restrictions) {
+            if (restriction.containsVersion(theVersion)) {
+                return true;
+            }
+        }
+    }
+    
+    if (recommendedVersion != null && recommendedVersion.compareTo(theVersion) <= 0) {
+        return true;
+    }
+    
+    return false;
+}
+```
+
+By adding the null check for `recommendedVersion`, you can prevent the `NullPointerException` from occurring.
+
+@@ actionable @@
