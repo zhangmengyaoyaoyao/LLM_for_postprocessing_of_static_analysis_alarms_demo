@@ -25,7 +25,7 @@ def excel_to_json(excel_file, output_dir, columns):
     index = 1
     for idx, row in data.iterrows():
         row_data = row.to_dict()  # 转为字典
-        project = row_data.get("project", "Unknown").replace(" ", "_")
+        project = row_data.get("Project", "Unknown").replace(" ", "_")
         filename = f'bug_{index:04d}_{project}.json'
         output_path = os.path.join(output_dir, filename)
         
@@ -39,6 +39,6 @@ def excel_to_json(excel_file, output_dir, columns):
 # 使用示例
 excel_file = "report/c_raw/c.xlsx"  # 替换为你的 Excel 文件路径
 output_dir = "report/c_json"  # 输出 JSON 文件的目录
-columns = ["project", "tool", "category", "file", "message", "warning_function_name","warning_line", "warning_context"]  # 需要保留的列
+columns = ["Project", "Tool", "category", "file", "message", "warning_function_name","warning_line", "warning_context"]  # 需要保留的列
 
 excel_to_json(excel_file, output_dir, columns)

@@ -21,10 +21,7 @@ key = ""
 url = "https://open.bigmodel.cn/api/paas/v4/"
 model = "glm-4-flash"
 
-def process_spotbugs_project_files(key, url, model, tool, prompts_technique, project_name):
-    # 构建项目路径
-    project_path = os.path.join("report", tool, project_name)
-
+def process_spotbugs_project_files(key, url, model, tool, prompts_technique, project_name, project_path):
     # 获取该项目下的所有 JSON 文件路径
     json_files = sorted(glob.glob(os.path.join(project_path, "*.json")))
 
@@ -33,12 +30,15 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
         return
     
     # 存储输出的路径
-    output_dir = os.path.join("response", model, tool, prompts_technique, project_name)
+    if project_name == "unknown":
+        output_dir = os.path.join("response", model, "C_project", prompts_technique)
+    else:
+        output_dir = os.path.join("response", model, tool, prompts_technique, project_name)
     os.makedirs(output_dir, exist_ok=True)
 
     # temp
-    if prompts_technique == "chain_of_thought":
-        json_files = json_files[292:]
+    # if prompts_technique == "chain_of_thought":
+    #     json_files = json_files[292:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -51,8 +51,8 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
         
         # 设置工具和项目名
         if(tool != 'spotbugs'):
-            tool = json_content["Tool"]
-            project_name = json_content["Project"]
+            tool = data["Tool"]
+            project_name = data["Project"]
         constructor.setGeneralInfo(tool, project_name)
         constructor.setWarning(json_content)
 
@@ -97,7 +97,7 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
             f.write(content)
         
         if prompts_technique == "critique" or prompts_technique == "self_heuristic":
-            print("///////historyresponse///////", history_response)
+            # print("///////historyresponse///////", history_response)
             txt_file = os.path.join(output_dir, f"{base_name}_history.txt")
             # Open the file in append mode ("a") instead of write mode ("w")
             with open(txt_file, "a", encoding="utf-8") as f:
@@ -112,17 +112,26 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
 
 
 if __name__ == '__main__':
-    # 项目列表
-    #projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
-    # projects = ["mavendp", "collections"]
+#java
+    # # 项目列表
+    # projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
 
     # prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
 
-    tool = "spotbugs"
+    # tool = "spotbugs"
+    
+    # # 依次处理所有项目
+    # for project in projects:
+    #     # 构建项目路径
+    #     project_path = os.path.join("report", tool, project)
+    #     for prompts_technique in prompts_techniques:
+    #         print(f"Processing project {project} with {prompts_technique}")
+    #         process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, project_path)
 
-
-    # 依次处理所有项目
-    for project in projects:
-        for prompts_technique in prompts_techniques:
-            print(f"Processing project {project} with {prompts_technique}")
-            process_spotbugs_project_files( key, url, model, tool, prompts_technique, project)
+#C
+    prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
+    tool = "unknown"
+    project = "unknown"
+    project_path = os.path.join("report", "c_json")
+    for prompts_technique in prompts_techniques:
+        process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, project_path)
