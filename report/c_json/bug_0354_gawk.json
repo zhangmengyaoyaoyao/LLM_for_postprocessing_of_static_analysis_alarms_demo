@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "CSA",
-    "Bug Type": "core.NullDereference",
-    "Message": "Dereference of null pointer",
-    "Code_line": "\t\t*s++ = paren[0];",
-    "Code_function": "pp_list(int nargs, const char *paren, const char *delim)\n{\n\tNODE *r;\n \tchar *str, *s;\n\tsize_t len;\n\tsize_t delimlen;\n\tint i;\n\n\tif (pp_args == NULL) {\n\t\tnpp_args = nargs;\n\t\temalloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *), \"pp_list\");\n\t} else if (nargs > npp_args) {\n\t\tnpp_args = nargs;\n\t\terealloc(pp_args, NODE **, (nargs + 2) * sizeof(NODE *), \"pp_list\");\n\t}\n\n\tdelimlen = strlen(delim);\n\tlen = -delimlen;\n\tfor (i = 1; i <= nargs; i++) {\n\t\tr = pp_args[i] = pp_pop();\n\t\tlen += r->pp_len + delimlen;\n\t}\n\tif (paren != NULL) {\n\t\tassert(strlen(paren) == 2);\n\t\tlen += 2;\n\t}\n\n\temalloc(str, char *, len + 1, \"pp_list\");\n\ts = str;\n\tif (paren != NULL)\n\t\t*s++ = paren[0];\n\tr = pp_args[nargs];\n\tmemcpy(s, r->pp_str, r->pp_len);\n\ts += r->pp_len;\n\tpp_free(r);\n\tfor (i = nargs - 1; i > 0; i--) {\n\t\tif (delimlen > 0) {\n\t\t\tmemcpy(s, delim, delimlen);\n\t\t\ts += delimlen;\n\t\t}\n\t\tr = pp_args[i];\n\t\tmemcpy(s, r->pp_str, r->pp_len);\n\t\ts += r->pp_len;\n\t\tpp_free(r);\n\t}\n\tif (paren != NULL)\n\t\t*s++ = paren[1];\n\t*s = '\\0';\n\treturn str;\n}"
-}

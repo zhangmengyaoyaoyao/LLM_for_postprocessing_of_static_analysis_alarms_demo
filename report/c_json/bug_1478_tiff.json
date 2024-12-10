@@ -1,0 +1,10 @@
+{
+    "project": "tiff",
+    "tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "libtiff/tif_apple.c",
+    "message": "Uninitialized variable: pname",
+    "warning_function_name": "TIFFOpen",
+    "warning_line": "strcpy((char*) pname, name);",
+    "warning_context": "TIFF*\nTIFFOpen(const char* name, const char* mode)\n{\n\tstatic const char module[] = \"TIFFOpen\";\n\tStr255 pname;\n\tFInfo finfo;\n\tshort fref;\n\tOSErr err;\n\tFSSpec\tfSpec;\n\n\tstrcpy((char*) pname, name);\n\tourc2pstr((char*) pname);\n\t\n\terr = FSMakeFSSpec( 0, 0, pname, &fSpec );\n\n\tswitch (_TIFFgetMode(mode, module)) {\n\tdefault:\n\t\treturn ((TIFF*) 0);\n\tcase O_RDWR | O_CREAT | O_TRUNC:\n\t\tif (FSpGetFInfo(&fSpec, &finfo) == noErr)\n\t\t\tFSpDelete(&fSpec);\n\t\t/* fall through */\n\tcase O_RDWR | O_CREAT:\n\t\tif ((err = FSpGetFInfo(&fSpec, &finfo)) == fnfErr) {\n\t\t\tif (FSpCreate(&fSpec, '    ', 'TIFF', smSystemScript) != noErr)\n\t\t\t\tgoto badCreate;\n\t\t\tif (FSpOpenDF(&fSpec, fsRdWrPerm, &fref) != noErr)\n\t\t\t\tgoto badOpen;\n\t\t} else if (err == noErr) {\n\t\t\tif (FSpOpenDF(&fSpec, fsRdWrPerm, &fref) != noErr)\n\t\t\t\tgoto badOpen;\n\t\t} else\n\t\t\tgoto badOpen;\n\t\tbreak;\n\tcase O_RDONLY:\n\t\tif (FSpOpenDF(&fSpec, fsRdPerm, &fref) != noErr)\n\t\t\tgoto badOpen;\n\t\tbreak;\n\tcase O_RDWR:\n\t\tif (FSpOpenDF(&fSpec, fsRdWrPerm, &fref) != noErr)\n\t\t\tgoto badOpen;\n\t\tbreak;\n\t}\n\treturn (TIFFFdOpen((int) fref, name, mode));\nbadCreate:\n\tTIFFErrorExt(0, module, \"%s: Cannot create\", name);\n\treturn ((TIFF*) 0);\nbadOpen:\n\tTIFFErrorExt(0, module, \"%s: Cannot open\", name);\n\treturn ((TIFF*) 0);\n}\n"
+}

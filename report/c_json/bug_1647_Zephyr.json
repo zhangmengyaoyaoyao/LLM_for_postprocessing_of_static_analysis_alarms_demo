@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from *pending_no_cb was never initialized.",
-    "Code_line": "\t\t\t(*pending_no_cb)--;",
-    "Code_function": "static bool send_frag(struct bt_conn *conn, struct net_buf *buf, u8_t flags,\n\t\t      bool always_consume)\n{\n\tstruct bt_conn_tx *tx = tx_data(buf)->tx;\n\tstruct bt_hci_acl_hdr *hdr;\n\tu32_t *pending_no_cb;\n\tunsigned int key;\n\tint err;\n\n\tBT_DBG(\"conn %p buf %p len %u flags 0x%02x\", conn, buf, buf->len,\n\t       flags);\n\n\t/* Wait until the controller can accept ACL packets */\n\tk_sem_take(bt_conn_get_pkts(conn), K_FOREVER);\n\n\t/* Check for disconnection while waiting for pkts_sem */\n\tif (conn->state != BT_CONN_CONNECTED) {\n\t\tgoto fail;\n\t}\n\n\thdr = net_buf_push(buf, sizeof(*hdr));\n\thdr->handle = sys_cpu_to_le16(bt_acl_handle_pack(conn->handle, flags));\n\thdr->len = sys_cpu_to_le16(buf->len - sizeof(*hdr));\n\n\t/* Add to pending, it must be done before bt_buf_set_type */\n\tkey = irq_lock();\n\tif (tx) {\n\t\tsys_slist_append(&conn->tx_pending, &tx->node);\n\t} else {\n\t\tstruct bt_conn_tx *tail_tx;\n\n\t\ttail_tx = (void *)sys_slist_peek_tail(&conn->tx_pending);\n\t\tif (tail_tx) {\n\t\t\tpending_no_cb = &tail_tx->pending_no_cb;\n\t\t} else {\n\t\t\tpending_no_cb = &conn->pending_no_cb;\n\t\t}\n\n\t\t(*pending_no_cb)++;\n\t}\n\tirq_unlock(key);\n\n\tbt_buf_set_type(buf, BT_BUF_ACL_OUT);\n\n\terr = bt_send(buf);\n\tif (err) {\n\t\tBT_ERR(\"Unable to send to driver (err %d)\", err);\n\t\tkey = irq_lock();\n\t\t/* Roll back the pending TX info */\n\t\tif (tx) {\n\t\t\tsys_slist_find_and_remove(&conn->tx_pending, &tx->node);\n\t\t} else {\n\t\t\t__ASSERT_NO_MSG(*pending_no_cb > 0);\n\t\t\t(*pending_no_cb)--;\n\t\t}\n\t\tirq_unlock(key);\n\t\tgoto fail;\n\t}\n\n\treturn true;\n\nfail:\n\tk_sem_give(bt_conn_get_pkts(conn));\n\tif (tx) {\n\t\ttx_free(tx);\n\t}\n\n\tif (always_consume) {\n\t\tnet_buf_unref(buf);\n\t}\n\treturn false;\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "subsys/net/ip/tp.c",
+    "message": "Uninitialized variables: mem.next, mem.func, mem.footer, mem.header",
+    "warning_function_name": "tp_mem_stat",
+    "warning_line": "tp_mem_chk(mem);",
+    "warning_context": "void tp_mem_stat(void)\n{\n\tstruct tp_mem *mem;\n\n\tSYS_SLIST_FOR_EACH_CONTAINER(&tp_mem, mem, next) {\n\t\ttp_dbg(\"len=%zu %s:%d\", mem->size, mem->file, mem->line);\n\t\ttp_mem_chk(mem);\n\t}\n}\n"
 }

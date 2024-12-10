@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset added: [-20, 139] (⇐ [-68, 91] + 48) Size: 4064 by call to `bfd_zalloc`.",
-    "Code_line": "  new_lo = (struct bfd_link_order *) bfd_zalloc (abfd, amt);",
-    "Code_function": "bfd_new_link_order (bfd *abfd, asection *section)\n{\n  bfd_size_type amt = sizeof (struct bfd_link_order);\n  struct bfd_link_order *new_lo;\n\n  new_lo = (struct bfd_link_order *) bfd_zalloc (abfd, amt);\n  if (!new_lo)\n    return NULL;\n\n  new_lo->type = bfd_undefined_link_order;\n\n  if (section->map_tail.link_order != NULL)\n    section->map_tail.link_order->next = new_lo;\n  else\n    section->map_head.link_order = new_lo;\n  section->map_tail.link_order = new_lo;\n\n  return new_lo;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L1",
+    "file": "binutils/ieee.c",
+    "message": "Offset: [max(490, `info->curbuf->c`), `info->curbuf->c`] Size: 490 by call to `ieee_real_write_byte`.",
+    "warning_function_name": "ieee_write_id",
+    "warning_line": "if (! ieee_write_byte (info, len))",
+    "warning_context": "static bfd_boolean\nieee_write_id (struct ieee_handle *info, const char *s)\n{\n  unsigned int len;\n\n  len = strlen (s);\n  if (len <= 0x7f)\n    {\n      if (! ieee_write_byte (info, len))\n\treturn FALSE;\n    }\n  else if (len <= 0xff)\n    {\n      if (! ieee_write_byte (info, (int) ieee_extension_length_1_enum)\n\t  || ! ieee_write_byte (info, len))\n\treturn FALSE;\n    }\n  else if (len <= 0xffff)\n    {\n      if (! ieee_write_byte (info, (int) ieee_extension_length_2_enum)\n\t  || ! ieee_write_2bytes (info, len))\n\treturn FALSE;\n    }\n  else\n    {\n      fprintf (stderr, _(\"IEEE string length overflow: %u\\n\"), len);\n      return FALSE;\n    }\n\n  for (; *s != '\\0'; s++)\n    if (! ieee_write_byte (info, *s))\n      return FALSE;\n\n  return TRUE;\n}\n"
 }

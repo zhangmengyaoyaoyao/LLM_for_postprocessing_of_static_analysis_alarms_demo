@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "sys/cb_mux/cb_mux.c",
+    "message": "Uninitialized variable: free",
+    "warning_function_name": "cb_mux_find_free_id",
+    "warning_line": "if (~free & ((uint32_t)1 << num)) {",
+    "warning_context": "cb_mux_cbid_t cb_mux_find_free_id(cb_mux_t *head)\n{\n    uint32_t free;\n    cb_mux_cbid_t block;\n    cb_mux_t *entry = NULL;\n    uint8_t num;\n\n    /* Search for free IDs in blocks of 32 IDs */\n    for (block = 0; block + 31 < (cb_mux_cbid_t)(-1); block += 32) {\n        /* Set all IDs in block to free */\n        free = 0;\n\n        LL_FOREACH(head, entry) {\n            /* cbid falls within this block */\n            if ((entry->cbid >= block) && (entry->cbid < block + 32)) {\n                /* Set cbid to taken */\n                free |= 1 << (entry->cbid & 0x1F);\n            }\n        }\n\n        /* At least one ID in block free */\n        if (~free) {\n            break;\n        }\n    }\n\n    /* Find which ID in block was free */\n    for (num = 0; num < 32; num++) {\n        if (~free & ((uint32_t)1 << num)) {\n            return block | num;\n        }\n    }\n\n    /* No free IDs */\n    return (cb_mux_cbid_t)(-1);\n}\n"
+}

@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: [4, +oo] Size: [1, +oo] by call to `do_repeat`.",
-    "Code_line": "  do_repeat (count, \"REPT\", \"ENDR\");",
-    "Code_function": "s_rept (int ignore ATTRIBUTE_UNUSED)\n{\n  int count;\n\n  count = get_absolute_expression ();\n\n  do_repeat (count, \"REPT\", \"ENDR\");\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "UNINITIALIZED_VALUE",
+    "file": "binutils/stabs.c",
+    "message": "The value read from varargs was never initialized.",
+    "warning_function_name": "stab_demangle_type",
+    "warning_line": "*ptype = debug_make_function_type (minfo->dhandle, *ptype, args,",
+    "warning_context": "\t\tstab_bad_demangle (orig);\n\t\treturn FALSE;\n\t      }\n\t    high *= 10;\n\t    high += **pp - '0';\n\t    ++*pp;\n\t  }\n\tif (**pp != '_')\n\t  {\n\t    stab_bad_demangle (orig);\n\t    return FALSE;\n\t  }\n\t++*pp;\n\n\tif (! stab_demangle_type (minfo, pp, ptype))\n\t  return FALSE;\n\tif (ptype != NULL)\n\t  {\n\t    debug_type int_type;\n\n\t    int_type = debug_find_named_type (minfo->dhandle, \"int\");\n\t    if (int_type == NULL)\n\t      int_type = debug_make_int_type (minfo->dhandle, 4, FALSE);\n\t    *ptype = debug_make_array_type (minfo->dhandle, *ptype, int_type,\n\t\t\t\t\t    0, high, FALSE);\n\t  }\n      }\n      break;\n\n    case 'T':\n      /* A back reference to a remembered type.  */\n      {\n\tunsigned int i;\n\tconst char *p;\n\n\t++*pp;\n\tif (! stab_demangle_get_count (pp, &i))\n\t  {\n\t    stab_bad_demangle (orig);\n\t    return FALSE;\n\t  }\n\tif (i >= minfo->typestring_count)\n\t  {\n\t    stab_bad_demangle (orig);\n\t    return FALSE;\n\t  }\n\tp = minfo->typestrings[i].typestring;\n\tif (! stab_demangle_type (minfo, &p, ptype))\n\t  return FALSE;\n      }\n      break;\n\n    case 'F':\n      /* A function.  */\n      {\n\tdebug_type *args;\n\tbfd_boolean varargs;\n\n\t++*pp;\n\tif (! stab_demangle_args (minfo, pp,\n\t\t\t\t  (ptype == NULL\n\t\t\t\t   ? (debug_type **) NULL\n\t\t\t\t   : &args),\n\t\t\t\t  (ptype == NULL\n\t\t\t\t   ? (bfd_boolean *) NULL\n\t\t\t\t   : &varargs)))\n\t  return FALSE;\n\tif (**pp != '_')\n\t  {\n\t    /* cplus_demangle will accept a function without a return\n\t       type, but I don't know when that will happen, or what\n\t       to do if it does.  */\n\t    stab_bad_demangle (orig);\n\t    return FALSE;\n\t  }\n\t++*pp;\n\tif (! stab_demangle_type (minfo, pp, ptype))\n\t  return FALSE;\n\tif (ptype != NULL)\n\t  *ptype = debug_make_function_type (minfo->dhandle, *ptype, args,\n\t\t\t\t\t     varargs);\n\n      }\n      break;\n\n    case 'M':\n    case 'O':\n      {\n\tbfd_boolean memberp;\n\tdebug_type class_type = DEBUG_TYPE_NULL;\n\tdebug_type *args;\n\tbfd_boolean varargs;\n\tunsigned int n;\n\tconst char *name;\n\n\tmemberp = **pp == 'M';\n\targs = NULL;\n\tvarargs = FALSE;\n\n\t++*pp;\n\tif (ISDIGIT (**pp))\n"
 }

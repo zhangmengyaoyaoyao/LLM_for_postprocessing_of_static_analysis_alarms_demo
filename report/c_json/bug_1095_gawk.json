@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "str_array.c",
+    "message": "pointer `new` last assigned on line 299 could be null and is dereferenced by call to `memset()` at line 300, column 2.",
+    "warning_function_name": "str_copy",
+    "warning_line": "memset(new, '\\0', cursize * sizeof(BUCKET *));",
+    "warning_context": "static NODE **\nstr_copy(NODE *symbol, NODE *newsymb)\n{\n\tBUCKET **old, **new, **pnew;\n\tBUCKET *chain, *newchain;\n\tunsigned long cursize, i;\n\t\n\tassert(symbol->table_size > 0);\n\n\t/* find the current hash size */\n\tcursize = symbol->array_size;\n\n\t/* allocate new table */\n\temalloc(new, BUCKET **, cursize * sizeof(BUCKET *), \"str_copy\");\n\tmemset(new, '\\0', cursize * sizeof(BUCKET *));\n\n\told = symbol->buckets;\n\n\tfor (i = 0; i < cursize; i++) {\n\t\tfor (chain = old[i], pnew = & new[i]; chain != NULL;\n\t\t\t\tchain = chain->ahnext\n\t\t) {\n\t\t\tNODE *oldval, *newsubs;\n\n\t\t\tgetbucket(newchain);\n\n\t\t\t/*\n\t\t\t * copy the corresponding name and\n\t\t\t * value from the original input list\n\t\t\t */\n\n\t\t\tnewsubs = newchain->ahname = dupnode(chain->ahname);\n\t\t\tnewchain->ahname_str = newsubs->stptr;\n\t\t\tnewchain->ahname_len = newsubs->stlen;\n\n\t\t\toldval = chain->ahvalue;\n\t\t\tif (oldval->type == Node_val)\n\t\t\t\tnewchain->ahvalue = dupnode(oldval);\n\t\t\telse {\n\t\t\t\tNODE *r;\n\n\t\t\t\tr = make_array();\n\t\t\t\tr->vname = estrdup(oldval->vname, strlen(oldval->vname));\n\t\t\t\tr->parent_array = newsymb;\n\t\t\t\tnewchain->ahvalue = assoc_copy(oldval, r);\n\t\t\t}\n\t\t\tnewchain->ahcode = chain->ahcode;\n\n\t\t\t*pnew = newchain;\n\t\t\tnewchain->ahnext = NULL;\n\t\t\tpnew = & newchain->ahnext;\n\t\t}\n\t}\t\n\n\tnewsymb->table_size = symbol->table_size;\n\tnewsymb->buckets = new;\n\tnewsymb->array_size = cursize;\n\tnewsymb->flags = symbol->flags;\n\treturn NULL;\n}\n"
+}

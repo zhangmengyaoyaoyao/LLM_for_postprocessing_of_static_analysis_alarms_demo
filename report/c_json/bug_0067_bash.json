@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "hashlib.c",
+    "message": "Uninitialized variables: new_bucket.next, new_bucket.key, new_bucket.data, new_bucket.khash, new_bucket.times_found",
+    "warning_function_name": "copy_bucket_array",
+    "warning_line": "return new_bucket;",
+    "warning_context": "static BUCKET_CONTENTS *\ncopy_bucket_array (ba, cpdata)\n     BUCKET_CONTENTS *ba;\n     sh_string_func_t *cpdata;\t/* data copy function */\n{\n  BUCKET_CONTENTS *new_bucket, *n, *e;\n\n  if (ba == 0)\n    return ((BUCKET_CONTENTS *)0);\n\n  for (n = (BUCKET_CONTENTS *)0, e = ba; e; e = e->next)\n    {\n      if (n == 0)\n        {\n          new_bucket = (BUCKET_CONTENTS *)xmalloc (sizeof (BUCKET_CONTENTS));\n          n = new_bucket;\n        }\n      else\n        {\n          n->next = (BUCKET_CONTENTS *)xmalloc (sizeof (BUCKET_CONTENTS));\n          n = n->next;\n        }\n\n      n->key = savestring (e->key);\n      n->data = e->data ? (cpdata ? (*cpdata) (e->data) : savestring (e->data))\n\t\t\t: NULL;\n      n->khash = e->khash;\n      n->times_found = e->times_found;\n      n->next = (BUCKET_CONTENTS *)NULL;\n    }\n\n  return new_bucket;  \n}\n"
+}

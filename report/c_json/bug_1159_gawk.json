@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "cint_array.c",
+    "message": "Offset added: [0, 8589934592] Size: [0, 8589934592].",
+    "warning_function_name": "e_lookup(NO",
+    "warning_line": "memset(table, '\\0', actual_size * sizeof(NODE *));",
+    "warning_context": "static NODE **\ntree_lookup(NODE *symbol, NODE *tree, long k, int m, long base)\n{\n\tNODE **lhs;\n\tNODE *tn;\n\tint i, n;\n\tsize_t size;\n\tlong num = k;\n\n\t/*\n\t * HAT size (size of Top & Leaf array) = 2^n\n\t * where n = Floor ((m + 1)/2). For an odd value of m,\n\t * only the first half of the HAT is needed.\n\t */\n\n\tn = (m + 1) / 2;\n\t\n\tif (tree->table_size == 0) {\n\t\tsize_t actual_size;\n\t\tNODE **table;\n\n\t\tassert(tree->nodes == NULL);\n\n\t\t/* initialize top-level array */\n\t\tsize = actual_size = power_two_table[n];\n\t\ttree->array_base = base;\n\t\ttree->array_size = size;\n\t\ttree->table_size = 0;\t/* # of elements in the array */\n\t\tif (n > m/2) {\n\t\t\t/* only first half of the array used */\n\t\t\tactual_size /= 2;\n\t\t\ttree->flags |= HALFHAT;\n\t\t}\n\t\temalloc(table, NODE **, actual_size * sizeof(NODE *), \"tree_lookup\");\n \t\tmemset(table, '\\0', actual_size * sizeof(NODE *));\n\t\ttree->nodes = table;\n\t} else\n\t\tsize = tree->array_size;\n\n\tnum -= tree->array_base;\n\ti = num / size;\t/* top-level array index */\n\tassert(i >= 0);\n\n\tif ((lhs = tree_find(tree, k, i)) != NULL)\n\t\treturn lhs;\n\n\t/* It's not there, install it */\n\n\ttree->table_size++;\n\tbase += (size * i);\n\ttn = tree->nodes[i];\n\tif (n > NHAT) {\n\t\tif (tn == NULL)\n\t\t\ttn = tree->nodes[i] = make_node(Node_array_tree);\n\t\treturn tree_lookup(symbol, tn, k, n, base);\n\t} else {\n\t\tif (tn == NULL)\n\t\t\ttn = tree->nodes[i] = make_node(Node_array_leaf);\n\t\treturn leaf_lookup(symbol, tn, k, size, base);\n\t}\n}\n"
+}

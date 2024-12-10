@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Cppcheck",
-    "Bug Type": "Null Pointer Dereference",
-    "Message": "Either the condition '!ud' is redundant or there is possible null pointer dereference: ud.",
-    "Code_line": "\t\tDBG(\"Test %s failed.\", ud->test);",
-    "Code_function": "\t\tDBG(\"Test %s failed.\", ud->test);"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "drivers/can/can_mcux_flexcan.c",
+    "message": "Uninitialized variable: alloc",
+    "warning_function_name": "mcux_get_tx_alloc",
+    "warning_line": "alloc = alloc ? (pivot + 1 + i * ATOMIC_BITS) : 0;",
+    "warning_context": "static int mcux_get_tx_alloc(struct mcux_flexcan_data *data)\n{\n\tatomic_val_t *allocs = data->tx_allocs;\n\tatomic_val_t pivot = ATOMIC_BITS / 2;\n\tatomic_val_t alloc, mask;\n\tint i;\n\n\tfor (i = MCUX_N_TX_ALLOC_ELEM - 1; i >= 0; i--) {\n\t\talloc = allocs[i];\n\t\tif (alloc) {\n\t\t\tfor (atomic_val_t bits = ATOMIC_BITS / 2U;\n\t\t\t    bits; bits >>= 1) {\n\t\t\t\tmask = GENMASK(pivot + bits - 1, pivot);\n\t\t\t\tif (alloc & mask) {\n\t\t\t\t\tpivot += bits / 2U;\n\t\t\t\t} else {\n\t\t\t\t\tpivot -= bits / 2U;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tif (!(alloc & mask)) {\n\t\t\t\tpivot--;\n\t\t\t}\n\n\t\t\tbreak;\n\t\t}\n\t}\n\n\talloc = alloc ? (pivot + 1 + i * ATOMIC_BITS) : 0;\n\treturn alloc >= MCUX_FLEXCAN_MAX_TX ? -1 : alloc;\n}\n"
 }

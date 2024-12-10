@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Infer",
+    "category": "Buffer Overrun L2",
+    "file": "sys/hashes/sha1.c",
+    "message": "Offset: [0, 19] Size: 5.",
+    "warning_function_name": "ha1_final_hmac(",
+    "warning_line": "sha1_update_byte(ctx, ctx->inner_hash[i]);",
+    "warning_context": "void sha1_final_hmac(sha1_context *ctx, void *digest)\n{\n    uint8_t i;\n\n    /* Complete inner hash */\n    sha1_final(ctx, ctx->inner_hash);\n    /* Calculate outer hash */\n    sha1_init(ctx);\n    for (i = 0; i < SHA1_BLOCK_LENGTH; i++) {\n        sha1_update_byte(ctx, ctx->key_buffer[i] ^ HMAC_OPAD);\n    }\n    for (i = 0; i < SHA1_DIGEST_LENGTH; i++) {\n        sha1_update_byte(ctx, ctx->inner_hash[i]);\n    }\n\n    sha1_final(ctx, digest);\n}\n"
+}

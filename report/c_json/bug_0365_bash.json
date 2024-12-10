@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Infer",
+    "category": "UNINITIALIZED_VALUE",
+    "file": "subst.c",
+    "message": "The value read from state_bak.__count was never initialized.",
+    "warning_function_name": "skiparith",
+    "warning_line": "ADVANCE_CHAR (substr, sublen, i);",
+    "warning_context": "static char *\nskiparith (substr, delim)\n     char *substr;\n     int delim;\n{\n  size_t sublen;\n  int skipcol, pcount, i;\n  DECLARE_MBSTATE;\n\n  sublen = strlen (substr);\n  i = skipcol = pcount = 0;\n  while (substr[i])\n    {\n      /* Balance parens */\n      if (substr[i] == LPAREN)\n\t{\n\t  pcount++;\n\t  i++;\n\t  continue;\n\t}\n      if (substr[i] == RPAREN && pcount)\n\t{\n\t  pcount--;\n\t  i++;\n\t  continue;\n\t}\n      if (pcount)\n\t{\n\t  ADVANCE_CHAR (substr, sublen, i);\n\t  continue;\n\t}\n\n      /* Skip one `:' for each `?' */\n      if (substr[i] == ':' && skipcol)\n\t{\n\t  skipcol--;\n\t  i++;\n\t  continue;\n\t}\n      if (substr[i] == delim)\n\tbreak;\n      if (substr[i] == '?')\n\t{\n\t  skipcol++;\n\t  i++;\n\t  continue;\n\t}\n      ADVANCE_CHAR (substr, sublen, i);\n    }\n\n  return (substr + i);\n}\n"
+}

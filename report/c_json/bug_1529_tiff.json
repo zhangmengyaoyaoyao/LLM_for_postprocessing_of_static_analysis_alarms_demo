@@ -1,0 +1,10 @@
+{
+    "project": "tiff",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L2",
+    "file": "libtiff/tif_fax3.c",
+    "message": "Offset: [-oo, 2559] Size: 109 by call to `putspan`.",
+    "warning_function_name": "Fax3Encode1DRow",
+    "warning_line": "putspan(tif, span, TIFFFaxWhiteCodes);",
+    "warning_context": "static int\nFax3Encode1DRow(TIFF* tif, unsigned char* bp, uint32 bits)\n{\n\tFax3CodecState* sp = EncoderState(tif);\n\tint32 span;\n        uint32 bs = 0;\n\n\tfor (;;) {\n\t\tspan = find0span(bp, bs, bits);\t\t/* white span */\n\t\tputspan(tif, span, TIFFFaxWhiteCodes);\n\t\tbs += span;\n\t\tif (bs >= bits)\n\t\t\tbreak;\n\t\tspan = find1span(bp, bs, bits);\t\t/* black span */\n\t\tputspan(tif, span, TIFFFaxBlackCodes);\n\t\tbs += span;\n\t\tif (bs >= bits)\n\t\t\tbreak;\n\t}\n\tif (sp->b.mode & (FAXMODE_BYTEALIGN|FAXMODE_WORDALIGN)) {\n\t\tif (sp->bit != 8)\t\t\t/* byte-align */\n\t\t\tFax3FlushBits(tif, sp);\n\t\tif ((sp->b.mode&FAXMODE_WORDALIGN) &&\n\t\t    !isAligned(tif->tif_rawcp, uint16))\n\t\t\tFax3FlushBits(tif, sp);\n\t}\n\treturn (1);\n}\n"
+}

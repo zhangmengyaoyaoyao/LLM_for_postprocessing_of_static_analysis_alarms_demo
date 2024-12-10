@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(q, K_OBJ_MSGQ));",
-    "Code_function": "static inline int z_vrfy_k_msgq_peek(struct k_msgq *q, void *data)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(q, K_OBJ_MSGQ));\n\tZ_OOPS(Z_SYSCALL_MEMORY_WRITE(data, q->msg_size));\n\n\treturn z_impl_k_msgq_peek(q, data);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "subsys/bluetooth/controller/hci/hci.c",
+    "message": "Null pointer dereference: buf",
+    "warning_function_name": "hci_cmd_complete",
+    "warning_line": "*buf = bt_buf_get_evt(BT_HCI_EVT_CMD_COMPLETE, false, K_FOREVER);",
+    "warning_context": "void *hci_cmd_complete(struct net_buf **buf, u8_t plen)\n{\n\tstruct bt_hci_evt_cmd_complete *cc;\n\n\t*buf = bt_buf_get_evt(BT_HCI_EVT_CMD_COMPLETE, false, K_FOREVER);\n\n\thci_evt_create(*buf, BT_HCI_EVT_CMD_COMPLETE, sizeof(*cc) + plen);\n\n\tcc = net_buf_add(*buf, sizeof(*cc));\n\tcc->ncmd = 1U;\n\tcc->opcode = sys_cpu_to_le16(_opcode);\n\n\treturn net_buf_add(*buf, plen);\n}\n"
 }

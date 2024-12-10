@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from rc was never initialized.",
-    "Code_line": "\t\tif (rc) {",
-    "Code_function": "int boot_request_upgrade(int permanent)\n{\n#ifdef CONFIG_MCUBOOT_TRAILER_SWAP_TYPE\n\tu8_t swap_type;\n#endif\n\tint rc;\n\n\trc = boot_magic_write(FLASH_AREA_IMAGE_SECONDARY);\n\tif (rc) {\n\t\tgoto op_end;\n\t}\n\n\tif (permanent) {\n\t\trc = boot_image_ok_write(FLASH_AREA_IMAGE_SECONDARY);\n\n#ifdef CONFIG_MCUBOOT_TRAILER_SWAP_TYPE\n\t\tif (rc) {\n\t\t\tgoto op_end;\n\t\t}\n\n\t\tswap_type = BOOT_SWAP_TYPE_PERM;\n\t} else {\n\t\tswap_type = BOOT_SWAP_TYPE_TEST;\n\t}\n\n\trc = boot_swap_type_write(FLASH_AREA_IMAGE_SECONDARY, swap_type);\n#else\n\t}\n#endif\nop_end:\n\treturn rc;\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "subsys/net/lib/lwm2m/lwm2m_engine.c",
+    "message": "Uninitialized variable: srv->last_timestamp",
+    "warning_function_name": "lwm2m_engine_service",
+    "warning_line": "service_due_timestamp = srv->last_timestamp +",
+    "warning_context": "static int lwm2m_engine_service(void)\n{\n\tstruct observe_node *obs;\n\tstruct service_node *srv;\n\ts64_t timestamp, service_due_timestamp;\n\n\t/*\n\t * 1. scan the observer list\n\t * 2. For each notify event found, scan the observer list\n\t * 3. For each observer match, generate a NOTIFY message,\n\t *    attaching the notify response handler\n\t */\n\ttimestamp = k_uptime_get();\n\tSYS_SLIST_FOR_EACH_CONTAINER(&engine_observer_list, obs, node) {\n\t\t/*\n\t\t * manual notify requirements:\n\t\t * - event_timestamp > last_timestamp\n\t\t * - current timestamp > last_timestamp + min_period_sec\n\t\t */\n\t\tif (obs->event_timestamp > obs->last_timestamp &&\n\t\t    timestamp > obs->last_timestamp +\n\t\t\t\tK_SECONDS(obs->min_period_sec)) {\n\t\t\tobs->last_timestamp = k_uptime_get();\n\t\t\tgenerate_notify_message(obs, true);\n\n\t\t/*\n\t\t * automatic time-based notify requirements:\n\t\t * - current timestamp > last_timestamp + max_period_sec\n\t\t */\n\t\t} else if (timestamp > obs->last_timestamp +\n\t\t\t\tK_SECONDS(obs->max_period_sec)) {\n\t\t\tobs->last_timestamp = k_uptime_get();\n\t\t\tgenerate_notify_message(obs, false);\n\t\t}\n\n\t}\n\n\ttimestamp = k_uptime_get();\n\tSYS_SLIST_FOR_EACH_CONTAINER(&engine_service_list, srv, node) {\n\t\tservice_due_timestamp = srv->last_timestamp +\n\t\t\t\t\tK_MSEC(srv->min_call_period);\n\t\t/* service is due */\n\t\tif (timestamp >= service_due_timestamp) {\n\t\t\tsrv->last_timestamp = k_uptime_get();\n\t\t\tsrv->service_work(NULL);\n\t\t}\n\t}\n\n\t/* calculate how long to sleep till the next service */\n\treturn engine_next_service_timeout_ms(ENGINE_UPDATE_INTERVAL);\n}\n"
 }

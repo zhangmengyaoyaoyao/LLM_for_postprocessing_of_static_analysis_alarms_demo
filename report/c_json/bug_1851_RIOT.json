@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "negativeIndex",
+    "file": "sys/fmt/fmt.c",
+    "message": "Either the condition 'fp_digits>0' is redundant or the array '_tenmap[8]' is accessed at index -2, which is out of bounds.",
+    "warning_function_name": "fmt_s32_dfp",
+    "warning_line": "uint32_t e = _tenmap[fp_digits];",
+    "warning_context": "size_t fmt_s32_dfp(char *out, int32_t val, int fp_digits)\n{\n    assert(fp_digits > -(int)TENMAP_SIZE);\n\n    unsigned  pos = 0;\n\n    if (fp_digits == 0) {\n        pos = fmt_s32_dec(out, val);\n    }\n    else if (fp_digits > 0) {\n        pos = fmt_s32_dec(out, val);\n        if (out) {\n            memset(&out[pos], '0', fp_digits);\n        }\n        pos += fp_digits;\n    }\n    else {\n        fp_digits *= -1;\n        uint32_t e = _tenmap[fp_digits];\n        int32_t abs = (val / (int32_t)e);\n        int32_t div = val - (abs * e);\n\n        /* the divisor should never be negative */\n        if (div < 0) {\n            div *= -1;\n        }\n        /* handle special case for negative number with zero as absolute value */\n        if ((abs == 0) && (val < 0)) {\n            if (out) {\n                out[pos] = '-';\n            }\n            pos++;\n        }\n\n        if (!out) {\n            /* compensate for the decimal point character... */\n            pos += fmt_s32_dec(NULL, abs) + 1;\n        }\n        else {\n            pos += fmt_s32_dec(&out[pos], abs);\n            out[pos++] = '.';\n            unsigned div_len = fmt_s32_dec(&out[pos], div);\n            fmt_lpad(&out[pos], div_len, (size_t)fp_digits, '0');\n        }\n        pos += fp_digits;\n    }\n\n    return pos;\n}\n"
+}

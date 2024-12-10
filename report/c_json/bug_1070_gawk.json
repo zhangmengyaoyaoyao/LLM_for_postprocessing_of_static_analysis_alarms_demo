@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L2",
+    "file": "cint_array.c",
+    "message": "Offset: [3, 31] Size: 31.",
+    "warning_function_name": "cint_array_init",
+    "warning_line": "THRESHOLD = power_two_table[NHAT + 1];",
+    "warning_context": "static NODE **\ncint_array_init(NODE *symbol ATTRIBUTE_UNUSED, NODE *subs ATTRIBUTE_UNUSED)\n{\n\tif (symbol == NULL) {\n\t\tlong newval;\n\t\tsize_t nelems = (sizeof(power_two_table) / sizeof(power_two_table[0]));\n\n\t\t/* check relevant environment variables */\n\t\tif ((newval = getenv_long(\"NHAT\")) > 1 && newval < INT32_BIT)\n\t\t\tNHAT = newval;\n\t\t/* don't allow overflow off the end of the table */\n\t\tif (NHAT >= nelems)\n\t\t\tNHAT = nelems - 2;\n\t\tTHRESHOLD = power_two_table[NHAT + 1];\n\t} else\n\t\tnull_array(symbol);\n\n\treturn (NODE **) ! NULL;\n}\n"
+}

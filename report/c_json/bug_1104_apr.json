@@ -1,8 +1,0 @@
-{
-    "Project": "apr",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset added: 128 Size: [0, +oo].",
-    "Code_line": "    memcpy(new->index_first, t->index_first, sizeof(int) * TABLE_HASH_SIZE);",
-    "Code_function": "APR_DECLARE(apr_table_t *) apr_table_copy(apr_pool_t *p, const apr_table_t *t)\n{\n    apr_table_t *new = apr_palloc(p, sizeof(apr_table_t));\n\n#if APR_POOL_DEBUG\n    /* we don't copy keys and values, so it's necessary that t->a.pool\n     * have a life span at least as long as p\n     */\n    if (!apr_pool_is_ancestor(t->a.pool, p)) {\n\tfprintf(stderr, \"apr_table_copy: t's pool is not an ancestor of p\\n\");\n\tabort();\n    }\n#endif\n    make_array_core(&new->a, p, t->a.nalloc, sizeof(apr_table_entry_t), 0);\n    memcpy(new->a.elts, t->a.elts, t->a.nelts * sizeof(apr_table_entry_t));\n    new->a.nelts = t->a.nelts;\n    memcpy(new->index_first, t->index_first, sizeof(int) * TABLE_HASH_SIZE);\n    memcpy(new->index_last, t->index_last, sizeof(int) * TABLE_HASH_SIZE);\n    new->index_initialized = t->index_initialized;\n    return new;\n}"
-}

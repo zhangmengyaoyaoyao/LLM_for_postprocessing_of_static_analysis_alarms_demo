@@ -1,8 +1,0 @@
-{
-    "Project": "tiff",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: [7, +oo] (⇐ [0, +oo] + 7) Size: [0, +oo] by call to `TIFFWriteScanline`.",
-    "Code_line": "\t\tif (TIFFWriteScanline(out, buf, row, 0) < 0) {",
-    "Code_function": "DECLAREcpFunc(cpContig2ContigByRow)\n{\n\ttsize_t scanlinesize = TIFFScanlineSize(in);\n\ttdata_t buf;\n\tuint32 row;\n\n\tbuf = _TIFFmalloc(scanlinesize);\n\tif (!buf)\n\t\treturn 0;\n\t_TIFFmemset(buf, 0, scanlinesize);\n\t(void) imagewidth; (void) spp;\n\tfor (row = 0; row < imagelength; row++) {\n\t\tif (TIFFReadScanline(in, buf, row, 0) < 0 && !ignore) {\n\t\t\tTIFFError(TIFFFileName(in),\n\t\t\t\t  \"Error, can't read scanline %lu\",\n\t\t\t\t  (unsigned long) row);\n\t\t\tgoto bad;\n\t\t}\n\t\tif (TIFFWriteScanline(out, buf, row, 0) < 0) {\n\t\t\tTIFFError(TIFFFileName(out),\n\t\t\t\t  \"Error, can't write scanline %lu\",\n\t\t\t\t  (unsigned long) row);\n\t\t\tgoto bad;\n\t\t}\n\t}\n\t_TIFFfree(buf);\n\treturn 1;\nbad:\n\t_TIFFfree(buf);\n\treturn 0;\n}"
-}

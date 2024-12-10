@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "NULL_DEREFERENCE",
-    "Message": "pointer `&out->write_idx` last assigned on line 1005 could be null and is dereferenced by call to `cattext()` at line 1029, column 4.",
-    "Code_line": "\t  cattext (&out, \")\");",
-    "Code_function": "indent ()\n{\n  string_type out;\n  int tab = 0;\n  int idx = 0;\n  int ol = 0;\n  init_string (&out);\n  while (at (tos, idx))\n    {\n      switch (at (tos, idx))\n\t{\n\tcase '\\n':\n\t  cattext (&out, \"\\n\");\n\t  idx++;\n\t  if (tab && at (tos, idx))\n\t    {\n\t      cattext (&out, \"    \");\n\t    }\n\t  ol = 0;\n\t  break;\n\tcase '(':\n\t  tab++;\n\t  if (ol == 0)\n\t    cattext (&out, \"   \");\n\t  idx++;\n\t  cattext (&out, \"(\");\n\t  ol = 1;\n\t  break;\n\tcase ')':\n\t  tab--;\n\t  cattext (&out, \")\");\n\t  idx++;\n\t  ol = 1;\n\n\t  break;\n\tdefault:\n\t  catchar (&out, at (tos, idx));\n\t  ol = 1;\n\n\t  idx++;\n\t  break;\n\t}\n    }\n\n  pc++;\n  delete_string (tos);\n  *tos = out;\n\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "binutils/prdbg.c",
+    "message": "Offset: [5, +oo] (⇐ [0, +oo] + 5) Size: [1, +oo] by call to `append_type`.",
+    "warning_function_name": "pr_class_static_method_variant",
+    "warning_line": "&& append_type (info, \" */;\\n\")",
+    "warning_context": "static bfd_boolean\npr_class_static_method_variant (void *p, const char *physname,\n\t\t\t\tenum debug_visibility visibility,\n\t\t\t\tbfd_boolean constp, bfd_boolean volatilep)\n{\n  struct pr_handle *info = (struct pr_handle *) p;\n  char *method_type;\n\n  assert (info->stack != NULL);\n  assert (info->stack->next != NULL);\n  assert (info->stack->next->method != NULL);\n\n  /* Put the const and volatile qualifiers on the type.  */\n  if (volatilep)\n    {\n      if (! append_type (info, \" volatile\"))\n\treturn FALSE;\n    }\n  if (constp)\n    {\n      if (! append_type (info, \" const\"))\n\treturn FALSE;\n    }\n\n  /* Mark it as static.  */\n  if (! prepend_type (info, \"static \"))\n    return FALSE;\n\n  /* Stick the name of the method into its type.  */\n  if (! substitute_type (info, info->stack->next->method))\n    return FALSE;\n\n  /* Get the type.  */\n  method_type = pop_type (info);\n  if (method_type == NULL)\n    return FALSE;\n\n  /* Now the top of the stack is the class.  */\n\n  if (! pr_fix_visibility (info, visibility))\n    return FALSE;\n\n  return (append_type (info, method_type)\n\t  && append_type (info, \" /* \")\n\t  && append_type (info, physname)\n\t  && append_type (info, \" */;\\n\")\n\t  && indent_type (info));\n}\n"
 }

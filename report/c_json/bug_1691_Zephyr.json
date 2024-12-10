@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(timer, K_OBJ_TIMER));",
-    "Code_function": "static inline void z_vrfy_k_timer_user_data_set(struct k_timer *timer,\n\t\t\t\t\t\tvoid *user_data)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(timer, K_OBJ_TIMER));\n\tz_impl_k_timer_user_data_set(timer, user_data);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "ctuArrayIndex",
+    "file": "subsys/net/ip/net_shell.c",
+    "message": "Array index out of bounds; 'argv' buffer size is 0 and it is accessed at offset 1.",
+    "warning_function_name": "cmd_net_dns_query",
+    "warning_line": "host = argv[arg++];",
+    "warning_context": "static int cmd_net_dns_query(const struct shell *shell, size_t argc,\n\t\t\t     char *argv[])\n{\n\n#if defined(CONFIG_DNS_RESOLVER)\n#define DNS_TIMEOUT K_MSEC(2000) /* ms */\n\tenum dns_query_type qtype = DNS_QUERY_TYPE_A;\n\tchar *host, *type = NULL;\n\tint ret, arg = 1;\n\n\thost = argv[arg++];\n\tif (!host) {\n\t\tPR_WARNING(\"Hostname not specified.\\n\");\n\t\treturn -ENOEXEC;\n\t}\n\n\tif (argv[arg]) {\n\t\ttype = argv[arg];\n\t}\n\n\tif (type) {\n\t\tif (strcmp(type, \"A\") == 0) {\n\t\t\tqtype = DNS_QUERY_TYPE_A;\n\t\t\tPR(\"IPv4 address type\\n\");\n\t\t} else if (strcmp(type, \"AAAA\") == 0) {\n\t\t\tqtype = DNS_QUERY_TYPE_AAAA;\n\t\t\tPR(\"IPv6 address type\\n\");\n\t\t} else {\n\t\t\tPR_WARNING(\"Unknown query type, specify either \"\n\t\t\t\t   \"A or AAAA\\n\");\n\t\t\treturn -ENOEXEC;\n\t\t}\n\t}\n\n\tret = dns_get_addr_info(host, qtype, NULL, dns_result_cb,\n\t\t\t\t(void *)shell, DNS_TIMEOUT);\n\tif (ret < 0) {\n\t\tPR_WARNING(\"Cannot resolve '%s' (%d)\\n\", host, ret);\n\t} else {\n\t\tPR(\"Query for '%s' sent.\\n\", host);\n\t}\n#else\n\tPR_INFO(\"DNS resolver not supported. Set CONFIG_DNS_RESOLVER to \"\n\t\t\"enable it.\\n\");\n#endif\n\n\treturn 0;\n}\n"
 }

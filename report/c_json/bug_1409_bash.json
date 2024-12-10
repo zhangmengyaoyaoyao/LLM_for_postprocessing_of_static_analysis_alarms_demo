@@ -1,8 +1,0 @@
-{
-    "Project": "bash",
-    "Tool": "Infer",
-    "Bug Type": "NULL_DEREFERENCE",
-    "Message": "pointer `gname` last assigned on line 2385 could be null and is dereferenced at line 2401, column 29.",
-    "Code_line": "      if (gnamelen == 0 || (STREQN (gname, grent->gr_name, gnamelen)))",
-    "Code_function": "bash_groupname_completion_function (text, state)\n     const char *text;\n     int state;\n{\n#if defined (__WIN32__) || defined (__OPENNT) || !defined (HAVE_GRP_H)\n  return ((char *)NULL);\n#else\n  static char *gname = (char *)NULL;\n  static struct group *grent;\n  static int gnamelen;\n  char *value;\n\n  if (state == 0)\n    {\n      FREE (gname);\n      gname = savestring (text);\n      gnamelen = strlen (gname);\n\n      setgrent ();\n    }\n\n  while (grent = getgrent ())\n    {\n      if (gnamelen == 0 || (STREQN (gname, grent->gr_name, gnamelen)))\n        break;\n    }\n\n  if (grent == 0)\n    {\n      endgrent ();\n      return ((char *)NULL);\n    }\n\n  value = savestring (grent->gr_name);\n  return (value);\n#endif\n}"
-}

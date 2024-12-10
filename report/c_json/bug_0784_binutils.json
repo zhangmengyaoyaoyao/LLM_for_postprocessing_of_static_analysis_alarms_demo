@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: 1 Size: [0, +oo] by call to `add_to_definition`.",
-    "Code_line": "  add_to_definition (new_d, 0);",
-    "Code_function": "add_intrinsic (name, func)\n     char *name;\n     void (*func) ();\n{\n  dict_type *new_d = newentry (name);\n  add_to_definition (new_d, func);\n  add_to_definition (new_d, 0);\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "ld/ldlang.c",
+    "message": "pointer `s->bfd_section` last assigned on line 2180 could be null and is dereferenced at line 2187, column 3.",
+    "warning_function_name": "init_os",
+    "warning_line": "s->bfd_section->output_section = s->bfd_section;",
+    "warning_context": "static void\ninit_os (lang_output_section_statement_type *s, flagword flags)\n{\n  if (strcmp (s->name, DISCARD_SECTION_NAME) == 0)\n    einfo (_(\"%P%F: Illegal use of `%s' section\\n\"), DISCARD_SECTION_NAME);\n\n  if (s->constraint != SPECIAL)\n    s->bfd_section = bfd_get_section_by_name (link_info.output_bfd, s->name);\n  if (s->bfd_section == NULL)\n    s->bfd_section = bfd_make_section_anyway_with_flags (link_info.output_bfd,\n\t\t\t\t\t\t\t s->name, flags);\n  if (s->bfd_section == NULL)\n    {\n      einfo (_(\"%P%F: output format %s cannot represent section called %s\\n\"),\n\t     link_info.output_bfd->xvec->name, s->name);\n    }\n  s->bfd_section->output_section = s->bfd_section;\n  s->bfd_section->output_offset = 0;\n\n  /* Set the userdata of the output section to the output section\n     statement to avoid lookup.  */\n  get_userdata (s->bfd_section) = s;\n\n  /* If there is a base address, make sure that any sections it might\n     mention are initialized.  */\n  if (s->addr_tree != NULL)\n    exp_init_os (s->addr_tree);\n\n  if (s->load_base != NULL)\n    exp_init_os (s->load_base);\n\n  /* If supplied an alignment, set it.  */\n  if (s->section_alignment != -1)\n    s->bfd_section->alignment_power = s->section_alignment;\n}\n"
 }

@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Cppcheck",
-    "Bug Type": "ctuArrayIndex",
-    "Message": "Array index out of bounds; buffer 's' is accessed at offset 0.",
-    "Code_line": "\ts[0] ^= (uint8_t)(k[0] >> 24); s[1] ^= (uint8_t)(k[0] >> 16);",
-    "Code_function": "\ts[0] ^= (uint8_t)(k[0] >> 24); s[1] ^= (uint8_t)(k[0] >> 16);"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "drivers/eeprom/eeprom_at2x.c",
+    "message": "Uninitialized variable: sr",
+    "warning_function_name": "eeprom_at25_rdsr",
+    "warning_line": "*status = sr[1];",
+    "warning_context": "static int eeprom_at25_rdsr(struct device *dev, u8_t *status)\n{\n\tstruct eeprom_at2x_data *data = dev->driver_data;\n\tu8_t rdsr[2] = { EEPROM_AT25_RDSR, 0 };\n\tu8_t sr[2];\n\tint err;\n\tconst struct spi_buf tx_buf = {\n\t\t.buf = rdsr,\n\t\t.len = sizeof(rdsr),\n\t};\n\tconst struct spi_buf_set tx = {\n\t\t.buffers = &tx_buf,\n\t\t.count = 1,\n\t};\n\tconst struct spi_buf rx_buf = {\n\t\t.buf = sr,\n\t\t.len = sizeof(sr),\n\t};\n\tconst struct spi_buf_set rx = {\n\t\t.buffers = &rx_buf,\n\t\t.count = 1,\n\t};\n\n\terr = spi_transceive(data->bus_dev, &data->spi_cfg, &tx, &rx);\n\tif (!err) {\n\t\t*status = sr[1];\n\t}\n\n\treturn err;\n}\n"
 }

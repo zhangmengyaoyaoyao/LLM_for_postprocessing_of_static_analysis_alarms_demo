@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "str_array.c",
+    "message": "Offset: [1, +oo] Size: [0, +oo].",
+    "warning_function_name": "str_list",
+    "warning_line": "list[k++] = val;",
+    "warning_context": "static NODE**\nstr_list(NODE *symbol, NODE *t)\n{\n\tNODE **list;\n\tNODE *subs, *val;\n\tBUCKET *b;\n\tunsigned long num_elems, list_size, i, k = 0;\n\tint elem_size = 1;\n\tassoc_kind_t assoc_kind;\n\n\tif (symbol->table_size == 0)\n\t\treturn NULL;\n\n\tassoc_kind = (assoc_kind_t) t->flags;\n\tif ((assoc_kind & (AINDEX|AVALUE)) == (AINDEX|AVALUE))\n\t\telem_size = 2;\n\n\t/* allocate space for array */\n\tnum_elems = symbol->table_size;\n\tif ((assoc_kind & (AINDEX|AVALUE|ADELETE)) == (AINDEX|ADELETE))\n\t\tnum_elems = 1;\n\tlist_size =  elem_size * num_elems;\n\t\n\temalloc(list, NODE **, list_size * sizeof(NODE *), \"str_list\");\n \n\t/* populate it */\n\n\tfor (i = 0; i < symbol->array_size; i++) {\n\t\tfor (b = symbol->buckets[i]; b != NULL;\tb = b->ahnext) {\n\t\t\t/* index */\n\t\t\tsubs = b->ahname;\n\t\t\tif ((assoc_kind & AINUM) != 0)\n\t\t\t\t(void) force_number(subs);\n\t\t\tlist[k++] = dupnode(subs);\n\n\t\t\t/* value */\n\t\t\tif ((assoc_kind & AVALUE) != 0) {\n\t\t\t\tval = b->ahvalue;\n\t\t\t\tif (val->type == Node_val) {\n\t\t\t\t\tif ((assoc_kind & AVNUM) != 0)\n\t\t\t\t\t\t(void) force_number(val);\n\t\t\t\t\telse if ((assoc_kind & AVSTR) != 0)\n\t\t\t\t\t\tval = force_string(val);\n\t\t\t\t}\n\t\t\t\tlist[k++] = val;\n\t\t\t}\n\t\t\tif (k >= list_size)\n\t\t\t\treturn list;\n\t\t}\t\t\t\n\t}\n\treturn list;\n}\n"
+}

@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Cppcheck",
-    "Bug Type": "ctuArrayIndex",
-    "Message": "Array index out of bounds; 'argv' buffer size is 0 and it is accessed at offset 1.",
-    "Code_line": "\tpub.dst = strtoul(argv[1], NULL, 0);",
-    "Code_function": "\tpub.dst = strtoul(argv[1], NULL, 0);"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "arrayIndexOutOfBounds",
+    "file": "drivers/spi/spi_oc_simple.c",
+    "message": "Array 'DIVIDERS[12]' accessed at index 12, which is out of bounds.",
+    "warning_function_name": "spi_oc_simple_configure",
+    "warning_line": "sys_write8((DIVIDERS[i] >> 4) & 0x3, SPI_OC_SIMPLE_SPER(info));",
+    "warning_context": "static int spi_oc_simple_configure(const struct spi_oc_simple_cfg *info,\n\t\t\t\tstruct spi_oc_simple_data *spi,\n\t\t\t\tconst struct spi_config *config)\n{\n\tu8_t spcr = 0U;\n\tint i;\n\n\tif (spi_context_configured(&spi->ctx, config)) {\n\t\t/* Nothing to do */\n\t\treturn 0;\n\t}\n\n\t/* Simple SPI only supports master mode */\n\tif (spi_context_is_slave(&spi->ctx)) {\n\t\tLOG_ERR(\"Slave mode not supported\");\n\t\treturn -ENOTSUP;\n\t}\n\n\tif (config->operation & (SPI_MODE_LOOP | SPI_TRANSFER_LSB |\n\t\t\t\t SPI_LINES_DUAL | SPI_LINES_QUAD)) {\n\t\tLOG_ERR(\"Unsupported configuration\");\n\t\treturn -EINVAL;\n\t}\n\n\t/* SPI mode */\n\tif (SPI_MODE_GET(config->operation) & SPI_MODE_CPOL) {\n\t\tspcr |= SPI_OC_SIMPLE_SPCR_CPOL;\n\t}\n\n\tif (SPI_MODE_GET(config->operation) & SPI_MODE_CPHA) {\n\t\tspcr |= SPI_OC_SIMPLE_SPCR_CPHA;\n\t}\n\n\t/* Set clock divider */\n\tfor (i = 0; i < 12; i++)\n\t\tif ((config->frequency << (i + 1)) >\n\t\t    CONFIG_SYS_CLOCK_HW_CYCLES_PER_SEC) {\n\t\t\tbreak;\n\t\t}\n\n\tsys_write8((DIVIDERS[i] >> 4) & 0x3, SPI_OC_SIMPLE_SPER(info));\n\tspcr |= (DIVIDERS[i] & 0x3);\n\n\t/* Configure and Enable SPI controller */\n\tsys_write8(spcr | SPI_OC_SIMPLE_SPCR_SPE, SPI_OC_SIMPLE_SPCR(info));\n\n\tspi->ctx.config = config;\n\n\tif (config->cs) {\n\t\tspi_context_cs_configure(&spi->ctx);\n\t}\n\n\treturn 0;\n}\n"
 }

@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(signal, K_OBJ_POLL_SIGNAL));",
-    "Code_function": "static inline int z_vrfy_k_poll_signal_raise(struct k_poll_signal *signal,\n\t\t\t\t\t     int result)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(signal, K_OBJ_POLL_SIGNAL));\n\treturn z_impl_k_poll_signal_raise(signal, result);\n}"
+    "project": "Zephyr",
+    "tool": "Infer",
+    "category": "Uninitialized Value",
+    "file": "subsys/dfu/boot/mcuboot.c",
+    "message": "The value read from primary_slot.copy_done was never initialized.",
+    "warning_function_name": "mcuboot_swap_type",
+    "warning_line": "table->copy_done_primary_slot == primary_slot.copy_done)) {",
+    "warning_context": "int mcuboot_swap_type(void)\n{\n\tconst struct boot_swap_table *table;\n\tstruct boot_swap_state primary_slot;\n\tstruct boot_swap_state secondary_slot;\n\tint rc;\n\tsize_t i;\n\n\trc = boot_read_swap_state_by_id(FLASH_AREA_IMAGE_PRIMARY,\n\t\t\t\t\t&primary_slot);\n\tif (rc) {\n\t\treturn rc;\n\t}\n\n\trc = boot_read_swap_state_by_id(FLASH_AREA_IMAGE_SECONDARY,\n\t\t\t\t\t&secondary_slot);\n\tif (rc) {\n\t\treturn rc;\n\t}\n\n\tfor (i = 0; i < BOOT_SWAP_TABLES_COUNT; i++) {\n\t\ttable = boot_swap_tables + i;\n\n\t\tif (boot_magic_compatible_check(table->magic_primary_slot,\n\t\t\t\t\t\tprimary_slot.magic)\n\t\t    &&\n\t\t    boot_magic_compatible_check(table->magic_secondary_slot,\n\t\t\t\t\t\tsecondary_slot.magic)\n\t\t    &&\n\t\t    (table->image_ok_primary_slot == BOOT_FLAG_ANY   ||\n\t\t     table->image_ok_primary_slot == primary_slot.image_ok)\n\t\t    &&\n\t\t    (table->image_ok_secondary_slot == BOOT_FLAG_ANY ||\n\t\t     table->image_ok_secondary_slot == secondary_slot.image_ok)\n\t\t    &&\n\t\t    (table->copy_done_primary_slot == BOOT_FLAG_ANY  ||\n\t\t     table->copy_done_primary_slot == primary_slot.copy_done)) {\n\n\t\t\tassert(table->swap_type == BOOT_SWAP_TYPE_TEST ||\n\t\t\t       table->swap_type == BOOT_SWAP_TYPE_PERM ||\n\t\t\t       table->swap_type == BOOT_SWAP_TYPE_REVERT);\n\t\t\treturn table->swap_type;\n\t\t}\n\t}\n\n\treturn BOOT_SWAP_TYPE_NONE;\n}\n"
 }

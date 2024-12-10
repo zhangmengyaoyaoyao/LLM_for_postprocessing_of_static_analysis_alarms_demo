@@ -1,0 +1,10 @@
+{
+    "project": "grep",
+    "tool": "Infer",
+    "category": "UNINITIALIZED_VALUE",
+    "file": "src/grep.c",
+    "message": "The value read from buf[_] was never initialized.",
+    "warning_function_name": "get_nondigit_option",
+    "warning_line": "p -= buf[0] == '0';",
+    "warning_context": "static int\nget_nondigit_option (int argc, char *const *argv, intmax_t *default_context)\n{\n  static int prev_digit_optind = -1;\n  int this_digit_optind;\n  bool was_digit;\n  char buf[INT_BUFSIZE_BOUND (intmax_t) + 4];\n  char *p = buf;\n  int opt;\n\n  was_digit = false;\n  this_digit_optind = optind;\n  while (true)\n    {\n      opt = getopt_long (argc, (char **) argv, short_options,\n                         long_options, NULL);\n      if ( ! ('0' <= opt && opt <= '9'))\n        break;\n\n      if (prev_digit_optind != this_digit_optind || !was_digit)\n        {\n          /* Reset to start another context length argument.  */\n          p = buf;\n        }\n      else\n        {\n          /* Suppress trivial leading zeros, to avoid incorrect\n             diagnostic on strings like 00000000000.  */\n          p -= buf[0] == '0';\n        }\n\n      if (p == buf + sizeof buf - 4)\n        {\n          /* Too many digits.  Append \"...\" to make context_length_arg\n             complain about \"X...\", where X contains the digits seen\n             so far.  */\n          strcpy (p, \"...\");\n          p += 3;\n          break;\n        }\n      *p++ = opt;\n\n      was_digit = true;\n      prev_digit_optind = this_digit_optind;\n      this_digit_optind = optind;\n    }\n  if (p != buf)\n    {\n      *p = '\\0';\n      context_length_arg (buf, default_context);\n    }\n\n  return opt;\n}\n"
+}

@@ -1,0 +1,10 @@
+{
+    "project": "tiff",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L2",
+    "file": "tools/tiffcrop.c",
+    "message": "Offset: [0, max(65, `out->tif_fieldinfo->field_bit`)] Size: 4 by call to `writeSingleSection`.",
+    "warning_function_name": "writeImageSections",
+    "warning_line": "if (writeSingleSection(in, out, image, dump, width, length, hres, vres, sect_buff))",
+    "warning_context": "static int\nwriteImageSections(TIFF *in, TIFF *out, struct image_data *image,\n\t\t   struct pagedef *page, struct pageseg *sections,\n\t\t   struct dump_opts * dump, unsigned char *src_buff,\n                   unsigned char **sect_buff_ptr)\n  {\n  double  hres, vres;\n  uint32  i, k, width, length, sectsize;\n  unsigned char *sect_buff = *sect_buff_ptr;\n\n  hres = page->hres;\n  vres = page->vres;\n\n  k = page->cols * page->rows;\n  if ((k < 1) || (k > MAX_SECTIONS))\n   {\n   TIFFError(\"writeImageSections\",\n\t     \"%d Rows and Columns exceed maximum sections\\nIncrease resolution or reduce sections\", k);\n   return (-1);\n   }\n\n  for (i = 0; i < k; i++)\n    {\n    width  = sections[i].x2 - sections[i].x1 + 1;\n    length = sections[i].y2 - sections[i].y1 + 1;\n    sectsize = (uint32)\n\t    ceil((width * image->bps + 7) / (double)8) * image->spp * length;\n    /* allocate a buffer if we don't have one already */\n    if (createImageSection(sectsize, sect_buff_ptr))\n      {\n      TIFFError(\"writeImageSections\", \"Unable to allocate section buffer\");\n      exit (-1);\n      }\n    sect_buff = *sect_buff_ptr;\n\n    if (extractImageSection (image, &sections[i], src_buff, sect_buff))\n      {\n      TIFFError(\"writeImageSections\", \"Unable to extract image sections\");\n      exit (-1);\n      }\n\n  /* call the write routine here instead of outside the loop */\n    if (writeSingleSection(in, out, image, dump, width, length, hres, vres, sect_buff))\n      {\n      TIFFError(\"writeImageSections\", \"Unable to write image section\");\n      exit (-1);\n      }\n    }\n\n  return (0);\n  } /* end writeImageSections */\n"
+}

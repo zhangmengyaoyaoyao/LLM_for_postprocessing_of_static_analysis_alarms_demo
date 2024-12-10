@@ -1,0 +1,10 @@
+{
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "ld/ldfile.c",
+    "message": "pointer `realname` last assigned on line 80 could be null and is dereferenced by call to `strlen()` at line 81, column 9.",
+    "warning_function_name": "is_sysrooted_pathname",
+    "warning_line": "len = strlen (realname);",
+    "warning_context": "static bfd_boolean\nis_sysrooted_pathname (const char *name)\n{\n  char *realname;\n  int len;\n  bfd_boolean result;\n\n  if (ld_canon_sysroot == NULL)\n    return FALSE;\n\n  realname = lrealpath (name);\n  len = strlen (realname);\n  result = FALSE;\n  if (len > ld_canon_sysroot_len\n      && IS_DIR_SEPARATOR (realname[ld_canon_sysroot_len]))\n    {\n      realname[ld_canon_sysroot_len] = '\\0';\n      result = FILENAME_CMP (ld_canon_sysroot, realname) == 0;\n    }\n\n  free (realname);\n  return result;\n}\n"
+}

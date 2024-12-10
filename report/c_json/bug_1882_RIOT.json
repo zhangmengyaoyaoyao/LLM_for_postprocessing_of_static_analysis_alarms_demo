@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Infer",
+    "category": "Buffer Overrun L3",
+    "file": "sys/net/network_layer/ipv6/addr/ipv6_addr.c",
+    "message": "Offset: [-1, 15] Size: 16.",
+    "warning_function_name": "ipv6_addr_init_iid",
+    "warning_line": "out->u8[pos - 1] &= mask;",
+    "warning_context": "void ipv6_addr_init_iid(ipv6_addr_t *out, const uint8_t *iid, uint8_t bits)\n{\n    uint8_t unaligned_bits, bytes, pos;\n\n    if (bits > 128) {\n        bits = 128;\n    }\n\n    unaligned_bits = bits % 8;\n    bytes = bits / 8;\n    pos = (IPV6_ADDR_BIT_LEN / 8) - bytes;\n\n    if (unaligned_bits) {\n        uint8_t mask = 0xff << unaligned_bits;\n        out->u8[pos - 1] &= mask;\n        out->u8[pos - 1] |= (*iid & ~mask);\n        iid++;\n    }\n\n    memcpy(&(out->u8[pos]), iid, bytes);\n}\n"
+}

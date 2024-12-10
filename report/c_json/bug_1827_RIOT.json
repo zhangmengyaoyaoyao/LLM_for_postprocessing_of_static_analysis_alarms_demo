@@ -1,8 +1,10 @@
 {
-    "Project": "RIOT",
-    "Tool": "Infer",
-    "Bug Type": "Buffer Overrun L3",
-    "Message": "Offset: [0, 6] Size: [0, 7] by call to `ccnl_fib_add_entry`.",
-    "Code_line": "    if (ccnl_fib_add_entry(&ccnl_relay, prefix, fibface) != 0) {",
-    "Code_function": "static int _intern_fib_add(char *pfx, char *addr_str)\n{\n    int suite = CCNL_SUITE_NDNTLV;\n    struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(pfx, suite, NULL);\n    if (!prefix) {\n        puts(\"Error: prefix could not be created!\");\n        return -1;\n    }\n\n    struct ccnl_face_s *fibface = _intern_face_get(addr_str);\n    if (fibface == NULL) {\n        return -1;\n    }\n    fibface->flags |= CCNL_FACE_FLAGS_STATIC;\n\n    if (ccnl_fib_add_entry(&ccnl_relay, prefix, fibface) != 0) {\n        printf(\"Error adding (%s : %s) to the FIB\\n\", pfx, addr_str);\n        return -1;\n    }\n\n    return 0;\n}"
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "cpu/esp32/vendor/esp-idf/wpa_supplicant/src/crypto/libtommath.h",
+    "message": "Uninitialized variable: W",
+    "warning_function_name": "fast_s_mp_mul_digs",
+    "warning_line": "*tmpc++ = W[ix];",
+    "warning_context": "static int\nfast_s_mp_mul_digs (mp_int * a, mp_int * b, mp_int * c, int digs)\n{\n  int     olduse, res, pa, ix, iz;\n  mp_digit W[MP_WARRAY];\n  register mp_word  _W;\n\n  /* grow the destination as required */\n  if (c->alloc < digs) {\n    if ((res = mp_grow (c, digs)) != MP_OKAY) {\n      return res;\n    }\n  }\n\n  /* number of output digits to produce */\n  pa = MIN(digs, a->used + b->used);\n\n  /* clear the carry */\n  _W = 0;\n  for (ix = 0; ix < pa; ix++) {\n      int      tx, ty;\n      int      iy;\n      mp_digit *tmpx, *tmpy;\n\n      /* get offsets into the two bignums */\n      ty = MIN(b->used-1, ix);\n      tx = ix - ty;\n\n      /* setup temp aliases */\n      tmpx = a->dp + tx;\n      tmpy = b->dp + ty;\n\n      /* this is the number of times the loop will iterrate, essentially\n         while (tx++ < a->used && ty-- >= 0) { ... }\n       */\n      iy = MIN(a->used-tx, ty+1);\n\n      /* execute loop */\n      for (iz = 0; iz < iy; ++iz) {\n         _W += ((mp_word)*tmpx++)*((mp_word)*tmpy--);\n\n      }\n\n      /* store term */\n      W[ix] = ((mp_digit)_W) & MP_MASK;\n\n      /* make next carry */\n      _W = _W >> ((mp_word)DIGIT_BIT);\n }\n\n  /* setup dest */\n  olduse  = c->used;\n  c->used = pa;\n\n  {\n    register mp_digit *tmpc;\n    tmpc = c->dp;\n    for (ix = 0; ix < pa+1; ix++) {\n      /* now extract the previous digit [below the carry] */\n      *tmpc++ = W[ix];\n    }\n\n    /* clear unused digits [that existed in the old copy of c] */\n    for (; ix < olduse; ix++) {\n      *tmpc++ = 0;\n    }\n  }\n  mp_clamp (c);\n  return MP_OKAY;\n}\n"
 }

@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: [7, +oo] (⇐ [0, +oo] + 7) Size: [1, +oo] by call to `substitute_type`.",
-    "Code_line": "  return substitute_type (info, \"const |\");",
-    "Code_function": "pr_const_type (void *p)\n{\n  struct pr_handle *info = (struct pr_handle *) p;\n\n  return substitute_type (info, \"const |\");\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "bfd/elf.c",
+    "message": "Offset added: [-20, 45] (⇐ [-21, 44] + 1) Size: 4064 by call to `_bfd_stringtab_add`.",
+    "warning_function_name": "_bfd_elf_stringtab_init",
+    "warning_line": "loc = _bfd_stringtab_add (ret, \"\", TRUE, FALSE);",
+    "warning_context": "struct bfd_strtab_hash *\n_bfd_elf_stringtab_init (void)\n{\n  struct bfd_strtab_hash *ret;\n\n  ret = _bfd_stringtab_init ();\n  if (ret != NULL)\n    {\n      bfd_size_type loc;\n\n      loc = _bfd_stringtab_add (ret, \"\", TRUE, FALSE);\n      BFD_ASSERT (loc == 0 || loc == (bfd_size_type) -1);\n      if (loc == (bfd_size_type) -1)\n\t{\n\t  _bfd_stringtab_free (ret);\n\t  ret = NULL;\n\t}\n    }\n  return ret;\n}\n"
 }

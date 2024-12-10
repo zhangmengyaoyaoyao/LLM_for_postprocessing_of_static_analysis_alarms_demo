@@ -1,8 +1,0 @@
-{
-    "Project": "bash",
-    "Tool": "Infer",
-    "Bug Type": "UNINITIALIZED_VALUE",
-    "Message": "The value read from state_bak.__count was never initialized.",
-    "Code_line": "      ADVANCE_CHAR (string, slen, i);",
-    "Code_function": "string_extract (string, sindex, charlist, flags)\n     char *string;\n     int *sindex;\n     char *charlist;\n     int flags;\n{\n  register int c, i;\n  int found;\n  size_t slen;\n  char *temp;\n  DECLARE_MBSTATE;\n\n  slen = (MB_CUR_MAX > 1) ? strlen (string + *sindex) + *sindex : 0;\n  i = *sindex;\n  found = 0;\n  while (c = string[i])\n    {\n      if (c == '\\\\')\n\t{\n\t  if (string[i + 1])\n\t    i++;\n\t  else\n\t    break;\n\t}\n#if defined (ARRAY_VARS)\n      else if ((flags & SX_VARNAME) && c == '[')\n\t{\n\t  int ni;\n\t  /* If this is an array subscript, skip over it and continue. */\n\t  ni = skipsubscript (string, i, 0);\n\t  if (string[ni] == ']')\n\t    i = ni;\n\t}\n#endif\n      else if (MEMBER (c, charlist))\n\t{\n\t  found = 1;\n\t  break;\n\t}\n\n      ADVANCE_CHAR (string, slen, i);\n    }\n\n  /* If we had to have a matching delimiter and didn't find one, return an\n     error and let the caller deal with it. */\n  if ((flags & SX_REQMATCH) && found == 0)\n    {\n      *sindex = i;\n      return (&extract_string_error);\n    }\n\n  temp = (flags & SX_NOALLOC) ? (char *)NULL : substring (string, *sindex, i);\n  *sindex = i;\n\n  return (temp);\n}"
-}

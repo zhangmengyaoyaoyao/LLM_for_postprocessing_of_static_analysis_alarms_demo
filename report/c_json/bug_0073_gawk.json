@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: [1, +oo] Size: [0, +oo] by call to `make_regexp`.",
-    "Code_line": "\tt->re_reg = make_regexp(t->re_text->stptr, t->re_text->stlen,",
-    "Code_function": "re_update(NODE *t)\n{\n\tNODE *t1;\n\n\tif ((t->re_flags & CASE) == IGNORECASE) {\n\t\t/* regex was compiled with settings matching IGNORECASE */\n\t\tif ((t->re_flags & CONSTANT) != 0) {\n\t\t\t/* it's a constant, so just return it as is */\n\t\t\tassert(t->type == Node_regex);\n\t\t\treturn t->re_reg;\n\t\t}\n\t\tt1 = t->re_exp;\n\t\tif (t->re_text != NULL) {\n\t\t\t/* if contents haven't changed, just return it */\n\t\t\tif (cmp_nodes(t->re_text, t1) == 0)\n\t\t\t\treturn t->re_reg;\n\t\t\t/* things changed, fall through to recompile */\n\t\t\tunref(t->re_text);\n\t\t}\n\t\t/* get fresh copy of the text of the regexp */\n\t\tt->re_text = dupnode(t1);\n\t}\n\t/* was compiled with different IGNORECASE or text changed */\n\n\t/* free old */\n\tif (t->re_reg != NULL)\n\t\trefree(t->re_reg);\n\tif (t->re_cnt > 0)\n\t\tt->re_cnt++;\n\tif (t->re_cnt > 10)\n\t\tt->re_cnt = 0;\n\tif (t->re_text == NULL || (t->re_flags & CASE) != IGNORECASE) {\n\t\t/* reset regexp text if needed */\n\t\tt1 = t->re_exp;\n\t\tunref(t->re_text);\n\t\tt->re_text = dupnode(t1);\n\t}\n\t/* compile it */\n\tt->re_reg = make_regexp(t->re_text->stptr, t->re_text->stlen,\n\t\t\t\tIGNORECASE, t->re_cnt, true);\n\n\t/* clear case flag */\n\tt->re_flags &= ~CASE;\n\t/* set current value of case flag */\n\tt->re_flags |= IGNORECASE;\n\treturn t->re_reg;\n}"
-}

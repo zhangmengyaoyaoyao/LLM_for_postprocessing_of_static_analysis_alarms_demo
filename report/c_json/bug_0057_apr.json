@@ -1,0 +1,10 @@
+{
+    "project": "apr",
+    "tool": "CSA",
+    "category": "core.uninitialized.Assign",
+    "file": "file_io/unix/filestat.c",
+    "message": "The left expression of the compound assignment is an uninitialized value. The computed value will also be garbage",
+    "warning_function_name": "apr_file_attrs_set",
+    "warning_line": "finfo.protection |= APR_UEXECUTE;",
+    "warning_context": "APR_DECLARE(apr_status_t) apr_file_attrs_set(const char *fname,\n                                             apr_fileattrs_t attributes,\n                                             apr_fileattrs_t attr_mask,\n                                             apr_pool_t *pool)\n{\n    apr_status_t status;\n    apr_finfo_t finfo;\n\n    /* Don't do anything if we can't handle the requested attributes */\n    if (!(attr_mask & (APR_FILE_ATTR_READONLY\n                       | APR_FILE_ATTR_EXECUTABLE)))\n        return APR_SUCCESS;\n\n    status = apr_stat(&finfo, fname, APR_FINFO_PROT, pool);\n    if (status)\n        return status;\n\n    /* ### TODO: should added bits be umask'd? */\n    if (attr_mask & APR_FILE_ATTR_READONLY)\n    {\n        if (attributes & APR_FILE_ATTR_READONLY)\n        {\n            finfo.protection &= ~APR_UWRITE;\n            finfo.protection &= ~APR_GWRITE;\n            finfo.protection &= ~APR_WWRITE;\n        }\n        else\n        {\n            /* ### umask this! */\n            finfo.protection |= APR_UWRITE;\n            finfo.protection |= APR_GWRITE;\n            finfo.protection |= APR_WWRITE;\n        }\n    }\n\n    if (attr_mask & APR_FILE_ATTR_EXECUTABLE)\n    {\n        if (attributes & APR_FILE_ATTR_EXECUTABLE)\n        {\n            /* ### umask this! */\n            finfo.protection |= APR_UEXECUTE;\n            finfo.protection |= APR_GEXECUTE;\n            finfo.protection |= APR_WEXECUTE;\n        }\n        else\n        {\n            finfo.protection &= ~APR_UEXECUTE;\n            finfo.protection &= ~APR_GEXECUTE;\n            finfo.protection &= ~APR_WEXECUTE;\n        }\n    }\n\n    return apr_file_perms_set(fname, finfo.protection);\n}\n"
+}

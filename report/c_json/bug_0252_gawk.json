@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: 0 Size: [0, 2] by call to `make_str_node`.",
-    "Code_line": "\treturn make_string(the_result, strlen(the_result));",
-    "Code_function": "do_dcgettext(int nargs)\n{\n\tNODE *tmp, *t1, *t2 = NULL;\n\tchar *string;\n\tchar *the_result;\n#if ENABLE_NLS && defined(LC_MESSAGES) && HAVE_DCGETTEXT\n\tint lc_cat;\n\tchar *domain;\n\n\tif (nargs == 3) {\t/* third argument */\n\t\ttmp = POP_STRING();\n\t\tlc_cat = localecategory_from_argument(tmp);\n\t\tDEREF(tmp);\n\t} else\n\t\tlc_cat = LC_MESSAGES;\n\n\tif (nargs >= 2) {  /* second argument */\n\t\tt2 = POP_STRING();\n\t\tdomain = t2->stptr;\n\t} else\n\t\tdomain = TEXTDOMAIN;\n#else\n\tif (nargs == 3) {\n\t\ttmp = POP_STRING();\n\t\tDEREF(tmp);\n\t}\n\tif (nargs >= 2) {\n\t\tt2 = POP_STRING();\n\t\tDEREF(t2);\n\t}\n#endif\n\n\tt1 = POP_STRING();\t/* first argument */\n\tstring = t1->stptr;\n\n#if ENABLE_NLS && defined(LC_MESSAGES) && HAVE_DCGETTEXT\n\tthe_result = dcgettext(domain, string, lc_cat);\n\tif (t2 != NULL)\n\t\tDEREF(t2);\n#else\n\tthe_result = string;\n#endif\n\tDEREF(t1);\n\treturn make_string(the_result, strlen(the_result));\n}"
-}

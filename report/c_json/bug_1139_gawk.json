@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "field.c",
+    "message": "Offset: 0 Size: [0, 2] by call to `set_element`.",
+    "warning_function_name": "null_parse_field",
+    "warning_line": "set_element(nf, scan, 0L, sep_arr);",
+    "warning_context": "static long\nnull_parse_field(long up_to,\t/* parse only up to this field number */\n\tchar **buf,\t/* on input: string to parse; on output: point to start next */\n\tint len,\n\tNODE *fs ATTRIBUTE_UNUSED,\n\tRegexp *rp ATTRIBUTE_UNUSED,\n\tSetfunc set,\t/* routine to set the value of the parsed field */\n\tNODE *n,\n\tNODE *sep_arr,  /* array of field separators (maybe NULL) */\n\tbool in_middle ATTRIBUTE_UNUSED)\n{\n\tchar *scan = *buf;\n\tlong nf = parse_high_water;\n\tchar *end = scan + len;\n\n\tif (up_to == UNLIMITED)\n\t\tnf = 0;\n\tif (len == 0)\n\t\treturn nf;\n\n\tif (gawk_mb_cur_max > 1) {\n\t\tmbstate_t mbs;\n\t\tmemset(&mbs, 0, sizeof(mbstate_t));\n\t\tfor (; nf < up_to && scan < end;) {\n\t\t\tsize_t mbclen = mbrlen(scan, end-scan, &mbs);\n\t\t\tif ((mbclen == 1) || (mbclen == (size_t) -1)\n\t\t\t\t|| (mbclen == (size_t) -2) || (mbclen == 0)) {\n\t\t\t\t/* We treat it as a singlebyte character.  */\n\t\t\t\tmbclen = 1;\n\t\t\t}\n\t\t\tif (sep_arr != NULL && nf > 0)\n\t\t\t\tset_element(nf, scan, 0L, sep_arr);\n\t\t\t(*set)(++nf, scan, mbclen, n);\n\t\t\tscan += mbclen;\n\t\t}\n\t} else {\n\t\tfor (; nf < up_to && scan < end; scan++) {\n\t\t\tif (sep_arr != NULL && nf > 0)\n\t\t\t\tset_element(nf, scan, 0L, sep_arr);\n\t\t\t(*set)(++nf, scan, 1L, n);\n\t\t}\n\t}\n\n\t*buf = scan;\n\treturn nf;\n}\n"
+}

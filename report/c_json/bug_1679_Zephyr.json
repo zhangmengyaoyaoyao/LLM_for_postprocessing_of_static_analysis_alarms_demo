@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(sem, K_OBJ_SEM));",
-    "Code_function": "static inline int z_vrfy_k_sem_take(struct k_sem *sem, s32_t timeout)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(sem, K_OBJ_SEM));\n\treturn z_impl_k_sem_take((struct k_sem *)sem, timeout);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "tests/net/udp/src/main.c",
+    "message": "Either the condition '!ud' is redundant or there is possible null pointer dereference: ud.",
+    "warning_function_name": "test_ok",
+    "warning_line": "DBG(\"Test %s failed.\", ud->test);",
+    "warning_context": "static enum net_verdict test_ok(struct net_conn *conn,\n\t\t\t\tstruct net_pkt *pkt,\n\t\t\t\tunion net_ip_header *ip_hdr,\n\t\t\t\tunion net_proto_header *proto_hdr,\n\t\t\t\tvoid *user_data)\n{\n\tstruct ud *ud = (struct ud *)user_data;\n\n\tk_sem_give(&recv_lock);\n\n\tif (!ud) {\n\t\tfail = true;\n\n\t\tDBG(\"Test %s failed.\", ud->test);\n\n\t\treturn NET_DROP;\n\t}\n\n\tfail = false;\n\n\treturned_ud = user_data;\n\n\tnet_pkt_unref(pkt);\n\n\treturn NET_OK;\n}\n"
 }

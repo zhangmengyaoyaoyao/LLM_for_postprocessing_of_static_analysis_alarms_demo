@@ -1,0 +1,10 @@
+{
+    "project": "Zephyr",
+    "tool": "Infer",
+    "category": "Null Dereference",
+    "file": "subsys/net/ip/net_if.c",
+    "message": "pointer `new_pkt` last assigned on line 3331 could be null and is dereferenced by call to `net_pkt_cursor_init()` at line 3339, column 3.",
+    "warning_function_name": "net_if_recv_data",
+    "warning_line": "net_pkt_cursor_init(new_pkt);",
+    "warning_context": "enum net_verdict net_if_recv_data(struct net_if *iface, struct net_pkt *pkt)\n{\n\tif (IS_ENABLED(CONFIG_NET_PROMISCUOUS_MODE) &&\n\t    net_if_is_promisc(iface)) {\n\t\t/* If the packet is not for us and the promiscuous\n\t\t * mode is enabled, then increase the ref count so\n\t\t * that net_core.c:processing_data() will not free it.\n\t\t * The promiscuous mode handler must free the packet\n\t\t * after it has finished working with it.\n\t\t *\n\t\t * If packet is for us, then NET_CONTINUE is returned.\n\t\t * In this case we must clone the packet, as the packet\n\t\t * could be manipulated by other part of the stack.\n\t\t */\n\t\tenum net_verdict verdict;\n\t\tstruct net_pkt *new_pkt;\n\n\t\t/* This protects pkt so that it will not be freed by L2 recv()\n\t\t */\n\t\tnet_pkt_ref(pkt);\n\n\t\tverdict = net_if_l2(iface)->recv(iface, pkt);\n\t\tif (verdict == NET_CONTINUE) {\n\t\t\tnew_pkt = net_pkt_clone(pkt, K_NO_WAIT);\n\t\t} else {\n\t\t\tnew_pkt = net_pkt_ref(pkt);\n\t\t}\n\n\t\t/* L2 has modified the buffer starting point, it is easier\n\t\t * to re-initialize the cursor rather than updating it.\n\t\t */\n\t\tnet_pkt_cursor_init(new_pkt);\n\n\t\tif (net_promisc_mode_input(new_pkt) == NET_DROP) {\n\t\t\tnet_pkt_unref(new_pkt);\n\t\t}\n\n\t\tnet_pkt_unref(pkt);\n\n\t\treturn verdict;\n\t}\n\n\treturn net_if_l2(iface)->recv(iface, pkt);\n}\n"
+}

@@ -1,0 +1,10 @@
+{
+    "project": "apr",
+    "tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "network_io/unix/inet_pton.c",
+    "message": "Uninitialized variable: tmp",
+    "warning_function_name": "inet_pton4",
+    "warning_line": "memcpy(dst, tmp, INADDRSZ);",
+    "warning_context": "static int\ninet_pton4(const char *src, unsigned char *dst)\n{\n    static const char digits[] = \"0123456789\";\n    int saw_digit, octets, ch;\n    unsigned char tmp[INADDRSZ], *tp;\n\n    saw_digit = 0;\n    octets = 0;\n    *(tp = tmp) = 0;\n    while ((ch = *src++) != '\\0') {\n\tconst char *pch;\n\n\tif ((pch = strchr(digits, ch)) != NULL) {\n\t    unsigned int new = *tp * 10 + (unsigned int)(pch - digits);\n\n\t    if (new > 255)\n\t\treturn (0);\n\t    *tp = new;\n\t    if (! saw_digit) {\n\t\tif (++octets > 4)\n\t\t    return (0);\n\t\tsaw_digit = 1;\n\t    }\n\t} else if (ch == '.' && saw_digit) {\n\t    if (octets == 4)\n\t\treturn (0);\n\t    *++tp = 0;\n\t    saw_digit = 0;\n\t} else\n\t\treturn (0);\n    }\n    if (octets < 4)\n\treturn (0);\n\n    memcpy(dst, tmp, INADDRSZ);\n    return (1);\n}\n"
+}

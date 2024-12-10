@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_VERIFY_MSG(otype > K_OBJ_ANY && otype < K_OBJ_LAST &&",
-    "Code_function": "static inline void *z_vrfy_k_object_alloc(enum k_objects otype)\n{\n\tZ_OOPS(Z_SYSCALL_VERIFY_MSG(otype > K_OBJ_ANY && otype < K_OBJ_LAST &&\n\t\t\t\t    otype != K_OBJ__THREAD_STACK_ELEMENT,\n\t\t\t\t    \"bad object type %d requested\", otype));\n\n\treturn z_impl_k_object_alloc(otype);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "subsys/random/rand32_ctr_drbg.c",
+    "message": "Uninitialized variable: ret",
+    "warning_function_name": "sys_csrand_get",
+    "warning_line": "return ret;",
+    "warning_context": "int sys_csrand_get(void *dst, u32_t outlen)\n{\n\tint ret;\n\tunsigned int key = irq_lock();\n\n\tif (unlikely(!entropy_driver)) {\n\t\tret = ctr_drbg_initialize();\n\t\tif (ret != 0) {\n\t\t\treturn ret;\n\t\t}\n\t}\n\n#if defined(CONFIG_MBEDTLS)\n\n\tret = mbedtls_ctr_drbg_random(&ctr_ctx, (unsigned char *)dst, outlen);\n\n#elif defined(CONFIG_TINYCRYPT)\n\n\tu8_t entropy[TC_AES_KEY_SIZE + TC_AES_BLOCK_SIZE];\n\n\tret = tc_ctr_prng_generate(&ctr_ctx, 0, 0, (uint8_t *)dst, outlen);\n\n\tif (ret == TC_CRYPTO_SUCCESS) {\n\t\tret = 0;\n\t} else if (ret == TC_CTR_PRNG_RESEED_REQ) {\n\n\t\tentropy_get_entropy(entropy_driver,\n\t\t\t\t    (void *)&entropy, sizeof(entropy));\n\n\t\tret = tc_ctr_prng_reseed(&ctr_ctx,\n\t\t\t\t\tentropy,\n\t\t\t\t\tsizeof(entropy),\n\t\t\t\t\tdrbg_seed,\n\t\t\t\t\tsizeof(drbg_seed));\n\n\t\tret = tc_ctr_prng_generate(&ctr_ctx, 0, 0,\n\t\t\t\t\t   (uint8_t *)dst, outlen);\n\n\t\tret = (ret == TC_CRYPTO_SUCCESS) ? 0 : -EIO;\n\t} else {\n\t\tret = -EIO;\n\t}\n#endif\n\tirq_unlock(key);\n\n\treturn ret;\n}\n"
 }

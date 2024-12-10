@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(queue, K_OBJ_QUEUE));",
-    "Code_function": "static inline void *z_vrfy_k_queue_get(struct k_queue *queue, s32_t timeout)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(queue, K_OBJ_QUEUE));\n\treturn z_impl_k_queue_get(queue, timeout);\n}"
+    "project": "Zephyr",
+    "tool": "Infer",
+    "category": "Null Dereference",
+    "file": "kernel/pipes.c",
+    "message": "pointer `thread` last assigned on line 325 could be null and is dereferenced at line 326, column 33.",
+    "warning_function_name": "pipe_xfer_prepare",
+    "warning_line": "desc = (struct k_pipe_desc *)thread->base.swap_data;",
+    "warning_context": "static bool pipe_xfer_prepare(sys_dlist_t      *xfer_list,\n\t\t\t       struct k_thread **waiter,\n\t\t\t       _wait_q_t        *wait_q,\n\t\t\t       size_t            pipe_space,\n\t\t\t       size_t            bytes_to_xfer,\n\t\t\t       size_t            min_xfer,\n\t\t\t       s32_t           timeout)\n{\n\tstruct k_thread  *thread;\n\tstruct k_pipe_desc *desc;\n\tsize_t num_bytes = 0;\n\n\tif (timeout == K_NO_WAIT) {\n\t\t_WAIT_Q_FOR_EACH(wait_q, thread) {\n\t\t\tdesc = (struct k_pipe_desc *)thread->base.swap_data;\n\n\t\t\tnum_bytes += desc->bytes_to_xfer;\n\n\t\t\tif (num_bytes >= bytes_to_xfer) {\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\n\t\tif (num_bytes + pipe_space < min_xfer) {\n\t\t\treturn false;\n\t\t}\n\t}\n\n\t/*\n\t * Either @a timeout is not K_NO_WAIT (so the thread may pend) or\n\t * the entire request can be satisfied. Generate the working list.\n\t */\n\n\tsys_dlist_init(xfer_list);\n\tnum_bytes = 0;\n\n\twhile ((thread = z_waitq_head(wait_q)) != NULL) {\n\t\tdesc = (struct k_pipe_desc *)thread->base.swap_data;\n\t\tnum_bytes += desc->bytes_to_xfer;\n\n\t\tif (num_bytes > bytes_to_xfer) {\n\t\t\t/*\n\t\t\t * This request can not be fully satisfied.\n\t\t\t * Do not remove it from the wait_q.\n\t\t\t * Do not abort its timeout (if applicable).\n\t\t\t * Do not add it to the transfer list\n\t\t\t */\n\t\t\tbreak;\n\t\t}\n\n\t\t/*\n\t\t * This request can be fully satisfied.\n\t\t * Remove it from the wait_q.\n\t\t * Abort its timeout.\n\t\t * Add it to the transfer list.\n\t\t */\n\t\tz_unpend_thread(thread);\n\t\tsys_dlist_append(xfer_list, &thread->base.qnode_dlist);\n\t}\n\n\t*waiter = (num_bytes > bytes_to_xfer) ? thread : NULL;\n\n\treturn true;\n}\n"
 }

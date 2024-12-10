@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "CSA",
+    "category": "core.CallAndMessage",
+    "file": "ext.c",
+    "message": "Called function pointer is null (null dereference)",
+    "warning_function_name": "load_old_ext",
+    "warning_line": "tmp = (*func)(obj, dl);",
+    "warning_context": "NODE *\nload_old_ext(SRCFILE *s, const char *init_func, const char *fini_func, NODE *obj)\n{\n\tNODE *(*func)(NODE *, void *);\n\tNODE *tmp;\n\tvoid *dl;\n\tint flags = RTLD_LAZY;\n\tint *gpl_compat;\n\tconst char *lib_name = s->fullpath;\n\n\tif (init_func == NULL || init_func[0] == '\\0')\n\t\tinit_func = OLD_INIT_FUNC;\n\n\tif (fini_func == NULL || fini_func[0] == '\\0')\n\t\tfini_func = OLD_FINI_FUNC;\n\n\tif (do_sandbox)\n\t\tfatal(_(\"extensions are not allowed in sandbox mode\"));\n\n\tif (do_traditional || do_posix)\n\t\tfatal(_(\"`extension' is a gawk extension\"));\n\n\tif (lib_name == NULL)\n\t\tfatal(_(\"extension: received NULL lib_name\"));\n\n\tif ((dl = dlopen(lib_name, flags)) == NULL)\n\t\tfatal(_(\"extension: cannot open library `%s' (%s)\"), lib_name,\n\t\t      dlerror());\n\n\t/* Per the GNU Coding standards */\n\tgpl_compat = (int *) dlsym(dl, \"plugin_is_GPL_compatible\");\n\tif (gpl_compat == NULL)\n\t\tfatal(_(\"extension: library `%s': does not define `plugin_is_GPL_compatible' (%s)\"),\n\t\t\t\tlib_name, dlerror());\n\tfunc = (NODE *(*)(NODE *, void *)) dlsym(dl, init_func);\n\tif (func == NULL)\n\t\tfatal(_(\"extension: library `%s': cannot call function `%s' (%s)\"),\n\t\t\t\tlib_name, init_func, dlerror());\n\n\tif (obj == NULL) {\n\t\tobj = make_string(lib_name, strlen(lib_name));\n\t\ttmp = (*func)(obj, dl);\n\t\tunref(tmp);\n\t\tunref(obj);\n\t\ttmp = NULL;\n\t} else\n\t\ttmp = (*func)(obj, dl);\n\n\ts->fini_func = (void (*)(void)) dlsym(dl, fini_func);\n\treturn tmp;\n}\n"
+}

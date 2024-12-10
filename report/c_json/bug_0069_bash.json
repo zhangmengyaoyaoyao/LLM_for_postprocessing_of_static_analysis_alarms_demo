@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Cppcheck",
+    "category": "uninitdata",
+    "file": "lib/glob/xmbsrtowcs.c",
+    "message": "Memory is allocated but not initialized: wsbuf",
+    "warning_function_name": "xmbsrtowcs",
+    "warning_line": "wclength = mbsrtowcs (wsbuf, &mbs, n, &psbuf);",
+    "warning_context": "size_t\nxmbsrtowcs (dest, src, len, pstate)\n    wchar_t *dest;\n    const char **src;\n    size_t len;\n    mbstate_t *pstate;\n{\n  mbstate_t *ps;\n  size_t mblength, wclength, n;\n\n  ps = pstate;\n  if (pstate == NULL)\n    {\n      if (!local_state_use)\n\t{\n\t  memset (&local_state, '\\0', sizeof(mbstate_t));\n\t  local_state_use = 1;\n\t}\n      ps = &local_state;\n    }\n\n  n = strlen (*src);\n\n  if (dest == NULL)\n    {\n      wchar_t *wsbuf;\n      const char *mbs;\n      mbstate_t psbuf;\n\n      /* It doesn't matter if malloc fails here, since mbsrtowcs should do\n\t the right thing with a NULL first argument. */\n      wsbuf = (wchar_t *) malloc ((n + 1) * sizeof(wchar_t));\n      mbs = *src;\n      psbuf = *ps;\n\n      wclength = mbsrtowcs (wsbuf, &mbs, n, &psbuf);\n\n      if (wsbuf)\n\tfree (wsbuf);\n      return wclength;\n    }\n      \n  for (wclength = 0; wclength < len; wclength++, dest++)\n    {\n      if (mbsinit(ps))\n\t{\n\t  if (**src == '\\0')\n\t    {\n\t      *dest = L'\\0';\n\t      *src = NULL;\n\t      return (wclength);\n\t    }\n\t  else if (**src == '\\\\')\n\t    {\n\t      *dest = L'\\\\';\n\t      mblength = 1;\n\t    }\n\t  else\n\t    mblength = mbrtowc(dest, *src, n, ps);\n\t}\n      else\n\tmblength = mbrtowc(dest, *src, n, ps);\n\n      /* Cannot convert multibyte character to wide character. */\n      if (mblength == (size_t)-1 || mblength == (size_t)-2)\n\treturn (size_t)-1;\n\n      *src += mblength;\n      n -= mblength;\n\n      /* The multibyte string  has  been  completely  converted,\n\t including  the terminating '\\0'. */\n      if (*dest == L'\\0')\n\t{\n\t  *src = NULL;\n\t  break;\n\t}\n    }\n\n    return (wclength);\n}\n"
+}

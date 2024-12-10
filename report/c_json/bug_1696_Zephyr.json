@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(q, K_OBJ_MSGQ));",
-    "Code_function": "static inline u32_t z_vrfy_k_msgq_num_free_get(struct k_msgq *q)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(q, K_OBJ_MSGQ));\n\treturn z_impl_k_msgq_num_free_get(q);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "subsys/net/ip/tcp2.c",
+    "message": "Null pointer dereference: conn",
+    "warning_function_name": "tcp_conn_state",
+    "warning_line": "tcp_state_to_str(conn->state, false),",
+    "warning_context": "static const char *tcp_conn_state(struct tcp *conn, struct net_pkt *pkt)\n{\n#define BUF_SIZE 64\n\tstatic char buf[BUF_SIZE];\n\n\tsnprintf(buf, BUF_SIZE, \"%s %s %u/%u\", pkt ? tcp_th(pkt) : \"\",\n\t\t\ttcp_state_to_str(conn->state, false),\n\t\t\tconn->seq, conn->ack);\n#undef BUF_SIZE\n\treturn buf;\n}\n"
 }

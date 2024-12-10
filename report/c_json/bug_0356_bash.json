@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "subst.c",
+    "message": "Offset: [-1, +oo] (⇐ [0, +oo] + -1) Size: [32, +oo] by call to `match_wpattern`.",
+    "warning_function_name": "match_pattern",
+    "warning_line": "ret = match_wpattern (wstring, indices, n, wpat, mtype, sp, ep);",
+    "warning_context": "static int\nmatch_pattern (string, pat, mtype, sp, ep)\n     char *string, *pat;\n     int mtype;\n     char **sp, **ep;\n{\n#if defined (HANDLE_MULTIBYTE)\n  int ret;\n  size_t n;\n  wchar_t *wstring, *wpat;\n  char **indices;\n  size_t slen, plen, mslen, mplen;\n#endif\n\n  if (string == 0 || *string == 0 || pat == 0 || *pat == 0)\n    return (0);\n\n#if defined (HANDLE_MULTIBYTE)\n  if (MB_CUR_MAX > 1)\n    {\n      if (mbsmbchar (string) == 0 && mbsmbchar (pat) == 0)\n        return (match_upattern (string, pat, mtype, sp, ep));\n\n      n = xdupmbstowcs (&wpat, NULL, pat);\n      if (n == (size_t)-1)\n\treturn (match_upattern (string, pat, mtype, sp, ep));\n      n = xdupmbstowcs (&wstring, &indices, string);\n      if (n == (size_t)-1)\n\t{\n\t  free (wpat);\n\t  return (match_upattern (string, pat, mtype, sp, ep));\n\t}\n      ret = match_wpattern (wstring, indices, n, wpat, mtype, sp, ep);\n\n      free (wpat);\n      free (wstring);\n      free (indices);\n\n      return (ret);\n    }\n  else\n#endif\n    return (match_upattern (string, pat, mtype, sp, ep));\n}\n"
+}

@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Infer",
+    "category": "Null Dereference",
+    "file": "sys/net/gnrc/sock/udp/gnrc_sock_udp.c",
+    "message": "pointer `udp` last assigned on line 220 could be null and is dereferenced at line 222, column 11.",
+    "warning_function_name": "sock_udp_recv_buf",
+    "warning_line": "hdr = udp->data;",
+    "warning_context": "ssize_t sock_udp_recv_buf(sock_udp_t *sock, void **data, void **buf_ctx,\n                          uint32_t timeout, sock_udp_ep_t *remote)\n{\n    gnrc_pktsnip_t *pkt, *udp;\n    udp_hdr_t *hdr;\n    sock_ip_ep_t tmp;\n    int res;\n\n    assert((sock != NULL) && (data != NULL) && (buf_ctx != NULL));\n    if (*buf_ctx != NULL) {\n        *data = NULL;\n        gnrc_pktbuf_release(*buf_ctx);\n        *buf_ctx = NULL;\n        return 0;\n    }\n    if (sock->local.family == AF_UNSPEC) {\n        return -EADDRNOTAVAIL;\n    }\n    tmp.family = sock->local.family;\n    res = gnrc_sock_recv((gnrc_sock_reg_t *)sock, &pkt, timeout, &tmp);\n    if (res < 0) {\n        return res;\n    }\n    udp = gnrc_pktsnip_search_type(pkt, GNRC_NETTYPE_UDP);\n    assert(udp);\n    hdr = udp->data;\n    if (remote != NULL) {\n        /* return remote to possibly block if wrong remote */\n        memcpy(remote, &tmp, sizeof(tmp));\n        remote->port = byteorder_ntohs(hdr->src_port);\n    }\n    if ((sock->remote.family != AF_UNSPEC) &&  /* check remote end-point if set */\n        ((sock->remote.port != byteorder_ntohs(hdr->src_port)) ||\n        /* We only have IPv6 for now, so just comparing the whole end point\n         * should suffice */\n        ((memcmp(&sock->remote.addr, &ipv6_addr_unspecified,\n                 sizeof(ipv6_addr_t)) != 0) &&\n         (memcmp(&sock->remote.addr, &tmp.addr, sizeof(ipv6_addr_t)) != 0)))) {\n        gnrc_pktbuf_release(pkt);\n        return -EPROTO;\n    }\n    *data = pkt->data;\n    *buf_ctx = pkt;\n    res = (int)pkt->size;\n    return res;\n}\n"
+}

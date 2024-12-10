@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset added: 33 (⇐ 1 + 32) Size: [0, +oo] by call to `bcalloc`.",
-    "Code_line": "\tbp = bcalloc(Op_breakpoint, 1, srcline);",
-    "Code_function": "mk_breakpoint(char *src, int srcline)\n{\n\tINSTRUCTION *bp;\n\tBREAKPOINT *b;\n\n\tbp = bcalloc(Op_breakpoint, 1, srcline);\n\temalloc(b, BREAKPOINT *, sizeof(BREAKPOINT), \"mk_breakpoint\");\n\tmemset(&b->cndn, 0, sizeof(struct condition));\n\tb->commands.next = b->commands.prev = &b->commands;\n\tb->silent = false;\n\n\n\tb->number = ++watch_list.number;\t/* breakpoints and watchpoints use same counter */\n\tb->ignore_count = 0;\n\tb->hit_count = 0;\n\tb->flags = BP_ENABLE;\n\tb->src = src;\n\tbp->break_pt = b;\n\tb->bpi = bp;\n\n\t/* prepend to list */\n\tb->next = breakpoints.next;\n\tb->prev = &breakpoints;\n\tbreakpoints.next = b;\n\tb->next->prev = b;\n\treturn bp;\n}"
-}

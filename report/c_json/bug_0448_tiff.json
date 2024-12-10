@@ -1,8 +1,0 @@
-{
-    "Project": "tiff",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: 1 Size: [0, +oo] by call to `TIFFFetchAnyArray`.",
-    "Code_line": "        if (v && TIFFFetchAnyArray(tif, dir, v)) {",
-    "Code_function": "TIFFFetchPerSampleAnys(TIFF* tif, TIFFDirEntry* dir, double* minv, double* maxv)\n{\n    uint16 samples = tif->tif_dir.td_samplesperpixel;\n    int status = 0;\n\n    if (CheckDirCount(tif, dir, (uint32) samples, TIFFFieldSet(tif,FIELD_BITSPERSAMPLE))) {\n        double buf[10];\n        double* v = buf;\n\n        if (dir->tdir_count > NITEMS(buf))\n            v = (double*) _TIFFCheckMalloc(tif, dir->tdir_count, sizeof (double),\n                                      \"to fetch per-sample values\");\n        if (v && TIFFFetchAnyArray(tif, dir, v)) {\n            uint16 i;\n            int check_count = dir->tdir_count;\n            if( samples < check_count )\n                check_count = samples;\n\n            *minv = *maxv = v[0];\n            for (i = 1; i < check_count; i++)\n            {\n                if (v[i] < *minv)\n                    *minv = v[i];\n                if (v[i] > *maxv)\n                    *maxv = v[i];\n            }\n            status = 1;\n        }\n        if (v && v != buf)\n            _TIFFfree(v);\n    }\n    return (status);\n}"
-}

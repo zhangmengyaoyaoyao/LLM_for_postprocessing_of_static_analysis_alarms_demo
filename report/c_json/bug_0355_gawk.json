@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "CSA",
-    "Bug Type": "unix.Malloc",
-    "Message": "Use of memory after it is freed",
-    "Code_line": "\t\t\t\tif (pid == redp->pid) {",
-    "Code_function": "wait_any(int interesting)\t/* pid of interest, if any */\n{\n\tRETSIGTYPE (*hstat)(int), (*istat)(int), (*qstat)(int);\n\tint pid;\n\tint status = 0;\n\tstruct redirect *redp;\n\n\tistat = signal(SIGINT, SIG_IGN);\n#ifdef __MINGW32__\n\tif (interesting < 0) {\n\t\tstatus = -1;\n\t\tpid = -1;\n\t}\n\telse\n\t\tpid = _cwait(& status, interesting, 0);\n\tif (pid == interesting && pid > 0) {\n\t\tfor (redp = red_head; redp != NULL; redp = redp->next)\n\t\t\tif (interesting == redp->pid) {\n\t\t\t\tredp->pid = -1;\n\t\t\t\tredp->status = status;\n\t\t\t\tbreak;\n\t\t\t}\n\t}\n#else\n\thstat = signal(SIGHUP, SIG_IGN);\n\tqstat = signal(SIGQUIT, SIG_IGN);\n\tfor (;;) {\n# ifdef HAVE_SYS_WAIT_H\t/* POSIX compatible sys/wait.h */\n\t\tpid = wait(& status);\n# else\n\t\tpid = wait((union wait *) & status);\n# endif\n\t\tif (interesting && pid == interesting) {\n\t\t\tbreak;\n\t\t} else if (pid != -1) {\n\t\t\tfor (redp = red_head; redp != NULL; redp = redp->next)\n\t\t\t\tif (pid == redp->pid) {\n\t\t\t\t\tredp->pid = -1;\n\t\t\t\t\tredp->status = status;\n\t\t\t\t\tbreak;\n\t\t\t\t}\n\t\t}\n\t\tif (pid == -1 && errno == ECHILD)\n\t\t\tbreak;\n\t}\n\tsignal(SIGHUP, hstat);\n\tsignal(SIGQUIT, qstat);\n#endif\n\tsignal(SIGINT, istat);\n\treturn status;\n}"
-}

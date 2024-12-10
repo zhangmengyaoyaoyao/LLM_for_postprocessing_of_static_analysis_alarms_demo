@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "drivers/sht3x/sht3x.c",
+    "message": "Either the condition 'dev!=NULL' is redundant or there is possible null pointer dereference: dev.",
+    "warning_function_name": "_send_command",
+    "warning_line": "DEBUG_DEV(\"send command 0x%02x%02x\", dev, data[0], data[1]);",
+    "warning_context": "static int _send_command(sht3x_dev_t* dev, uint16_t cmd)\n{\n    ASSERT_PARAM (dev != NULL);\n\n    int res = SHT3X_OK;\n\n    uint8_t data[2] = { cmd >> 8, cmd & 0xff };\n    DEBUG_DEV(\"send command 0x%02x%02x\", dev, data[0], data[1]);\n\n    if (i2c_acquire(dev->i2c_dev) != 0) {\n        DEBUG_DEV (\"could not acquire I2C bus\", dev);\n        return -SHT3X_ERROR_I2C;\n    }\n\n    res = i2c_write_bytes(dev->i2c_dev, dev->i2c_addr, (const void*)data, 2, 0);\n    i2c_release(dev->i2c_dev);\n\n    if (res != 0) {\n        DEBUG_DEV(\"could not send command 0x%02x%02x to sensor, reason=%d\",\n                  dev, data[0], data[1], res);\n        return -SHT3X_ERROR_I2C;\n    }\n\n    return SHT3X_OK;\n}\n"
+}

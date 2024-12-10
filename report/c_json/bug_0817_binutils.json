@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset added: [0, 10] Size: [8, 88] by call to `string_append`.",
-    "Code_line": "\t\t  string_append (s, optable[i].out);",
-    "Code_function": "demangle_expression (struct work_stuff *work, const char **mangled,\n                     string *s, type_kind_t tk)\n{\n  int need_operator = 0;\n  int success;\n\n  success = 1;\n  string_appendn (s, \"(\", 1);\n  (*mangled)++;\n  while (success && **mangled != 'W' && **mangled != '\\0')\n    {\n      if (need_operator)\n\t{\n\t  size_t i;\n\t  size_t len;\n\n\t  success = 0;\n\n\t  len = strlen (*mangled);\n\n\t  for (i = 0; i < ARRAY_SIZE (optable); ++i)\n\t    {\n\t      size_t l = strlen (optable[i].in);\n\n\t      if (l <= len\n\t\t  && memcmp (optable[i].in, *mangled, l) == 0)\n\t\t{\n\t\t  string_appendn (s, \" \", 1);\n\t\t  string_append (s, optable[i].out);\n\t\t  string_appendn (s, \" \", 1);\n\t\t  success = 1;\n\t\t  (*mangled) += l;\n\t\t  break;\n\t\t}\n\t    }\n\n\t  if (!success)\n\t    break;\n\t}\n      else\n\tneed_operator = 1;\n\n      success = demangle_template_value_parm (work, mangled, s, tk);\n    }\n\n  if (**mangled != 'W')\n    success = 0;\n  else\n    {\n      string_appendn (s, \")\", 1);\n      (*mangled)++;\n    }\n\n  return success;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L1",
+    "file": "bfd/elf32-i386.c",
+    "message": "Offset: [24, 25] (⇐ [7, 8] + 17) Size: 18 by call to `_bfd_generic_link_add_one_symbol`.",
+    "warning_function_name": "elf_i386_always_size_sections",
+    "warning_line": "if (!(_bfd_generic_link_add_one_symbol",
+    "warning_context": "static bfd_boolean\nelf_i386_always_size_sections (bfd *output_bfd,\n\t\t\t       struct bfd_link_info *info)\n{\n  asection *tls_sec = elf_hash_table (info)->tls_sec;\n\n  if (tls_sec)\n    {\n      struct elf_link_hash_entry *tlsbase;\n\n      tlsbase = elf_link_hash_lookup (elf_hash_table (info),\n\t\t\t\t      \"_TLS_MODULE_BASE_\",\n\t\t\t\t      FALSE, FALSE, FALSE);\n\n      if (tlsbase && tlsbase->type == STT_TLS)\n\t{\n\t  struct elf_i386_link_hash_table *htab;\n\t  struct bfd_link_hash_entry *bh = NULL;\n\t  const struct elf_backend_data *bed\n\t    = get_elf_backend_data (output_bfd);\n\n\t  htab = elf_i386_hash_table (info);\n\t  if (htab == NULL)\n\t    return FALSE;\n\n\t  if (!(_bfd_generic_link_add_one_symbol\n\t\t(info, output_bfd, \"_TLS_MODULE_BASE_\", BSF_LOCAL,\n\t\t tls_sec, 0, NULL, FALSE,\n\t\t bed->collect, &bh)))\n\t    return FALSE;\n\n\t  htab->tls_module_base = bh;\n\n\t  tlsbase = (struct elf_link_hash_entry *)bh;\n\t  tlsbase->def_regular = 1;\n\t  tlsbase->other = STV_HIDDEN;\n\t  (*bed->elf_backend_hide_symbol) (info, tlsbase, TRUE);\n\t}\n    }\n\n  return TRUE;\n}\n"
 }

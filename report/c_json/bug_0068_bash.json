@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "expr.c",
+    "message": "Uninitialized variable: oevalbuf",
+    "warning_function_name": "evalexp",
+    "warning_line": "FASTCOPY (evalbuf, oevalbuf, sizeof (evalbuf));",
+    "warning_context": "intmax_t\nevalexp (expr, validp)\n     char *expr;\n     int *validp;\n{\n  intmax_t val;\n  int c;\n  procenv_t oevalbuf;\n\n  val = 0;\n  noeval = 0;\n\n  FASTCOPY (evalbuf, oevalbuf, sizeof (evalbuf));\n\n  c = setjmp_nosigs (evalbuf);\n\n  if (c)\n    {\n      FREE (tokstr);\n      FREE (expression);\n      tokstr = expression = (char *)NULL;\n\n      expr_unwind ();\n\n      if (validp)\n\t*validp = 0;\n      return (0);\n    }\n\n  val = subexpr (expr);\n\n  if (validp)\n    *validp = 1;\n\n  FASTCOPY (oevalbuf, evalbuf, sizeof (evalbuf));\n\n  return (val);\n}\n"
+}

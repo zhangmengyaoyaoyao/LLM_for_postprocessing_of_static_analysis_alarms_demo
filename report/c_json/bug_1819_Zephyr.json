@@ -1,0 +1,10 @@
+{
+    "project": "Zephyr",
+    "tool": "Infer",
+    "category": "Null Dereference",
+    "file": "subsys/net/l2/bluetooth/bluetooth.c",
+    "message": "pointer `conn` last assigned on line 529 could be null and is dereferenced at line 531, column 7.",
+    "warning_function_name": "bt_disconnect",
+    "warning_line": "if (!conn->ipsp_chan.chan.conn) {",
+    "warning_context": "static int bt_disconnect(u32_t mgmt_request, struct net_if *iface,\n\t\t\t void *data, size_t len)\n{\n\tstruct bt_if_conn *conn = net_bt_get_conn(iface);\n\n\tif (!conn->ipsp_chan.chan.conn) {\n\t\tNET_ERR(\"Not connected\");\n\t\treturn -ENOTCONN;\n\t}\n\n\t/* Release connect reference in case of central/router role */\n\tif (default_conn) {\n\t\tbt_conn_unref(default_conn);\n\t\tdefault_conn = NULL;\n\t}\n\n\treturn bt_l2cap_chan_disconnect(&conn->ipsp_chan.chan);\n}\n"
+}

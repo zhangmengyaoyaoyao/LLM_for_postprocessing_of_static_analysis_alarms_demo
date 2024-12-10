@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(queue, K_OBJ_QUEUE));",
-    "Code_function": "static inline void z_vrfy_k_queue_cancel_wait(struct k_queue *queue)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(queue, K_OBJ_QUEUE));\n\tz_impl_k_queue_cancel_wait(queue);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "subsys/usb/usb_descriptor.c",
+    "message": "Uninitialized variables: dev_data.dev, dev_data.node",
+    "warning_function_name": "usb_get_dev_data_by_ep",
+    "warning_line": "return dev_data;",
+    "warning_context": "struct usb_dev_data *usb_get_dev_data_by_ep(sys_slist_t *list, u8_t ep)\n{\n\tstruct usb_dev_data *dev_data;\n\n\tSYS_SLIST_FOR_EACH_CONTAINER(list, dev_data, node) {\n\t\tstruct device *dev = dev_data->dev;\n\t\tconst struct usb_cfg_data *cfg = dev->config->config_info;\n\t\tconst struct usb_ep_cfg_data *ep_data = cfg->endpoint;\n\n\t\tfor (u8_t i = 0; i < cfg->num_endpoints; i++) {\n\t\t\tif (ep_data[i].ep_addr == ep) {\n\t\t\t\treturn dev_data;\n\t\t\t}\n\t\t}\n\t}\n\n\tLOG_DBG(\"Device data not found for ep %u\", ep);\n\n\treturn NULL;\n}\n"
 }

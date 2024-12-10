@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "sys/quad_math/ashrdi3.c",
+    "message": "Either the condition 'shift==0' is redundant or there is possible null pointer dereference: ul.",
+    "warning_function_name": "__ashrdi3",
+    "warning_line": "aa.ul[L] = (aa.ul[L] >> shift) | (aa.ul[H] << (INT_BITS - shift));",
+    "warning_context": "quad_t __ashrdi3(quad_t a, qshift_t shift)\n{\n    union uu aa;\n\n    if (shift == 0) {\n        return a;\n    }\n\n    aa.q = a;\n\n    if (shift >= INT_BITS) {\n        /*\n         * Smear bits rightward using the machine's right-shift\n         * method, whether that is sign extension or zero fill,\n         * to get the `sign word' s.  Note that shifting by\n         * INT_BITS is undefined, so we shift (INT_BITS-1),\n         * then 1 more, to get our answer.\n         */\n        /* LINTED inherits machine dependency */\n        int s = (aa.sl[H] >> (INT_BITS - 1)) >> 1;\n        /* LINTED inherits machine dependency*/\n        aa.ul[L] = aa.sl[H] >> (shift - INT_BITS);\n        aa.ul[H] = s;\n    }\n    else {\n        aa.ul[L] = (aa.ul[L] >> shift) | (aa.ul[H] << (INT_BITS - shift));\n        /* LINTED inherits machine dependency */\n        aa.sl[H] >>= shift;\n    }\n\n    return aa.q;\n}\n"
+}

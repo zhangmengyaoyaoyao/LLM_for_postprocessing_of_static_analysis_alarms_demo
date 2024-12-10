@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "lib/intl/localealias.c",
+    "message": "Uninitialized variable: &item.value",
+    "warning_function_name": "_nl_expand_alias",
+    "warning_line": "retval = (struct alias_map *) bsearch (&item, map, nmap,",
+    "warning_context": "const char *\n_nl_expand_alias (name)\n    const char *name;\n{\n  static const char *locale_alias_path;\n  struct alias_map *retval;\n  const char *result = NULL;\n  size_t added;\n\n#ifdef _LIBC\n  __libc_lock_lock (lock);\n#endif\n\n  if (locale_alias_path == NULL)\n    locale_alias_path = LOCALE_ALIAS_PATH;\n\n  do\n    {\n      struct alias_map item;\n\n      item.alias = name;\n\n      if (nmap > 0)\n\tretval = (struct alias_map *) bsearch (&item, map, nmap,\n\t\t\t\t\t       sizeof (struct alias_map),\n\t\t\t\t\t       (int (*) PARAMS ((const void *,\n\t\t\t\t\t\t\t\t const void *))\n\t\t\t\t\t\t) alias_compare);\n      else\n\tretval = NULL;\n\n      /* We really found an alias.  Return the value.  */\n      if (retval != NULL)\n\t{\n\t  result = retval->value;\n\t  break;\n\t}\n\n      /* Perhaps we can find another alias file.  */\n      added = 0;\n      while (added == 0 && locale_alias_path[0] != '\\0')\n\t{\n\t  const char *start;\n\n\t  while (locale_alias_path[0] == PATH_SEPARATOR)\n\t    ++locale_alias_path;\n\t  start = locale_alias_path;\n\n\t  while (locale_alias_path[0] != '\\0'\n\t\t && locale_alias_path[0] != PATH_SEPARATOR)\n\t    ++locale_alias_path;\n\n\t  if (start < locale_alias_path)\n\t    added = read_alias_file (start, locale_alias_path - start);\n\t}\n    }\n  while (added != 0);\n\n#ifdef _LIBC\n  __libc_lock_unlock (lock);\n#endif\n\n  return result;\n}\n"
+}

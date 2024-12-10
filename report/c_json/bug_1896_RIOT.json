@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Infer",
+    "category": "Buffer Overrun L3",
+    "file": "sys/hashes/sha1.c",
+    "message": "Offset added: 20 Size: [0, +oo].",
+    "warning_function_name": "ha1_final(",
+    "warning_line": "memcpy(digest, ctx->state, 20);",
+    "warning_context": "void sha1_final(sha1_context *ctx, void *digest)\n{\n    /* Pad to complete the last block */\n    sha1_pad(ctx);\n\n    /* Swap byte order back */\n    for (int i = 0; i < 5; i++) {\n        ctx->state[i] =\n            (((ctx->state[i]) << 24) & 0xff000000)\n            | (((ctx->state[i]) << 8) & 0x00ff0000)\n            | (((ctx->state[i]) >> 8) & 0x0000ff00)\n            | (((ctx->state[i]) >> 24) & 0x000000ff);\n    }\n\n    /* Copy the content of the hash (20 characters) */\n    memcpy(digest, ctx->state, 20);\n}\n"
+}

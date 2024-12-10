@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Cppcheck",
-    "Bug Type": "ctuArrayIndex",
-    "Message": "Array index out of bounds; 'argv' buffer size is 0 and it is accessed at offset 1.",
-    "Code_line": "\tif (!argv[arg]) {",
-    "Code_function": "\tif (!argv[arg]) {"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "arrayIndexOutOfBoundsCond",
+    "file": "drivers/usb/device/usb_dc_native_posix.c",
+    "message": "Either the condition 'ep_idx>=8' is redundant or the array 'usbip_ctrl.in_ep_ctrl[8]' is accessed at index 8, which is out of bounds.",
+    "warning_function_name": "handle_usb_data",
+    "warning_line": "u8_t buf_len = usbip_ctrl.in_ep_ctrl[ep_idx].buf_len;",
+    "warning_context": "int handle_usb_data(struct usbip_header *hdr)\n{\n\tu8_t ep_idx = ntohl(hdr->common.ep);\n\tusb_dc_ep_callback ep_cb;\n\tu8_t ep;\n\n\tLOG_DBG(\"ep_idx %u\", ep_idx);\n\n\tif (ntohl(hdr->common.direction) == USBIP_DIR_OUT) {\n\t\tif (ep_idx >= USBIP_OUT_EP_NUM) {\n\t\t\treturn -EINVAL;\n\t\t}\n\n\t\tep = ep_idx | USB_EP_DIR_OUT;\n\t\tep_cb = usbip_ctrl.out_ep_ctrl[ep_idx].cb;\n\n\t\tep_cb(ep, USB_DC_EP_DATA_OUT);\n\n\t\t/* Send ACK reply */\n\t\tif (!usbip_send_common(ep, 0)) {\n\t\t\treturn -EIO;\n\t\t}\n\t} else {\n\t\tu8_t buf_len = usbip_ctrl.in_ep_ctrl[ep_idx].buf_len;\n\t\tu8_t *buf = usbip_ctrl.in_ep_ctrl[ep_idx].buf;\n\n\t\tif (ep_idx >= USBIP_IN_EP_NUM) {\n\t\t\treturn -EINVAL;\n\t\t}\n\n\t\tep = ep_idx | USB_EP_DIR_IN;\n\t\tep_cb = usbip_ctrl.in_ep_ctrl[ep_idx].cb;\n\n\t\t/* Read USB setup, not handled */\n\t\tif (!usbip_skip_setup()) {\n\t\t\treturn -EIO;\n\t\t}\n\n\t\tLOG_DBG(\"Send %u bytes\", buf_len);\n\n\t\t/* Send queued data */\n\t\tif (!usbip_send_common(ep, buf_len)) {\n\t\t\treturn -EIO;\n\t\t}\n\n\t\tif (usbip_send(ep, buf, buf_len) != buf_len) {\n\t\t\treturn -EIO;\n\t\t}\n\n\t\tLOG_HEXDUMP_DBG(buf, buf_len, \">\");\n\n\t\t/* Indicate data sent */\n\t\tep_cb(ep, USB_DC_EP_DATA_IN);\n\t}\n\n\tLOG_DBG(\"ep %x ep_cb %p\", ep, ep_cb);\n\n\treturn 0;\n}\n"
 }

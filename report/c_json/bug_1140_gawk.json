@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "eval.c",
+    "message": "Offset: 1 Size: [0, +oo].",
+    "warning_function_name": "push_frame",
+    "warning_line": "fcall_list[1] = f;",
+    "warning_context": "static void\npush_frame(NODE *f)\n{\n\tstatic long max_fcall;\n\n\t/* NB: frame numbering scheme as in GDB. frame_ptr => frame #0. */\n\n\tfcall_count++;\n\tif (fcall_list == NULL) {\n\t\tmax_fcall = 10;\n\t\temalloc(fcall_list, NODE **, (max_fcall + 1) * sizeof(NODE *), \"push_frame\");\n\t} else if (fcall_count == max_fcall) {\n\t\tmax_fcall *= 2;\n\t\terealloc(fcall_list, NODE **, (max_fcall + 1) * sizeof(NODE *), \"push_frame\");\n\t}\n\n\tif (fcall_count > 1)\n\t\tmemmove(fcall_list + 2, fcall_list + 1, (fcall_count - 1) * sizeof(NODE *)); \n\tfcall_list[1] = f;\n}\n"
+}

@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Infer",
+    "category": "Buffer Overrun L2",
+    "file": "sys/net/gnrc/pktbuf_static/gnrc_pktbuf_static.c",
+    "message": "Offset: [0, 6144] Size: 16 by call to `_print_chunk`.",
+    "warning_function_name": "gnrc_pktbuf_stats",
+    "warning_line": "_print_chunk(chunk, GNRC_PKTBUF_SIZE, count++);",
+    "warning_context": "void gnrc_pktbuf_stats(void)\n{\n#ifdef MODULE_OD\n    _unused_t *ptr = _first_unused;\n    uint8_t *chunk = &_pktbuf[0];\n    int count = 0;\n\n    printf(\"packet buffer: first byte: %p, last byte: %p (size: %u)\\n\",\n           (void *)&_pktbuf[0], (void *)&_pktbuf[GNRC_PKTBUF_SIZE], GNRC_PKTBUF_SIZE);\n    printf(\"  position of last byte used: %\" PRIu16 \"\\n\", max_byte_count);\n    if (ptr == NULL) {  /* packet buffer is completely full */\n        _print_chunk(chunk, GNRC_PKTBUF_SIZE, count++);\n    }\n\n    if (((void *)ptr) == ((void *)chunk)) { /* _first_unused is at the beginning */\n        _print_unused(ptr);\n        chunk += ptr->size;\n        ptr = ptr->next;\n    }\n\n    while (ptr) {\n        size_t size = ((uint8_t *)ptr) - chunk;\n        if ((size == 0) && (!_pktbuf_contains(ptr)) &&\n            (!_pktbuf_contains(chunk)) && (size > GNRC_PKTBUF_SIZE)) {\n            puts(\"ERROR\");\n            return;\n        }\n        _print_chunk(chunk, size, count++);\n        chunk += (size + ptr->size);\n        _print_unused(ptr);\n        ptr = ptr->next;\n    }\n\n    if (chunk <= &_pktbuf[GNRC_PKTBUF_SIZE - 1]) {\n        _print_chunk(chunk, &_pktbuf[GNRC_PKTBUF_SIZE] - chunk, count);\n    }\n#else\n    DEBUG(\"pktbuf: needs od module\\n\");\n#endif\n}\n"
+}

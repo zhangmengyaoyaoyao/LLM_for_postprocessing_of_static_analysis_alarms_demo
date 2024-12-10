@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L2",
-    "Message": "Offset: [1, 34] Size: 34 by call to `stab_xcoff_builtin_type`.",
-    "Code_line": "      return stab_xcoff_builtin_type (dhandle, info, typenums[1]);",
-    "Code_function": "stab_find_type (void *dhandle, struct stab_handle *info, const int *typenums)\n{\n  debug_type *slot;\n\n  if (typenums[0] == 0 && typenums[1] < 0)\n    {\n      /* A negative type number indicates an XCOFF builtin type.  */\n      return stab_xcoff_builtin_type (dhandle, info, typenums[1]);\n    }\n\n  slot = stab_find_slot (info, typenums);\n  if (slot == NULL)\n    return DEBUG_TYPE_NULL;\n\n  if (*slot == DEBUG_TYPE_NULL)\n    return debug_make_indirect_type (dhandle, slot, (const char *) NULL);\n\n  return *slot;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "UNINITIALIZED_VALUE",
+    "file": "libiberty/cp-demangle.c",
+    "message": "The value read from dpt.next was never initialized.",
+    "warning_function_name": "d_print_cast",
+    "warning_line": "dpi->templates = dpt.next;",
+    "warning_context": "static void\nd_print_cast (struct d_print_info *dpi, int options,\n              const struct demangle_component *dc)\n{\n  struct d_print_template dpt;\n\n  /* For a cast operator, we need the template parameters from\n     the enclosing template in scope for processing the type.  */\n  if (dpi->current_template != NULL)\n    {\n      dpt.next = dpi->templates;\n      dpi->templates = &dpt;\n      dpt.template_decl = dpi->current_template;\n    }\n\n  if (d_left (dc)->type != DEMANGLE_COMPONENT_TEMPLATE)\n    {\n      d_print_comp (dpi, options, d_left (dc));\n      if (dpi->current_template != NULL)\n\tdpi->templates = dpt.next;\n    }\n  else\n    {\n      d_print_comp (dpi, options, d_left (d_left (dc)));\n\n      /* For a templated cast operator, we need to remove the template\n\t parameters from scope after printing the operator name,\n\t so we need to handle the template printing here.  */\n      if (dpi->current_template != NULL)\n\tdpi->templates = dpt.next;\n\n      if (d_last_char (dpi) == '<')\n\td_append_char (dpi, ' ');\n      d_append_char (dpi, '<');\n      d_print_comp (dpi, options, d_right (d_left (dc)));\n      /* Avoid generating two consecutive '>' characters, to avoid\n\t the C++ syntactic ambiguity.  */\n      if (d_last_char (dpi) == '>')\n\td_append_char (dpi, ' ');\n      d_append_char (dpi, '>');\n    }\n}\n"
 }

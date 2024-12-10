@@ -1,0 +1,10 @@
+{
+    "project": "apr",
+    "tool": "Cppcheck",
+    "category": "memleak",
+    "file": "threadproc/beos/apr_proc_stub.c",
+    "message": "Memory leak: newargs",
+    "warning_function_name": "main",
+    "warning_line": "if (dup2(pfd->err, STDERR_FILENO) != STDERR_FILENO) return (-1);",
+    "warning_context": "int main(int argc, char *argv[]) {\n/* we expect the following...\n * \n * argv[0] = this stub\n * argv[1] = directory to run in...\n * argv[2] = progname to execute\n * rest of arguments to be passed to program\n */\n\tchar *progname = argv[2];\n\tchar *directory = argv[1];\n\tstruct pipefd *pfd;\n\tthread_id sender;\n\tvoid *buffer;\n\tchar ** newargs;\n\tint i = 0;\n\t\n\tnewargs = (char**)malloc(sizeof(char*) * (argc - 1));\n  \n\tbuffer = (void*)malloc(sizeof(struct pipefd));\n\t/* this will block until we get the data */\n\treceive_data(&sender, buffer, sizeof(struct pipefd));\n\tpfd = (struct pipefd*)buffer;\n\t\n\tif (pfd->in > STDERR_FILENO) {\n\t\tif (dup2(pfd->in, STDIN_FILENO) != STDIN_FILENO) return (-1);\n\t    close (pfd->in);\n\t}\n\tif (pfd->out > STDERR_FILENO) {\n\t\tif (dup2(pfd->out, STDOUT_FILENO) != STDOUT_FILENO) return (-1);\n\t    close (pfd->out);\n\t}\n\tif (pfd->err > STDERR_FILENO) {\n\t\tif (dup2(pfd->err, STDERR_FILENO) != STDERR_FILENO) return (-1);\n\t    close (pfd->err);\n\t}\n\n\tfor\t(i=3;i<=argc;i++){\n\t    newargs[i-3] = argv[i];\n\t}\n\t\n\t/* tell the caller we're OK to start */\n\tsend_data(sender,1,NULL,0);\n\n\tif (directory != NULL)\n\t\tchdir(directory);\n\texecve (progname, newargs, environ);\n\n\treturn (-1);\n}\n"
+}

@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from primary_slot.image_ok was never initialized.",
-    "Code_line": "\t\t     table->image_ok_primary_slot == primary_slot.image_ok)",
-    "Code_function": "int mcuboot_swap_type(void)\n{\n\tconst struct boot_swap_table *table;\n\tstruct boot_swap_state primary_slot;\n\tstruct boot_swap_state secondary_slot;\n\tint rc;\n\tsize_t i;\n\n\trc = boot_read_swap_state_by_id(FLASH_AREA_IMAGE_PRIMARY,\n\t\t\t\t\t&primary_slot);\n\tif (rc) {\n\t\treturn rc;\n\t}\n\n\trc = boot_read_swap_state_by_id(FLASH_AREA_IMAGE_SECONDARY,\n\t\t\t\t\t&secondary_slot);\n\tif (rc) {\n\t\treturn rc;\n\t}\n\n\tfor (i = 0; i < BOOT_SWAP_TABLES_COUNT; i++) {\n\t\ttable = boot_swap_tables + i;\n\n\t\tif (boot_magic_compatible_check(table->magic_primary_slot,\n\t\t\t\t\t\tprimary_slot.magic)\n\t\t    &&\n\t\t    boot_magic_compatible_check(table->magic_secondary_slot,\n\t\t\t\t\t\tsecondary_slot.magic)\n\t\t    &&\n\t\t    (table->image_ok_primary_slot == BOOT_FLAG_ANY   ||\n\t\t     table->image_ok_primary_slot == primary_slot.image_ok)\n\t\t    &&\n\t\t    (table->image_ok_secondary_slot == BOOT_FLAG_ANY ||\n\t\t     table->image_ok_secondary_slot == secondary_slot.image_ok)\n\t\t    &&\n\t\t    (table->copy_done_primary_slot == BOOT_FLAG_ANY  ||\n\t\t     table->copy_done_primary_slot == primary_slot.copy_done)) {\n\n\t\t\tassert(table->swap_type == BOOT_SWAP_TYPE_TEST ||\n\t\t\t       table->swap_type == BOOT_SWAP_TYPE_PERM ||\n\t\t\t       table->swap_type == BOOT_SWAP_TYPE_REVERT);\n\t\t\treturn table->swap_type;\n\t\t}\n\t}\n\n\treturn BOOT_SWAP_TYPE_NONE;\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "subsys/net/lib/lwm2m/lwm2m_engine.c",
+    "message": "Uninitialized variable: obs->path",
+    "warning_function_name": "lwm2m_notify_observer",
+    "warning_line": "if (obs->path.obj_id == obj_id &&",
+    "warning_context": "int lwm2m_notify_observer(u16_t obj_id, u16_t obj_inst_id, u16_t res_id)\n{\n\tstruct observe_node *obs;\n\tint ret = 0;\n\n\t/* look for observers which match our resource */\n\tSYS_SLIST_FOR_EACH_CONTAINER(&engine_observer_list, obs, node) {\n\t\tif (obs->path.obj_id == obj_id &&\n\t\t    obs->path.obj_inst_id == obj_inst_id &&\n\t\t    (obs->path.level < 3 ||\n\t\t     obs->path.res_id == res_id)) {\n\t\t\t/* update the event time for this observer */\n\t\t\tobs->event_timestamp = k_uptime_get();\n\n\t\t\tLOG_DBG(\"NOTIFY EVENT %u/%u/%u\",\n\t\t\t\tobj_id, obj_inst_id, res_id);\n\n\t\t\tret++;\n\t\t}\n\t}\n\n\treturn ret;\n}\n"
 }

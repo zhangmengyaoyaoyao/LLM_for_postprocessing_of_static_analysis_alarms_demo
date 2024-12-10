@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: 0 Size: [0, 2] by call to `update_ERRNO_int`.",
-    "Code_line": "\t\tupdate_ERRNO_int(errcode);",
-    "Code_function": "after_beginfile(IOBUF **curfile)\n{\n\tIOBUF *iop;\n\n\tiop = *curfile;\n\tassert(iop != NULL);\n\n\t/*\n\t * Input parsers could have been changed by BEGINFILE,\n\t * so delay check until now.\n\t */\n\n\tfind_input_parser(iop);\n\n\tif (! iop->valid) {\n\t\tconst char *fname;\n\t\tint errcode;\n\t\tbool valid;\n\n\t\tfname = iop->public.name;\n\t\terrcode = iop->errcode;\n\t\tvalid = iop->valid;\n\t\terrno = 0;\n\t\tupdate_ERRNO_int(errcode);\n\t\tiop_close(iop);\n\t\t*curfile = NULL;\n\t\tif (! valid && errcode == EISDIR && ! do_traditional) {\n\t\t\twarning(_(\"command line argument `%s' is a directory: skipped\"), fname);\n\t\t\treturn;\t\t/* read next file */\n\t\t}\n\t\tfatal(_(\"cannot open file `%s' for reading (%s)\"),\n\t\t\t\tfname, strerror(errcode));\n\t}\n}"
-}

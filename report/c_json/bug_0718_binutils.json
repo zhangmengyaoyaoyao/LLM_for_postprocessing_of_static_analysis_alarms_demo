@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_S2",
-    "Message": "Offset: [max(1, `info->type_stack->index`), `info->type_stack->index`] Size: [0, +oo].",
-    "Code_line": "      tindex = (*cache)[targindex];",
-    "Code_function": "stab_modify_type (struct stab_write_handle *info, int mod,\n\t\t  unsigned int size, long **cache, size_t *cache_alloc)\n{\n  long targindex;\n  long tindex;\n  char *s, *buf;\n\n  assert (info->type_stack != NULL);\n  targindex = info->type_stack->index;\n\n  if (targindex <= 0\n      || cache == NULL)\n    {\n      bfd_boolean definition;\n\n      /* Either the target type has no index, or we aren't caching\n         this modifier.  Either way we have no way of recording the\n         new type, so we don't bother to define one.  */\n      definition = info->type_stack->definition;\n      s = stab_pop_type (info);\n      buf = (char *) xmalloc (strlen (s) + 2);\n      sprintf (buf, \"%c%s\", mod, s);\n      free (s);\n      if (! stab_push_string (info, buf, 0, definition, size))\n\treturn FALSE;\n      free (buf);\n    }\n  else\n    {\n      if ((size_t) targindex >= *cache_alloc)\n\t{\n\t  size_t alloc;\n\n\t  alloc = *cache_alloc;\n\t  if (alloc == 0)\n\t    alloc = 10;\n\t  while ((size_t) targindex >= alloc)\n\t    alloc *= 2;\n\t  *cache = (long *) xrealloc (*cache, alloc * sizeof (long));\n\t  memset (*cache + *cache_alloc, 0,\n\t\t  (alloc - *cache_alloc) * sizeof (long));\n\t  *cache_alloc = alloc;\n\t}\n\n      tindex = (*cache)[targindex];\n      if (tindex != 0 && ! info->type_stack->definition)\n\t{\n\t  /* We have already defined a modification of this type, and\n             the entry on the type stack is not a definition, so we\n             can safely discard it (we may have a definition on the\n             stack, even if we already defined a modification, if it\n             is a struct which we did not define at the time it was\n             referenced).  */\n\t  free (stab_pop_type (info));\n\t  if (! stab_push_defined_type (info, tindex, size))\n\t    return FALSE;\n\t}\n      else\n\t{\n\t  tindex = info->type_index;\n\t  ++info->type_index;\n\n\t  s = stab_pop_type (info);\n\t  buf = (char *) xmalloc (strlen (s) + 20);\n\t  sprintf (buf, \"%ld=%c%s\", tindex, mod, s);\n\t  free (s);\n\n\t  (*cache)[targindex] = tindex;\n\n\t  if (! stab_push_string (info, buf, tindex, TRUE, size))\n\t    return FALSE;\n\n\t  free (buf);\n\t}\n    }\n\n  return TRUE;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "bfd/doc/chew.c",
+    "message": "pointer `new_d` last assigned on line 1284 could be null and is dereferenced at line 1285, column 3.",
+    "warning_function_name": "newentry",
+    "warning_line": "new_d->word = word;",
+    "warning_context": "dict_type *\nnewentry (word)\n     char *word;\n{\n  dict_type *new_d = (dict_type *) malloc (sizeof (dict_type));\n  new_d->word = word;\n  new_d->next = root;\n  root = new_d;\n  new_d->code = (stinst_type *) malloc (sizeof (stinst_type));\n  new_d->code_length = 1;\n  new_d->code_end = 0;\n  return new_d;\n}\n"
 }

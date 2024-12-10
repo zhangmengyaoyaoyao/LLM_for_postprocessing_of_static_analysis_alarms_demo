@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "cint_array.c",
+    "message": "pointer `new` last assigned on line 389 could be null and is dereferenced by call to `memset()` at line 390, column 2.",
+    "warning_function_name": "cint_copy",
+    "warning_line": "memset(new, '\\0', INT32_BIT * sizeof(NODE *));",
+    "warning_context": "static NODE **\ncint_copy(NODE *symbol, NODE *newsymb)\n{\n\tNODE **old, **new;\n\tsize_t i;\n\n\tassert(symbol->nodes != NULL);\n\n\t/* allocate new table */\n\temalloc(new, NODE **, INT32_BIT * sizeof(NODE *), \"cint_copy\");\n\tmemset(new, '\\0', INT32_BIT * sizeof(NODE *));\n\n\told = symbol->nodes;\n\tfor (i = NHAT; i < INT32_BIT; i++) {\n\t\tif (old[i] == NULL)\n\t\t\tcontinue;\n\t\tnew[i] = make_node(Node_array_tree); \n\t\ttree_copy(newsymb, old[i], new[i]);\n\t}\n\n\tif (symbol->xarray != NULL) {\n\t\tNODE *xn, *n;\n\t\txn = symbol->xarray;\n\t\tn = make_array();\n\t\tn->vname = newsymb->vname;\n\t\t(void) xn->acopy(xn, n);\n\t\tnewsymb->xarray = n;\n\t} else\n\t\tnewsymb->xarray = NULL;\n\n\tnewsymb->nodes = new;\n\tnewsymb->table_size = symbol->table_size;\n\tnewsymb->array_capacity = symbol->array_capacity;\n\tnewsymb->flags = symbol->flags;\n\n\treturn NULL;\n}\n"
+}

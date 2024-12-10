@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Null Dereference",
-    "Message": "pointer `att` last assigned on line 145 could be null and is dereferenced at line 152, column 7.",
-    "Code_line": "\t\tif (att->req && att->req->buf == buf) {",
-    "Code_function": "void att_pdu_sent(struct bt_conn *conn, void *user_data)\n{\n\tstruct bt_att *att = att_get(conn);\n\tstruct net_buf *buf;\n\n\tBT_DBG(\"conn %p att %p\", conn, att);\n\n\twhile ((buf = net_buf_get(&att->tx_queue, K_NO_WAIT))) {\n\t\t/* Check if the queued buf is a request */\n\t\tif (att->req && att->req->buf == buf) {\n\t\t\t/* Save request state so it can be resent */\n\t\t\tnet_buf_simple_save(&att->req->buf->b,\n\t\t\t\t\t    &att->req->state);\n\t\t}\n\n\t\tif (!att_send(conn, buf, NULL, NULL)) {\n\t\t\treturn;\n\t\t}\n\t}\n\n\tk_sem_give(&att->tx_sem);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "subsys/net/ip/route.c",
+    "message": "Uninitialized variable: nexthop_route->nbr",
+    "warning_function_name": "net_route_del_by_nexthop_data",
+    "warning_line": "if (nexthop_route->nbr != nbr_nexthop) {",
+    "warning_context": "int net_route_del_by_nexthop_data(struct net_if *iface,\n\t\t\t\t  struct in6_addr *nexthop,\n\t\t\t\t  void *data)\n{\n\tint count = 0, status = 0;\n\tstruct net_nbr *nbr_nexthop;\n\tstruct net_route_nexthop *nexthop_route;\n\tint i, ret;\n\n\tNET_ASSERT(iface);\n\tNET_ASSERT(nexthop);\n\n\tnbr_nexthop = net_ipv6_nbr_lookup(iface, nexthop);\n\tif (!nbr_nexthop) {\n\t\treturn -EINVAL;\n\t}\n\n\tfor (i = 0; i < CONFIG_NET_MAX_ROUTES; i++) {\n\t\tstruct net_nbr *nbr = get_nbr(i);\n\t\tstruct net_route_entry *route = net_route_data(nbr);\n\n\t\tSYS_SLIST_FOR_EACH_CONTAINER(&route->nexthop, nexthop_route,\n\t\t\t\t\t     node) {\n\t\t\tvoid *extra_data;\n\n\t\t\tif (nexthop_route->nbr != nbr_nexthop) {\n\t\t\t\tcontinue;\n\t\t\t}\n\n\t\t\tif (nbr->extra_data_size == 0U) {\n\t\t\t\tcontinue;\n\t\t\t}\n\n\t\t\t/* Routing engine specific extra data needs\n\t\t\t * to match too.\n\t\t\t */\n\t\t\textra_data = net_nbr_extra_data(nbr_nexthop);\n\t\t\tif (extra_data != data) {\n\t\t\t\tcontinue;\n\t\t\t}\n\n\t\t\tret = net_route_del(route);\n\t\t\tif (!ret) {\n\t\t\t\tcount++;\n\t\t\t} else {\n\t\t\t\tstatus = ret;\n\t\t\t}\n\n\t\t\tbreak;\n\t\t}\n\t}\n\n\tif (count) {\n\t\treturn count;\n\t}\n\n\treturn status;\n}\n"
 }

@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Infer",
+    "category": "UNINITIALIZED_VALUE",
+    "file": "lib/sh/netopen.c",
+    "message": "The value read from s was never initialized.",
+    "warning_function_name": "_netopen6",
+    "warning_line": "return s;",
+    "warning_context": "static int\n_netopen6 (host, serv, typ)\n     char *host, *serv;\n     int typ;\n{\n  int s, e;\n  struct addrinfo hints, *res, *res0;\n  int gerr;\n\n  memset ((char *)&hints, 0, sizeof (hints));\n  /* XXX -- if problems with IPv6, set to PF_INET for IPv4 only */\n#ifdef DEBUG\t/* PF_INET is the one that works for me */\n  hints.ai_family = PF_INET;\n#else\n  hints.ai_family = PF_UNSPEC;\n#endif\n  hints.ai_socktype = (typ == 't') ? SOCK_STREAM : SOCK_DGRAM;\n\n  gerr = getaddrinfo (host, serv, &hints, &res0);\n  if (gerr)\n    {\n      if (gerr == EAI_SERVICE)\n\tinternal_error (\"%s: %s\", serv, gai_strerror (gerr));\n      else\n\tinternal_error (\"%s: %s\", host, gai_strerror (gerr));\n      errno = EINVAL;\n      return -1;\n    }\n\n  for (res = res0; res; res = res->ai_next)\n    {\n      if ((s = socket (res->ai_family, res->ai_socktype, res->ai_protocol)) < 0)\n\t{\n\t  if (res->ai_next)\n\t    continue;\n\t  sys_error (\"socket\");\n\t  freeaddrinfo (res0);\n\t  return -1;\n\t}\n      if (connect (s, res->ai_addr, res->ai_addrlen) < 0)\n\t{\n\t  if (res->ai_next)\n\t    {\n\t      close (s);\n\t      continue;\n\t    }\n\t  e = errno;\n\t  sys_error (\"connect\");\n\t  close (s);\n\t  freeaddrinfo (res0);\n\t  errno = e;\n\t  return -1;\n\t}\n      freeaddrinfo (res0);\n      break;\n    }\n  return s;\n}\n"
+}

@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "sys/quad_math/lshrdi3.c",
+    "message": "Either the condition 'shift==0' is redundant or there is possible null pointer dereference: ul.",
+    "warning_function_name": "__lshrdi3",
+    "warning_line": "aa.ul[L] = (aa.ul[L] >> shift) | (aa.ul[H] << (INT_BITS - shift));",
+    "warning_context": "quad_t __lshrdi3(quad_t a, qshift_t shift)\n{\n    union uu aa;\n\n    if (shift == 0) {\n        return a;\n    }\n\n    aa.q = a;\n\n    if (shift >= INT_BITS) {\n        aa.ul[L] = aa.ul[H] >> (shift - INT_BITS);\n        aa.ul[H] = 0;\n    }\n    else {\n        aa.ul[L] = (aa.ul[L] >> shift) | (aa.ul[H] << (INT_BITS - shift));\n        aa.ul[H] >>= shift;\n    }\n\n    return aa.q;\n}\n"
+}

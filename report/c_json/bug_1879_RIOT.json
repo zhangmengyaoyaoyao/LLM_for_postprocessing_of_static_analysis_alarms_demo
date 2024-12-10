@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "drivers/ccs811/ccs811.c",
+    "message": "Null pointer dereference: dev",
+    "warning_function_name": "reg_read(",
+    "warning_line": "DEBUG_DEV(\"read %\"PRIu32\" bytes from sensor registers starting at addr %02x\",",
+    "warning_context": "static int _reg_read(const ccs811_t *dev, uint8_t reg, uint8_t *data, uint32_t len)\n{\n    DEBUG_DEV(\"read %\"PRIu32\" bytes from sensor registers starting at addr %02x\",\n              dev, len, reg);\n\n    int res = CCS811_OK;\n\n    if (i2c_acquire(dev->params.i2c_dev) != CCS811_OK) {\n        DEBUG_DEV(\"could not acquire I2C bus\", dev);\n        return -CCS811_ERROR_I2C;\n    }\n\n#if MODULE_CCS811_FULL\n    if (dev->params.wake_pin != GPIO_UNDEF) {\n        /* wake the sensor with low active WAKE signal */\n        gpio_clear(dev->params.wake_pin);\n        /* t_WAKE is 50 us */\n        xtimer_usleep(50);\n    }\n#endif\n\n    res = i2c_read_regs(dev->params.i2c_dev, dev->params.i2c_addr, reg, data, len, 0);\n    i2c_release(dev->params.i2c_dev);\n\n#if MODULE_CCS811_FULL\n    if (dev->params.wake_pin != GPIO_UNDEF) {\n        /* let the sensor enter to sleep mode */\n        gpio_set(dev->params.wake_pin);\n        /* minimum t_DWAKE is 20 us */\n        xtimer_usleep(20);\n    }\n#endif\n\n    if (res == CCS811_OK) {\n        if (ENABLE_DEBUG) {\n            printf(\"[ccs811] %s dev=%d addr=%02x: read following bytes: \",\n                   __func__, dev->params.i2c_dev, dev->params.i2c_addr);\n            for (unsigned i = 0; i < len; i++) {\n                    printf(\"%02x \", data[i]);\n            }\n            printf(\"\\n\");\n        }\n    }\n    else {\n        DEBUG_DEV(\"could not read %\"PRIu32\" bytes from sensor registers \"\n                  \"starting at addr %02x, reason %i\", dev, len, reg, res);\n        return -CCS811_ERROR_I2C;\n    }\n\n    return CCS811_OK;\n}\n"
+}

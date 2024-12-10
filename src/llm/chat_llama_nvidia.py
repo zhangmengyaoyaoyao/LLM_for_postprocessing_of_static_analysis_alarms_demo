@@ -15,9 +15,10 @@ import construct_prompts as constructor
 # your api key
 key = ""
 url = "https://integrate.api.nvidia.com/v1"
-model_fullname="meta/llama-3.1-70b-instruct"
-model = "llama3.1-70b-instruct"
-
+# model_fullname="meta/llama-3.1-70b-instruct"
+# model = "llama3.1-70b-instruct"
+model_fullname="meta/llama-3.1-405b-instruct"
+model = "llama3.1-405b-instruct"
 
 def process_spotbugs_project_files(key, url, model, tool, prompts_technique, project_name, model_fullname=model):
     # 构建项目路径
@@ -119,8 +120,8 @@ if __name__ == '__main__':
     #projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
     projects = ["dbcp"]
     # 提示词技术列表
-    # prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
-    prompts_techniques = ["self_heuristic"]
+    prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
+    # prompts_techniques = ["self_heuristic"]
 
     tool = "spotbugs"
 

@@ -1,0 +1,10 @@
+{
+    "project": "sed",
+    "tool": "Infer",
+    "category": "UNINITIALIZED_VALUE",
+    "file": "sed/compile.c",
+    "message": "The value read from delim was never initialized.",
+    "warning_function_name": "snarf_char_class",
+    "warning_line": "else if (state == 2 && ch == delim)",
+    "warning_context": "static int\nsnarf_char_class(b, cur_stat)\n  struct buffer *b;\n  mbstate_t *cur_stat;\n{\n  int ch;\n  int state = 0;\n  int delim;\n  bool pending_mb = 0;\n  \n  ch = inchar();\n  if (ch == '^')\n    ch = add_then_next(b, ch);\n  if (ch == CLOSE_BRACKET)\n    ch = add_then_next(b, ch);\n  \n  /* States are:\n\t0 outside a collation element, character class or collation class\n\t1 after the bracket\n\t2 after the opening ./:/=\n\t3 after the closing ./:/= */\n\n  for (;; ch = add_then_next (b, ch))\n    {\n      pending_mb = BRLEN (ch, cur_stat) != 1;\n\n      switch (ch)\n\t{\n\tcase EOF:\n\tcase '\\n':\n\t  return ch;\n\n\tcase '.':\n\tcase ':':\n\tcase '=':\n\t  if (pending_mb)\n\t    continue;\n\n\t  if (state == 1)\n\t    {\n\t      delim = ch;\n\t      state++;\n\t    }\n\t  else if (state == 2 && ch == delim)\n\t    state++;\n\t  else\n\t    break;\n\n\t  continue;\n\n\tcase OPEN_BRACKET:\n\t  if (pending_mb)\n\t    continue;\n\n\t  state++;\n\t  continue;\n\n\tcase CLOSE_BRACKET:\n\t  if (pending_mb)\n\t    continue;\n\n\t  if (state == 0 || state == 1)\n\t    return ch;\n\t  else if (state == 3)\n\t    state = 0;\n\n\t  break;\n\n\tdefault:\n\t  break;\n\t}\n\n      /* Getting a character different from .=: whilst in state 1\n         goes back to state 0, getting a character different from ]\n         whilst in state 3 goes back to state 2.  */\n      state &= ~1;\n    }\n}\n"
+}

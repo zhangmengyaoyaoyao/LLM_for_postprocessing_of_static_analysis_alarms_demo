@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset added: [-20, 123] (⇐ [-60, 83] + 40) Size: 4064 by call to `bfd_zalloc`.",
-    "Code_line": "  vec = (struct opncls *) bfd_zalloc (nbfd, sizeof (struct opncls));",
-    "Code_function": "bfd_openr_iovec (const char *filename, const char *target,\n\t\t void *(*open_p) (struct bfd *, void *),\n\t\t void *open_closure,\n\t\t file_ptr (*pread_p) (struct bfd *, void *, void *,\n\t\t\t\t      file_ptr, file_ptr),\n\t\t int (*close_p) (struct bfd *, void *),\n\t\t int (*stat_p) (struct bfd *, void *, struct stat *))\n{\n  bfd *nbfd;\n  const bfd_target *target_vec;\n  struct opncls *vec;\n  void *stream;\n\n  nbfd = _bfd_new_bfd ();\n  if (nbfd == NULL)\n    return NULL;\n\n  target_vec = bfd_find_target (target, nbfd);\n  if (target_vec == NULL)\n    {\n      _bfd_delete_bfd (nbfd);\n      return NULL;\n    }\n\n  /* PR 11983: Do not cache the original filename, but\n     rather make a copy - the original might go away.  */\n  nbfd->filename = xstrdup (filename);\n  nbfd->direction = read_direction;\n\n  /* `open_p (...)' would get expanded by an the open(2) syscall macro.  */\n  stream = (*open_p) (nbfd, open_closure);\n  if (stream == NULL)\n    {\n      _bfd_delete_bfd (nbfd);\n      return NULL;\n    }\n\n  vec = (struct opncls *) bfd_zalloc (nbfd, sizeof (struct opncls));\n  vec->stream = stream;\n  vec->pread = pread_p;\n  vec->close = close_p;\n  vec->stat = stat_p;\n\n  nbfd->iovec = &opncls_iovec;\n  nbfd->iostream = vec;\n\n  return nbfd;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "bfd/doc/chew.c",
+    "message": "pointer `&out->write_idx` last assigned on line 1005 could be null and is dereferenced by call to `cattext()` at line 1029, column 4.",
+    "warning_function_name": "indent",
+    "warning_line": "cattext (&out, \")\");",
+    "warning_context": "static void\nindent ()\n{\n  string_type out;\n  int tab = 0;\n  int idx = 0;\n  int ol = 0;\n  init_string (&out);\n  while (at (tos, idx))\n    {\n      switch (at (tos, idx))\n\t{\n\tcase '\\n':\n\t  cattext (&out, \"\\n\");\n\t  idx++;\n\t  if (tab && at (tos, idx))\n\t    {\n\t      cattext (&out, \"    \");\n\t    }\n\t  ol = 0;\n\t  break;\n\tcase '(':\n\t  tab++;\n\t  if (ol == 0)\n\t    cattext (&out, \"   \");\n\t  idx++;\n\t  cattext (&out, \"(\");\n\t  ol = 1;\n\t  break;\n\tcase ')':\n\t  tab--;\n\t  cattext (&out, \")\");\n\t  idx++;\n\t  ol = 1;\n\n\t  break;\n\tdefault:\n\t  catchar (&out, at (tos, idx));\n\t  ol = 1;\n\n\t  idx++;\n\t  break;\n\t}\n    }\n\n  pc++;\n  delete_string (tos);\n  *tos = out;\n\n}\n"
 }

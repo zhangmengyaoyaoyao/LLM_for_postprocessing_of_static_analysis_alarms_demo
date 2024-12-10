@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset added: 272 Size: [0, 272].",
-    "Code_line": "\tmemset(iop, '\\0', sizeof(IOBUF));",
-    "Code_function": "iop_alloc(int fd, const char *name, int errno_val)\n{\n\tIOBUF *iop;\n\n\temalloc(iop, IOBUF *, sizeof(IOBUF), \"iop_alloc\");\n\n\tmemset(iop, '\\0', sizeof(IOBUF));\n\tiop->public.fd = fd;\n\tiop->public.name = name;\n\tiop->public.read_func = ( ssize_t(*)() ) read;\n\tiop->valid = false;\n\tiop->errcode = errno_val;\n\n\tif (fd != INVALID_HANDLE)\n\t\tfstat(fd, & iop->public.sbuf);\n#if defined(__EMX__) || defined(__MINGW32__)\n\telse if (errno_val == EISDIR) {\n\t\tiop->public.sbuf.st_mode = (_S_IFDIR | _S_IRWXU);\n\t\tiop->public.fd = FAKE_FD_VALUE;\n\t}\n#endif\n\n\treturn iop;\n}"
-}

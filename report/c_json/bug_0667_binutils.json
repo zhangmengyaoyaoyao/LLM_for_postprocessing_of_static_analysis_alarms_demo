@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "NULL_DEREFERENCE",
-    "Message": "pointer `null` is dereferenced by call to `check_file()` at line 474, column 7.",
-    "Code_line": "  if (check_file (file_name, NULL))",
-    "Code_function": "process_file (const char *file_name)\n{\n  FILE * file;\n  char armag[SARMAG];\n  int ret;\n\n  if (check_file (file_name, NULL))\n    return 1;\n\n  file = fopen (file_name, \"r+b\");\n  if (file == NULL)\n    {\n      error (_(\"Input file '%s' is not readable\\n\"), file_name);\n      return 1;\n    }\n\n  if (fread (armag, SARMAG, 1, file) != 1)\n    {\n      error (_(\"%s: Failed to read file's magic number\\n\"),\n\t\t file_name);\n      fclose (file);\n      return 1;\n    }\n\n  if (memcmp (armag, ARMAG, SARMAG) == 0)\n    ret = process_archive (file_name, file, FALSE);\n  else if (memcmp (armag, ARMAGT, SARMAG) == 0)\n    ret = process_archive (file_name, file, TRUE);\n  else\n    {\n      rewind (file);\n      archive_file_size = archive_file_offset = 0;\n      ret = process_object (file_name, file);\n    }\n\n  fclose (file);\n\n  return ret;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "binutils/prdbg.c",
+    "message": "Offset: [15, +oo] (⇐ [0, +oo] + 15) Size: [1, +oo] by call to `append_type`.",
+    "warning_function_name": "pr_set_type",
+    "warning_line": "if (! append_type (info, \"/* bitstring */\"))",
+    "warning_context": "static bfd_boolean\npr_set_type (void *p, bfd_boolean bitstringp)\n{\n  struct pr_handle *info = (struct pr_handle *) p;\n\n  if (! substitute_type (info, \"\"))\n    return FALSE;\n\n  if (! prepend_type (info, \"set { \")\n      || ! append_type (info, \" }\"))\n    return FALSE;\n\n  if (bitstringp)\n    {\n      if (! append_type (info, \"/* bitstring */\"))\n\treturn FALSE;\n    }\n\n  return TRUE;\n}\n"
 }

@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Infer",
+    "category": "UNINITIALIZED_VALUE",
+    "file": "subst.c",
+    "message": "The value read from state_bak.__count was never initialized.",
+    "warning_function_name": "quote_escapes",
+    "warning_line": "COPY_CHAR_P (t, s, send);",
+    "warning_context": "char *\nquote_escapes (string)\n     char *string;\n{\n  register char *s, *t;\n  size_t slen;\n  char *result, *send;\n  int quote_spaces, skip_ctlesc, skip_ctlnul;\n  DECLARE_MBSTATE; \n\n  slen = strlen (string);\n  send = string + slen;\n\n  quote_spaces = (ifs_value && *ifs_value == 0);\n\n  for (skip_ctlesc = skip_ctlnul = 0, s = ifs_value; s && *s; s++)\n    skip_ctlesc |= *s == CTLESC, skip_ctlnul |= *s == CTLNUL;\n\n  t = result = (char *)xmalloc ((slen * 2) + 1);\n  s = string;\n\n  while (*s)\n    {\n      if ((skip_ctlesc == 0 && *s == CTLESC) || (skip_ctlnul == 0 && *s == CTLNUL) || (quote_spaces && *s == ' '))\n\t*t++ = CTLESC;\n      COPY_CHAR_P (t, s, send);\n    }\n  *t = '\\0';\n\n  return (result);\n}\n"
+}

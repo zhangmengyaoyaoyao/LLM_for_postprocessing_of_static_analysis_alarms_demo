@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "CSA",
+    "category": "unix.Malloc",
+    "file": "debug.c",
+    "message": "Use of memory after it is freed",
+    "warning_function_name": "frame_popped",
+    "warning_line": "if (IS_PARAM(item) && (item->fcall_count > fcall_count)) {",
+    "warning_context": "void\nframe_popped()\n{\n\tstruct list_item *item;\n\n\t/* delete all out of scope watchpoints */\n\tfor (item = watch_list.next; item != &watch_list; item = item->next) {\n\t\tif (IS_PARAM(item) && (item->fcall_count > fcall_count)) {\n\t\t\tfprintf(out_fp,\n\t\t\t\t_(\"Watchpoint %d deleted because parameter is out of scope.\\n\"),\n\t\t\t\titem->number);\n\t\t\titem = item->prev;\n\t\t\tdelete_item(item->next);\n\t\t}\n\t}\n\n\t/* delete all out of scope display items */\n\tfor (item = display_list.next; item != &display_list; item = item->next) {\n\t\tif (IS_PARAM(item) && (item->fcall_count > fcall_count)) {\n\t\t\tfprintf(out_fp,\n\t\t\t\t_(\"Display %d deleted because parameter is out of scope.\\n\"),\n\t\t\t\titem->number);\n\t\t\titem = item->prev;\n\t\t\tdelete_item(item->next);\n\t\t}\n\t}\n}\n"
+}

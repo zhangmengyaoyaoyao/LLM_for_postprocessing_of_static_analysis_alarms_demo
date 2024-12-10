@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "sys/quad_math/ashldi3.c",
+    "message": "Either the condition 'shift==0' is redundant or there is possible null pointer dereference: ul.",
+    "warning_function_name": "__ashldi3",
+    "warning_line": "aa.ul[H] = aa.ul[L] << (shift - INT_BITS);",
+    "warning_context": "quad_t __ashldi3(quad_t a, qshift_t shift)\n{\n    union uu aa;\n\n    if (shift == 0) {\n        return a;\n    }\n\n    aa.q = a;\n\n    if (shift >= INT_BITS) {\n        aa.ul[H] = aa.ul[L] << (shift - INT_BITS);\n        aa.ul[L] = 0;\n    }\n    else {\n        aa.ul[H] = (aa.ul[H] << shift) | (aa.ul[L] >> (INT_BITS - shift));\n        aa.ul[L] <<= shift;\n    }\n\n    return aa.q;\n}\n"
+}

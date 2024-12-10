@@ -1,0 +1,10 @@
+{
+    "project": "apr",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "tables/apr_tables.c",
+    "message": "Offset added: 128 Size: [0, +oo].",
+    "warning_function_name": "apr_table_cat",
+    "warning_line": "memcpy(t->index_first,s->index_first,sizeof(int) * TABLE_HASH_SIZE);",
+    "warning_context": "static void apr_table_cat(apr_table_t *t, const apr_table_t *s)\n{\n    const int n = t->a.nelts;\n    register int idx;\n\n    apr_array_cat(&t->a,&s->a);\n\n    if (n == 0) {\n        memcpy(t->index_first,s->index_first,sizeof(int) * TABLE_HASH_SIZE);\n        memcpy(t->index_last, s->index_last, sizeof(int) * TABLE_HASH_SIZE);\n        t->index_initialized = s->index_initialized;\n        return;\n    }\n\n    for (idx = 0; idx < TABLE_HASH_SIZE; ++idx) {\n        if (TABLE_INDEX_IS_INITIALIZED(s, idx)) {\n            t->index_last[idx] = s->index_last[idx] + n;\n            if (!TABLE_INDEX_IS_INITIALIZED(t, idx)) {\n                t->index_first[idx] = s->index_first[idx] + n;\n            }\n        }\n    }\n\n    t->index_initialized |= s->index_initialized;\n}\n"
+}

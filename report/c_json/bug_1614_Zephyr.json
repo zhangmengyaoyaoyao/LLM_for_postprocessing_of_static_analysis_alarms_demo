@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Cppcheck",
-    "Bug Type": "ctuArrayIndex",
-    "Message": "Array index out of bounds; 'argv' buffer size is 0 and it is accessed at offset 1.",
-    "Code_line": "\tsub.src = strtoul(argv[1], NULL, 0);",
-    "Code_function": "\tsub.src = strtoul(argv[1], NULL, 0);"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "drivers/sensor/sht3xd/sht3xd.c",
+    "message": "Uninitialized variable: rx_buf",
+    "warning_function_name": "sht3xd_sample_fetch",
+    "warning_line": "t_sample = (rx_buf[0] << 8) | rx_buf[1];",
+    "warning_context": "static int sht3xd_sample_fetch(struct device *dev, enum sensor_channel chan)\n{\n\tstruct sht3xd_data *data = dev->driver_data;\n\tstruct device *i2c = sht3xd_i2c_device(dev);\n\tu8_t address = sht3xd_i2c_address(dev);\n\tu8_t rx_buf[6];\n\tu16_t t_sample, rh_sample;\n\n\t__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL);\n\n#ifdef CONFIG_SHT3XD_SINGLE_SHOT_MODE\n\t/* start single shot measurement */\n\tif (sht3xd_write_command(dev,\n\t\t\t\t measure_cmd[SHT3XD_REPEATABILITY_IDX])\n\t    < 0) {\n\t\tLOG_DBG(\"Failed to set single shot measurement mode!\");\n\t\treturn -EIO;\n\t}\n\tk_sleep(K_MSEC(measure_wait[SHT3XD_REPEATABILITY_IDX] / USEC_PER_MSEC));\n\n\tif (i2c_read(i2c, rx_buf, sizeof(rx_buf), address) < 0) {\n\t\tLOG_DBG(\"Failed to read data sample!\");\n\t\treturn -EIO;\n\t}\n#endif\n#ifdef CONFIG_SHT3XD_PERIODIC_MODE\n\tu8_t tx_buf[2] = {\n\t\tSHT3XD_CMD_FETCH >> 8,\n\t\tSHT3XD_CMD_FETCH & 0xFF\n\t};\n\n\tif (i2c_write_read(i2c, address, tx_buf, sizeof(tx_buf),\n\t\t\t   rx_buf, sizeof(rx_buf)) < 0) {\n\t\tLOG_DBG(\"Failed to read data sample!\");\n\t\treturn -EIO;\n\t}\n#endif\n\n\tt_sample = (rx_buf[0] << 8) | rx_buf[1];\n\tif (sht3xd_compute_crc(t_sample) != rx_buf[2]) {\n\t\tLOG_DBG(\"Received invalid temperature CRC!\");\n\t\treturn -EIO;\n\t}\n\n\trh_sample = (rx_buf[3] << 8) | rx_buf[4];\n\tif (sht3xd_compute_crc(rh_sample) != rx_buf[5]) {\n\t\tLOG_DBG(\"Received invalid relative humidity CRC!\");\n\t\treturn -EIO;\n\t}\n\n\tdata->t_sample = t_sample;\n\tdata->rh_sample = rh_sample;\n\n\treturn 0;\n}\n"
 }

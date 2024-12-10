@@ -1,8 +1,0 @@
-{
-    "Project": "grep",
-    "Tool": "Infer",
-    "Bug Type": "UNINITIALIZED_VALUE",
-    "Message": "The value read from r was never initialized.",
-    "Code_line": "      return r;",
-    "Code_function": "fnmatch_no_wildcards (char const *pattern, char const *f, int options)\n{\n  if (! (options & FNM_LEADING_DIR))\n    return ((options & FNM_CASEFOLD)\n            ? mbscasecmp (pattern, f)\n            : strcmp (pattern, f));\n  else if (! (options & FNM_CASEFOLD))\n    {\n      size_t patlen = strlen (pattern);\n      int r = strncmp (pattern, f, patlen);\n      if (! r)\n        {\n          r = f[patlen];\n          if (r == '/')\n            r = 0;\n        }\n      return r;\n    }\n  else\n    {\n      /* Walk through a copy of F, seeing whether P matches any prefix\n         of F.\n\n         FIXME: This is an O(N**2) algorithm; it should be O(N).\n         Also, the copy should not be necessary.  However, fixing this\n         will probably involve a change to the mbs* API.  */\n\n      char *fcopy = xstrdup (f);\n      char *p;\n      int r;\n      for (p = fcopy; ; *p++ = '/')\n        {\n          p = strchr (p, '/');\n          if (p)\n            *p = '\\0';\n          r = mbscasecmp (pattern, fcopy);\n          if (!p || r <= 0)\n            break;\n        }\n      free (fcopy);\n      return r;\n    }\n}"
-}

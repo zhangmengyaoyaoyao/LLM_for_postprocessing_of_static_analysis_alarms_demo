@@ -1,8 +1,0 @@
-{
-    "Project": "bash",
-    "Tool": "Infer",
-    "Bug Type": "UNINITIALIZED_VALUE",
-    "Message": "The value read from state_bak.__count was never initialized.",
-    "Code_line": "\t  ADVANCE_CHAR (string, slen, i);",
-    "Code_function": "skip_double_quoted (string, slen, sind)\n     char *string;\n     size_t slen;\n     int sind;\n{\n  int c, i;\n  char *ret;\n  int pass_next, backquote, si;\n  DECLARE_MBSTATE;\n\n  pass_next = backquote = 0;\n  i = sind;\n  while (c = string[i])\n    {\n      if (pass_next)\n\t{\n\t  pass_next = 0;\n\t  ADVANCE_CHAR (string, slen, i);\n\t  continue;\n\t}\n      else if (c == '\\\\')\n\t{\n\t  pass_next++;\n\t  i++;\n\t  continue;\n\t}\n      else if (backquote)\n\t{\n\t  if (c == '`')\n\t    backquote = 0;\n\t  ADVANCE_CHAR (string, slen, i);\n\t  continue;\n\t}\n      else if (c == '`')\n\t{\n\t  backquote++;\n\t  i++;\n\t  continue;\n\t}\n      else if (c == '$' && ((string[i + 1] == LPAREN) || (string[i + 1] == LBRACE)))\n\t{\n\t  si = i + 2;\n\t  if (string[i + 1] == LPAREN)\n\t    ret = extract_command_subst (string, &si, SX_NOALLOC);\n\t  else\n\t    ret = extract_dollar_brace_string (string, &si, Q_DOUBLE_QUOTES, SX_NOALLOC);\n\n\t  i = si + 1;\n\t  continue;\n\t}\n      else if (c != '\"')\n\t{\n\t  ADVANCE_CHAR (string, slen, i);\n\t  continue;\n\t}\n      else\n\tbreak;\n    }\n\n  if (c)\n    i++;\n\n  return (i);\n}"
-}

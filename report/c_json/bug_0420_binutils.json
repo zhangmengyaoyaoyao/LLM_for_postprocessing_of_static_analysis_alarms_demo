@@ -1,0 +1,10 @@
+{
+    "project": "binutils",
+    "tool": "Cppcheck",
+    "category": "arrayIndexOutOfBoundsCond",
+    "file": "bfd/coff64-rs6000.c",
+    "message": "Either the condition '19>=aux->x_csect.x_smclas' is redundant or the array 'names[19]' is accessed at index 19, which is out of bounds.",
+    "warning_function_name": "xcoff64_create_csect_from_smclas",
+    "warning_line": "&& (NULL != names[aux->x_csect.x_smclas]))",
+    "warning_context": "static asection *\nxcoff64_create_csect_from_smclas (bfd *abfd, union internal_auxent *aux,\n                                  const char *symbol_name)\n{\n  asection *return_value = NULL;\n\n  /* Changes from 32 :\n     .sv == 8, is only for 32 bit programs\n     .ti == 12 and .tb == 13 are now reserved.  */\n  static const char *names[19] =\n  {\n    \".pr\", \".ro\", \".db\", \".tc\", \".ua\", \".rw\", \".gl\", \".xo\",\n    NULL, \".bs\", \".ds\", \".uc\", NULL,  NULL,  NULL,  \".tc0\",\n    \".td\", \".sv64\", \".sv3264\"\n  };\n\n  if ((19 >= aux->x_csect.x_smclas)\n      && (NULL != names[aux->x_csect.x_smclas]))\n    {\n\n      return_value = bfd_make_section_anyway\n\t(abfd, names[aux->x_csect.x_smclas]);\n\n    }\n  else\n    {\n      (*_bfd_error_handler)\n\t(_(\"%B: symbol `%s' has unrecognized smclas %d\"),\n\t abfd, symbol_name, aux->x_csect.x_smclas);\n      bfd_set_error (bfd_error_bad_value);\n    }\n\n  return return_value;\n}\n"
+}

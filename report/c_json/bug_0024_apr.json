@@ -1,0 +1,10 @@
+{
+    "project": "apr",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "tables/apr_tables.c",
+    "message": "Offset: [-47, +oo] (⇐ [0, 47] + [-47, +oo]) Size: [8192, +oo] by call to `apr_table_compress`.",
+    "warning_function_name": "apr_table_overlap",
+    "warning_line": "apr_table_compress(a, flags);",
+    "warning_context": "APR_DECLARE(void) apr_table_overlap(apr_table_t *a, const apr_table_t *b,\n\t\t\t\t    unsigned flags)\n{\n    if (a->a.nelts + b->a.nelts == 0) {\n        return;\n    }\n\n#if APR_POOL_DEBUG\n    /* Since the keys and values are not copied, it's required that\n     * b->a.pool has a lifetime at least as long as a->a.pool. */\n    if (!apr_pool_is_ancestor(b->a.pool, a->a.pool)) {\n        fprintf(stderr, \"apr_table_overlap: b's pool is not an ancestor of a's\\n\");\n        abort();\n    }\n#endif\n\n    apr_table_cat(a, b);\n\n    apr_table_compress(a, flags);\n}\n"
+}

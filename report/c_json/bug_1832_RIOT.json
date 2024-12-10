@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "drivers/cc1xxx_common/gnrc_netif_cc1xxx.c",
+    "message": "Either the condition 'netif' is redundant or there is possible null pointer dereference: netif.",
+    "warning_function_name": "1xxx_adpt_send(g",
+    "warning_line": "cc1xxx_t *cc1xxx_dev = (cc1xxx_t *)netif->dev;",
+    "warning_context": "static int cc1xxx_adpt_send(gnrc_netif_t *netif, gnrc_pktsnip_t *pkt)\n{\n    int res;\n    size_t size;\n    cc1xxx_t *cc1xxx_dev = (cc1xxx_t *)netif->dev;\n    gnrc_netif_hdr_t *netif_hdr;\n    cc1xxx_l2hdr_t l2hdr;\n\n    /* check device descriptor and packet */\n    assert(netif && pkt);\n\n    /* get the payload size and the dst address details */\n    size = gnrc_pkt_len(pkt->next);\n    DEBUG(\"[cc1xxx-gnrc] send: payload of packet is %i\\n\", (int)size);\n    netif_hdr = (gnrc_netif_hdr_t *)pkt->data;\n\n\n    l2hdr.src_addr = cc1xxx_dev->addr;\n    if (netif_hdr->flags & BCAST) {\n        l2hdr.dest_addr = CC1XXX_BCAST_ADDR;\n        DEBUG(\"[cc1xxx-gnrc] send: preparing to send broadcast\\n\");\n#ifdef MODULE_NETSTATS_L2\n        netif->stats.tx_mcast_count++;\n#endif\n    }\n    else {\n        /* check that destination address is valid */\n        assert(netif_hdr->dst_l2addr_len > 0);\n        uint8_t *addr = gnrc_netif_hdr_get_dst_addr(netif_hdr);\n        l2hdr.dest_addr = addr[0];\n        DEBUG(\"[cc1xxx-gnrc] send: preparing to send unicast %02x --> %02x\\n\",\n              (int)l2hdr.src_addr, (int)l2hdr.dest_addr);\n#ifdef MODULE_NETSTATS_L2\n        netif->stats.tx_unicast_count++;\n#endif\n    }\n\n    /* now let's send out the stuff */\n    iolist_t iolist = {\n        .iol_next = (iolist_t *)pkt->next,\n        .iol_base = &l2hdr,\n        .iol_len = sizeof(l2hdr),\n    };\n\n    DEBUG(\"[cc1xxx-gnrc] send: triggering the drivers send function\\n\");\n    res = netif->dev->driver->send(netif->dev, &iolist);\n\n    gnrc_pktbuf_release(pkt);\n\n    return res;\n}\n"
+}

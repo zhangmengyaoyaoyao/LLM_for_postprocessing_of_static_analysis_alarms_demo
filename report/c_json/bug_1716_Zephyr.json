@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from j was never initialized.",
-    "Code_line": "\t\tif (isspace((int)str[i])) {",
-    "Code_function": "void shell_spaces_trim(char *str)\n{\n\tu16_t len = shell_strlen(str);\n\tu16_t shift = 0U;\n\n\tif (!str) {\n\t\treturn;\n\t}\n\n\tfor (u16_t i = 0; i < len - 1; i++) {\n\t\tif (isspace((int)str[i])) {\n\t\t\tfor (u16_t j = i + 1; j < len; j++) {\n\t\t\t\tif (isspace((int)str[j])) {\n\t\t\t\t\tshift++;\n\t\t\t\t\tcontinue;\n\t\t\t\t}\n\n\t\t\t\tif (shift > 0) {\n\t\t\t\t\t/* +1 for EOS */\n\t\t\t\t\tmemmove(&str[i + 1],\n\t\t\t\t\t\t&str[j],\n\t\t\t\t\t\tlen - j + 1);\n\t\t\t\t\tlen -= shift;\n\t\t\t\t\tshift = 0U;\n\t\t\t\t}\n\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\t}\n}"
+    "project": "Zephyr",
+    "tool": "Infer",
+    "category": "Null Dereference",
+    "file": "subsys/bluetooth/host/att.c",
+    "message": "pointer `att` last assigned on line 145 could be null and is dereferenced at line 152, column 7.",
+    "warning_function_name": "att_pdu_sent",
+    "warning_line": "if (att->req && att->req->buf == buf) {",
+    "warning_context": "void att_pdu_sent(struct bt_conn *conn, void *user_data)\n{\n\tstruct bt_att *att = att_get(conn);\n\tstruct net_buf *buf;\n\n\tBT_DBG(\"conn %p att %p\", conn, att);\n\n\twhile ((buf = net_buf_get(&att->tx_queue, K_NO_WAIT))) {\n\t\t/* Check if the queued buf is a request */\n\t\tif (att->req && att->req->buf == buf) {\n\t\t\t/* Save request state so it can be resent */\n\t\t\tnet_buf_simple_save(&att->req->buf->b,\n\t\t\t\t\t    &att->req->state);\n\t\t}\n\n\t\tif (!att_send(conn, buf, NULL, NULL)) {\n\t\t\treturn;\n\t\t}\n\t}\n\n\tk_sem_give(&att->tx_sem);\n}\n"
 }

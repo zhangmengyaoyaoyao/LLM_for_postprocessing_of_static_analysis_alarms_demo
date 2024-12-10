@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: 0 Size: [0, 2] by call to `make_str_node`.",
-    "Code_line": "\treturn make_string(the_result, strlen(the_result));",
-    "Code_function": "do_dcngettext(int nargs)\n{\n\tNODE *tmp, *t1, *t2, *t3;\n\tchar *string1, *string2;\n\tunsigned long number;\n\tAWKNUM d;\n\tchar *the_result;\n\n#if ENABLE_NLS && defined(LC_MESSAGES) && HAVE_DCGETTEXT\n\tint lc_cat;\n\tchar *domain;\n\n\tif (nargs == 5) {\t/* fifth argument */\n\t\ttmp = POP_STRING();\n\t\tlc_cat = localecategory_from_argument(tmp);\n\t\tDEREF(tmp);\n\t} else\n\t\tlc_cat = LC_MESSAGES;\n\n\tt3 = NULL;\n\tif (nargs >= 4) {\t/* fourth argument */\n\t\tt3 = POP_STRING();\n\t\tdomain = t3->stptr;\n\t} else\n\t\tdomain = TEXTDOMAIN;\n#else\n\tif (nargs == 5) {\n\t\ttmp = POP_STRING();\n\t\tDEREF(tmp);\n\t}\n\tif (nargs >= 4) {\n\t\tt3 = POP_STRING();\n\t\tDEREF(t3);\n\t}\n#endif\n\n\tt2 = POP_NUMBER();\t/* third argument */\n\td = get_number_d(t2);\n\tDEREF(t2);\n\n\tnumber = (unsigned long) double_to_int(d);\n\tt2 = POP_STRING();\t/* second argument */\n\tstring2 = t2->stptr;\n\tt1 = POP_STRING();\t/* first argument */\n\tstring1 = t1->stptr;\n\n#if ENABLE_NLS && defined(LC_MESSAGES) && HAVE_DCGETTEXT\n\n\tthe_result = dcngettext(domain, string1, string2, number, lc_cat);\n\tif (t3 != NULL)\n\t\tDEREF(t3);\n#else\n\tthe_result = (number == 1 ? string1 : string2);\n#endif\n\tDEREF(t1);\n\tDEREF(t2);\n\treturn make_string(the_result, strlen(the_result));\n}"
-}

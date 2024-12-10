@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "drivers/ccs811/ccs811.c",
+    "message": "Either the condition 'dev!=NULL' is redundant or there is possible null pointer dereference: dev.",
+    "warning_function_name": "ccs811_power_down",
+    "warning_line": "if (dev->params.wake_pin != GPIO_UNDEF) {",
+    "warning_context": "int ccs811_power_down (ccs811_t *dev)\n{\n    ASSERT_PARAM(dev != NULL);\n\n    ccs811_mode_t tmp_mode = dev->params.mode;\n    int res = ccs811_set_mode(dev, CCS811_MODE_IDLE);\n    dev->params.mode = tmp_mode;\n\n    if (dev->params.wake_pin != GPIO_UNDEF) {\n        DEBUG_DEV(\"Setting nWAKE pin high\", dev);\n        gpio_set(dev->params.wake_pin);\n    }\n\n    return res;\n}\n"
+}

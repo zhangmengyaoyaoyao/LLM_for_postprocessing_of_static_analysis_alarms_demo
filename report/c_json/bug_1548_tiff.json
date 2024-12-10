@@ -1,0 +1,10 @@
+{
+    "project": "tiff",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "libtiff/tif_dirread.c",
+    "message": "Offset: [1, +oo] (⇐ [0, +oo] + 1) Size: [0, +oo] by call to `TIFFFetchShortArray`.",
+    "warning_function_name": "TIFFFetchPerSampleShorts",
+    "warning_line": "if (v && TIFFFetchShortArray(tif, dir, v)) {",
+    "warning_context": "static int\nTIFFFetchPerSampleShorts(TIFF* tif, TIFFDirEntry* dir, uint16* pl)\n{\n    uint16 samples = tif->tif_dir.td_samplesperpixel;\n    int status = 0;\n\n    if (CheckDirCount(tif, dir, (uint32) samples, TIFFFieldSet(tif,FIELD_BITSPERSAMPLE))) {\n        uint16 buf[10];\n        uint16* v = buf;\n\n        if (dir->tdir_count > NITEMS(buf))\n            v = (uint16*) _TIFFCheckMalloc(tif, dir->tdir_count, sizeof(uint16),\n                                      \"to fetch per-sample values\");\n        if (v && TIFFFetchShortArray(tif, dir, v)) {\n            uint16 i;\n            int check_count = dir->tdir_count;\n            if( samples < check_count )\n                check_count = samples;\n\n            for (i = 1; i < check_count; i++)\n                if (v[i] != v[0]) {\n\t\t\tTIFFErrorExt(tif->tif_clientdata, tif->tif_name,\n                \"Cannot handle different per-sample values for field \\\"%s\\\"\",\n\t\t\t_TIFFFieldWithTag(tif, dir->tdir_tag)->field_name);\n\t\t\tgoto bad;\n                }\n            *pl = v[0];\n            status = 1;\n        }\n      bad:\n        if (v && v != buf)\n            _TIFFfree(v);\n    }\n    return (status);\n}\n"
+}

@@ -1,0 +1,10 @@
+{
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L2",
+    "file": "libiberty/sha1.c",
+    "message": "Offset added: [-8, 120] Size: 64 by call to `sha1_finish_ctx`.",
+    "warning_function_name": "sha1_stream",
+    "warning_line": "sha1_finish_ctx (&ctx, resblock);",
+    "warning_context": "int\nsha1_stream (FILE *stream, void *resblock)\n{\n  struct sha1_ctx ctx;\n  char buffer[BLOCKSIZE + 72];\n  size_t sum;\n\n  /* Initialize the computation context.  */\n  sha1_init_ctx (&ctx);\n\n  /* Iterate over full file contents.  */\n  while (1)\n    {\n      /* We read the file in blocks of BLOCKSIZE bytes.  One call of the\n\t computation function processes the whole buffer so that with the\n\t next round of the loop another block can be read.  */\n      size_t n;\n      sum = 0;\n\n      /* Read block.  Take care for partial reads.  */\n      while (1)\n\t{\n\t  n = fread (buffer + sum, 1, BLOCKSIZE - sum, stream);\n\n\t  sum += n;\n\n\t  if (sum == BLOCKSIZE)\n\t    break;\n\n\t  if (n == 0)\n\t    {\n\t      /* Check for the error flag IFF N == 0, so that we don't\n\t\t exit the loop after a partial read due to e.g., EAGAIN\n\t\t or EWOULDBLOCK.  */\n\t      if (ferror (stream))\n\t\treturn 1;\n\t      goto process_partial_block;\n\t    }\n\n\t  /* We've read at least one byte, so ignore errors.  But always\n\t     check for EOF, since feof may be true even though N > 0.\n\t     Otherwise, we could end up calling fread after EOF.  */\n\t  if (feof (stream))\n\t    goto process_partial_block;\n\t}\n\n      /* Process buffer with BLOCKSIZE bytes.  Note that\n\t\t\tBLOCKSIZE % 64 == 0\n       */\n      sha1_process_block (buffer, BLOCKSIZE, &ctx);\n    }\n\n process_partial_block:;\n\n  /* Process any remaining bytes.  */\n  if (sum > 0)\n    sha1_process_bytes (buffer, sum, &ctx);\n\n  /* Construct result in desired memory.  */\n  sha1_finish_ctx (&ctx, resblock);\n  return 0;\n}\n"
+}

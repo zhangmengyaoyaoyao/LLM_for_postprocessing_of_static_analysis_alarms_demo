@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L2",
+    "file": "lib/sh/spell.c",
+    "message": "Offset: [0, 4097] Size: 4097.",
+    "warning_function_name": "spname",
+    "warning_line": "*p = '\\0';",
+    "warning_context": "int\nspname(oldname, newname)\n     char *oldname;\n     char *newname;\n{\n  char *op, *np, *p;\n  char guess[PATH_MAX + 1], best[PATH_MAX + 1];\n\n  op = oldname;\n  np = newname;\n  for (;;)\n    {\n      while (*op == '/')    /* Skip slashes */\n\t*np++ = *op++;\n      *np = '\\0';\n\n      if (*op == '\\0')    /* Exact or corrected */\n\t{\n\t  /* `.' is rarely the right thing. */\n\t  if (oldname[1] == '\\0' && newname[1] == '\\0' &&\n\t\toldname[0] != '.' && newname[0] == '.')\n\t    return -1;\n\t  return strcmp(oldname, newname) != 0;\n\t}\n\n      /* Copy next component into guess */\n      for (p = guess; *op != '/' && *op != '\\0'; op++)\n\tif (p < guess + PATH_MAX)\n\t  *p++ = *op;\n      *p = '\\0';\n\n      if (mindist(newname, guess, best) >= 3)\n\treturn -1;  /* Hopeless */\n\n      /*\n       *  Add to end of newname\n       */\n      for (p = best; *np = *p++; np++)\n\t;\n    }\n}\n"
+}

@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(timer, K_OBJ_TIMER));",
-    "Code_function": "static inline u32_t z_vrfy_k_timer_remaining_get(struct k_timer *timer)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(timer, K_OBJ_TIMER));\n\treturn z_impl_k_timer_remaining_get(timer);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "ctuArrayIndex",
+    "file": "subsys/bluetooth/mesh/shell.c",
+    "message": "Array index out of bounds; buffer 'argv' is accessed at offset 0.",
+    "warning_function_name": "mod_pub_set",
+    "warning_line": "pub.addr = strtoul(argv[0], NULL, 0);",
+    "warning_context": "static int mod_pub_set(const struct shell *shell, u16_t addr, u16_t mod_id,\n\t\t       u16_t cid, char *argv[])\n{\n\tstruct bt_mesh_cfg_mod_pub pub;\n\tu8_t status, count;\n\tu16_t interval;\n\tint err;\n\n\tpub.addr = strtoul(argv[0], NULL, 0);\n\tpub.app_idx = strtoul(argv[1], NULL, 0);\n\tpub.cred_flag = str2bool(argv[2]);\n\tpub.ttl = strtoul(argv[3], NULL, 0);\n\tpub.period = strtoul(argv[4], NULL, 0);\n\n\tcount = strtoul(argv[5], NULL, 0);\n\tif (count > 7) {\n\t\tshell_print(shell, \"Invalid retransmit count\");\n\t\treturn -EINVAL;\n\t}\n\n\tinterval = strtoul(argv[6], NULL, 0);\n\tif (interval > (31 * 50) || (interval % 50)) {\n\t\tshell_print(shell, \"Invalid retransmit interval %u\", interval);\n\t\treturn -EINVAL;\n\t}\n\n\tpub.transmit = BT_MESH_PUB_TRANSMIT(count, interval);\n\n\tif (cid == CID_NVAL) {\n\t\terr = bt_mesh_cfg_mod_pub_set(net.net_idx, net.dst, addr,\n\t\t\t\t\t      mod_id, &pub, &status);\n\t} else {\n\t\terr = bt_mesh_cfg_mod_pub_set_vnd(net.net_idx, net.dst, addr,\n\t\t\t\t\t\t  mod_id, cid, &pub, &status);\n\t}\n\n\tif (err) {\n\t\tshell_error(shell, \"Model Publication Set failed (err %d)\",\n\t\t\t    err);\n\t\treturn 0;\n\t}\n\n\tif (status) {\n\t\tshell_print(shell, \"Model Publication Set failed \"\n\t\t\t    \"(status 0x%02x)\", status);\n\t} else {\n\t\tshell_print(shell, \"Model Publication successfully set\");\n\t}\n\n\treturn 0;\n}\n"
 }

@@ -1,0 +1,10 @@
+{
+    "project": "Zephyr",
+    "tool": "Infer",
+    "category": "Null Dereference",
+    "file": "subsys/net/ip/net_shell.c",
+    "message": "pointer `slab` last assigned on line 2598 could be null and is dereferenced at line 2608, column 3.",
+    "warning_function_name": "context_info",
+    "warning_line": "PR(\"%p\\t%d\\tETX\\n\", slab, slab->num_blocks);",
+    "warning_context": "static void context_info(struct net_context *context, void *user_data)\n{\n#if defined(CONFIG_NET_CONTEXT_NET_PKT_POOL)\n\tstruct net_shell_user_data *data = user_data;\n\tconst struct shell *shell = data->shell;\n\tstruct ctx_info *info = data->user_data;\n\tstruct k_mem_slab *slab;\n\tstruct net_buf_pool *pool;\n\n\tif (!net_context_is_used(context)) {\n\t\treturn;\n\t}\n\n\tif (context->tx_slab) {\n\t\tslab = context->tx_slab();\n\n\t\tif (slab_pool_found_already(info, slab, NULL)) {\n\t\t\treturn;\n\t\t}\n\n#if CONFIG_NET_PKT_LOG_LEVEL >= LOG_LEVEL_DBG\n\t\tPR(\"%p\\t%u\\t%u\\tETX\\n\",\n\t\t   slab, slab->num_blocks, k_mem_slab_num_free_get(slab));\n#else\n\t\tPR(\"%p\\t%d\\tETX\\n\", slab, slab->num_blocks);\n#endif\n\t\tinfo->are_external_pools = true;\n\t\tinfo->tx_slabs[info->pos] = slab;\n\t}\n\n\tif (context->data_pool) {\n\t\tpool = context->data_pool();\n\n\t\tif (slab_pool_found_already(info, NULL, pool)) {\n\t\t\treturn;\n\t\t}\n\n#if defined(CONFIG_NET_BUF_POOL_USAGE)\n\t\tPR(\"%p\\t%d\\t%d\\tEDATA (%s)\\n\",\n\t\t   pool, pool->buf_count,\n\t\t   pool->avail_count, pool->name);\n#else\n\t\tPR(\"%p\\t%d\\tEDATA\\n\", pool, pool->buf_count);\n#endif\n\t\tinfo->are_external_pools = true;\n\t\tinfo->data_pools[info->pos] = pool;\n\t}\n\n\tinfo->pos++;\n#endif /* CONFIG_NET_CONTEXT_NET_PKT_POOL */\n}\n"
+}

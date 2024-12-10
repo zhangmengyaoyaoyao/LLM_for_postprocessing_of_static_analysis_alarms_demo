@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "lib/readline/vi_mode.c",
+    "message": "Offset: [1, +oo] Size: [0, +oo] by call to `vi_save_insert_buffer`.",
+    "warning_function_name": "_rl_vi_save_replace",
+    "warning_line": "vi_save_insert_buffer (start, len);",
+    "warning_context": "static void\n_rl_vi_save_replace ()\n{\n  int len, start, end;\n  UNDO_LIST *up;\n\n  up = rl_undo_list;\n  if (up == 0 || up->what != UNDO_END || vi_replace_count <= 0)\n    {\n      if (vi_insert_buffer_size >= 1)\n\tvi_insert_buffer[0] = '\\0';\n      return;\n    }\n  /* Let's try it the quick and easy way for now.  This should essentially\n     accommodate every UNDO_INSERT and save the inserted text to\n     vi_insert_buffer */\n  end = rl_point;\n  start = end - vi_replace_count + 1;\n  len = vi_replace_count + 1;\n\n  vi_save_insert_buffer (start, len);  \n}\n"
+}

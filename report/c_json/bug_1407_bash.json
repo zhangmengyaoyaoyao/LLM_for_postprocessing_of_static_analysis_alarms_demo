@@ -1,8 +1,0 @@
-{
-    "Project": "bash",
-    "Tool": "Infer",
-    "Bug Type": "UNINITIALIZED_VALUE",
-    "Message": "The value read from afound was never initialized.",
-    "Code_line": "  value = afound ? savestring (aentry) : savestring (srvent->s_name);",
-    "Code_function": "bash_servicename_completion_function (text, state)\n     const char *text;\n     int state;\n{\n#if defined (__WIN32__) || defined (__OPENNT) || !defined (HAVE_GETSERVENT)\n  return ((char *)NULL);\n#else\n  static char *sname = (char *)NULL;\n  static struct servent *srvent;\n  static int snamelen, firstc;\n  char *value;\n  char **alist, *aentry;\n  int afound;\n\n  if (state == 0)\n    {\n      FREE (sname);\n      firstc = *text;\n\n      sname = savestring (text);\n      snamelen = strlen (sname);\n      setservent (0);\n    }\n\n  while (srvent = getservent ())\n    {\n      afound = 0;\n      if (snamelen == 0 || (STREQN (sname, srvent->s_name, snamelen)))\n\tbreak;\n      /* Not primary, check aliases */\n      for (alist = srvent->s_aliases; *alist; alist++)\n\t{\n\t  aentry = *alist;\n\t  if (STREQN (sname, aentry, snamelen))\n\t    {\n\t      afound = 1;\n\t      break;\n\t    }\n\t}\n\n      if (afound)\n\tbreak;\n    }\n\n  if (srvent == 0)\n    {\n      endservent ();\n      return ((char *)NULL);\n    }\n\n  value = afound ? savestring (aentry) : savestring (srvent->s_name);\n  return value;\n#endif\n}"
-}

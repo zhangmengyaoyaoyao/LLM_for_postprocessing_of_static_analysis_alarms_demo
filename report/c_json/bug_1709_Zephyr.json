@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(thread, K_OBJ_THREAD));",
-    "Code_function": "static inline int z_vrfy_k_thread_priority_get(k_tid_t thread)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(thread, K_OBJ_THREAD));\n\treturn z_impl_k_thread_priority_get(thread);\n}"
+    "project": "Zephyr",
+    "tool": "Infer",
+    "category": "Null Dereference",
+    "file": "subsys/net/ip/net_context.c",
+    "message": "pointer `context` last assigned on line 1832 could be null and is dereferenced at line 1841, column 7.",
+    "warning_function_name": "net_context_raw_packet_received",
+    "warning_line": "if (!context->recv_cb) {",
+    "warning_context": "static enum net_verdict net_context_raw_packet_received(\n\t\t\t\t\tstruct net_conn *conn,\n\t\t\t\t\tstruct net_pkt *pkt,\n\t\t\t\t\tunion net_ip_header *ip_hdr,\n\t\t\t\t\tunion net_proto_header *proto_hdr,\n\t\t\t\t\tvoid *user_data)\n{\n\tstruct net_context *context = find_context(conn);\n\n\tNET_ASSERT(context);\n\tNET_ASSERT(net_pkt_iface(pkt));\n\n\t/* If there is no callback registered, then we can only drop\n\t * the packet.\n\t */\n\n\tif (!context->recv_cb) {\n\t\treturn NET_DROP;\n\t}\n\n\tnet_context_set_iface(context, net_pkt_iface(pkt));\n\tnet_pkt_set_context(pkt, context);\n\n\tcontext->recv_cb(context, pkt, ip_hdr, proto_hdr, 0, user_data);\n\n#if defined(CONFIG_NET_CONTEXT_SYNC_RECV)\n\tk_sem_give(&context->recv_data_wait);\n#endif /* CONFIG_NET_CONTEXT_SYNC_RECV */\n\n\treturn NET_OK;\n}\n"
 }

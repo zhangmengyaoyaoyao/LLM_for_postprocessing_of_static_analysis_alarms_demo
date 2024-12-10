@@ -1,0 +1,10 @@
+{
+    "project": "combine",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "src/index.c",
+    "message": "pointer `tmp_str` last assigned on line 111 could be null and is dereferenced by call to `strcpy()` at line 111, column 5.",
+    "warning_function_name": "open_index",
+    "warning_line": "FATAL_PERROR (filename);",
+    "warning_context": "int\nopen_index (entries, number_size, hash_method, filename, index_file)\n     INDEXNUM *entries;\n     INDEXNUM *number_size;\n     INDEXNUM *hash_method;\n     char *filename;\n     FILE **index_file;\n{\n  int return_val;\n  comb_index_hdr index_hdr;\n  comb_index_hdr_ll index_hdr_more;\n\n  *index_file = fopen (filename, \"r\");\n  if (*index_file == NULL)\n    FATAL_PERROR (filename);\n\n  return_val = fread (&index_hdr, sizeof (index_hdr), 1, *index_file);\n  if (return_val != 1)\n    FATAL_ERROR (_(\"error reading index file\"));\n  if (index_hdr.magic_number != 'DpV!' || index_hdr.version != 1)\n    FATAL_ERROR (_(\"invalid index file or unsupported version\"));\n  *hash_method = index_hdr.hash_method;\n  *number_size = index_hdr.hash_number_size;\n  if (*number_size != 8)\n    FATAL_ERROR (_(\"only long long numbers are supported now\"));\n\n  return_val = fread (&index_hdr_more, sizeof (index_hdr_more), 1, *index_file);\n  if (return_val != 1)\n    FATAL_ERROR (_(\"error reading index file\"));\n  *entries = index_hdr_more.hash_size;\n\n  return 0;\n  }\n"
+}

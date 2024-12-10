@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(timer, K_OBJ_TIMER));",
-    "Code_function": "static inline void z_vrfy_k_timer_stop(struct k_timer *timer)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(timer, K_OBJ_TIMER));\n\tz_impl_k_timer_stop(timer);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "arrayIndexOutOfBoundsCond",
+    "file": "subsys/usb/usb_device.c",
+    "message": "Either the condition 'type>=4' is redundant or the array 'usb_dev.req_handlers[4]' is accessed at index 4, which is out of bounds.",
+    "warning_function_name": "usb_handle_request",
+    "warning_line": "usb_request_handler handler = usb_dev.req_handlers[type];",
+    "warning_context": "static bool usb_handle_request(struct usb_setup_packet *setup,\n\t\t\t       s32_t *len, u8_t **data)\n{\n\tu32_t type = REQTYPE_GET_TYPE(setup->bmRequestType);\n\tusb_request_handler handler = usb_dev.req_handlers[type];\n\n\tLOG_DBG(\"** %d **\", type);\n\n\tif (type >= MAX_NUM_REQ_HANDLERS) {\n\t\tLOG_DBG(\"Error Incorrect iType %d\", type);\n\t\treturn false;\n\t}\n\n\tif (handler == NULL) {\n\t\tLOG_DBG(\"No handler for reqtype %d\", type);\n\t\treturn false;\n\t}\n\n\tif ((*handler)(setup, len, data) < 0) {\n\t\tLOG_DBG(\"Handler Error %d\", type);\n\t\tusb_print_setup(setup);\n\t\treturn false;\n\t}\n\n\treturn true;\n}\n"
 }

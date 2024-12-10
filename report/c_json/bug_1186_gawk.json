@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "cint_array.c",
+    "message": "pointer `new` last assigned on line 930 could be null and is dereferenced by call to `memset()` at line 931, column 3.",
+    "warning_function_name": "e_copy(NO",
+    "warning_line": "memset(new, '\\0', hsize * sizeof(NODE *));",
+    "warning_context": "static void\ntree_copy(NODE *newsymb, NODE *tree, NODE *newtree)\n{ \n\tNODE **old, **new;\n\tsize_t j, hsize;\n\n\thsize = tree->array_size;\n\tif ((tree->flags & HALFHAT) != 0)\n\t\thsize /= 2;\n\n\temalloc(new, NODE **, hsize * sizeof(NODE *), \"tree_copy\");\n \tmemset(new, '\\0', hsize * sizeof(NODE *));\n\tnewtree->nodes = new;\n\tnewtree->array_base = tree->array_base;\n\tnewtree->array_size = tree->array_size;\n\tnewtree->table_size = tree->table_size;\n\tnewtree->flags = tree->flags;\n\n\told = tree->nodes;\n\tfor (j = 0; j < hsize; j++) {\n\t\tif (old[j] == NULL)\n\t\t\tcontinue;\n\t\tif (old[j]->type == Node_array_tree) {\n\t\t\tnew[j] = make_node(Node_array_tree);\n\t\t\ttree_copy(newsymb, old[j], new[j]);\n\t\t} else {\n\t\t\tnew[j] = make_node(Node_array_leaf);\n\t\t\tleaf_copy(newsymb, old[j], new[j]);\n\t\t}\n\t}\n}\n"
+}

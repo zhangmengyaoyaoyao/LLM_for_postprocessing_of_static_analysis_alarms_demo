@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "UNINITIALIZED_VALUE",
-    "Message": "The value read from head was never initialized.",
-    "Code_line": "  insn->u.esc = head;",
-    "Code_function": "dot_cfi_escape (int ignored ATTRIBUTE_UNUSED)\n{\n  struct cfi_escape_data *head, **tail, *e;\n  struct cfi_insn_data *insn;\n\n  if (frchain_now->frch_cfi_data == NULL)\n    {\n      as_bad (_(\"CFI instruction used without previous .cfi_startproc\"));\n      ignore_rest_of_line ();\n      return;\n    }\n\n  /* If the last address was not at the current PC, advance to current.  */\n  if (symbol_get_frag (frchain_now->frch_cfi_data->last_address) != frag_now\n      || S_GET_VALUE (frchain_now->frch_cfi_data->last_address)\n\t != frag_now_fix ())\n    cfi_add_advance_loc (symbol_temp_new_now ());\n\n  tail = &head;\n  do\n    {\n      e = (struct cfi_escape_data *) xmalloc (sizeof (*e));\n      do_parse_cons_expression (&e->exp, 1);\n      *tail = e;\n      tail = &e->next;\n    }\n  while (*input_line_pointer++ == ',');\n  *tail = NULL;\n\n  insn = alloc_cfi_insn_data ();\n  insn->insn = CFI_escape;\n  insn->u.esc = head;\n\n  --input_line_pointer;\n  demand_empty_rest_of_line ();\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "binutils/prdbg.c",
+    "message": "Offset: [5, +oo] (⇐ [0, +oo] + 5) Size: [1, +oo] by call to `append_type`.",
+    "warning_function_name": "pr_start_class_type",
+    "warning_line": "if (! append_type (info, \"self \"))",
+    "warning_context": "static bfd_boolean\npr_start_class_type (void *p, const char *tag, unsigned int id,\n\t\t     bfd_boolean structp, unsigned int size,\n\t\t     bfd_boolean vptr, bfd_boolean ownvptr)\n{\n  struct pr_handle *info = (struct pr_handle *) p;\n  char *tv = NULL;\n\n  info->indent += 2;\n\n  if (vptr && ! ownvptr)\n    {\n      tv = pop_type (info);\n      if (tv == NULL)\n\treturn FALSE;\n    }\n\n  if (! push_type (info, structp ? \"class \" : \"union class \"))\n    return FALSE;\n  if (tag != NULL)\n    {\n      if (! append_type (info, tag))\n\treturn FALSE;\n    }\n  else\n    {\n      char idbuf[20];\n\n      sprintf (idbuf, \"%%anon%u\", id);\n      if (! append_type (info, idbuf))\n\treturn FALSE;\n    }\n\n  if (! append_type (info, \" {\"))\n    return FALSE;\n  if (size != 0 || vptr || ownvptr || tag != NULL)\n    {\n      if (! append_type (info, \" /*\"))\n\treturn FALSE;\n\n      if (size != 0)\n\t{\n\t  char ab[20];\n\n\t  sprintf (ab, \"%u\", size);\n\t  if (! append_type (info, \" size \")\n\t      || ! append_type (info, ab))\n\t    return FALSE;\n\t}\n\n      if (vptr)\n\t{\n\t  if (! append_type (info, \" vtable \"))\n\t    return FALSE;\n\t  if (ownvptr)\n\t    {\n\t      if (! append_type (info, \"self \"))\n\t\treturn FALSE;\n\t    }\n\t  else\n\t    {\n\t      if (! append_type (info, tv)\n\t\t  || ! append_type (info, \" \"))\n\t\treturn FALSE;\n\t    }\n\t}\n\n      if (tag != NULL)\n\t{\n\t  char ab[30];\n\n\t  sprintf (ab, \" id %u\", id);\n\t  if (! append_type (info, ab))\n\t    return FALSE;\n\t}\n\n      if (! append_type (info, \" */\"))\n\treturn FALSE;\n    }\n\n  info->stack->visibility = DEBUG_VISIBILITY_PRIVATE;\n\n  return (append_type (info, \"\\n\")\n\t  && indent_type (info));\n}\n"
 }

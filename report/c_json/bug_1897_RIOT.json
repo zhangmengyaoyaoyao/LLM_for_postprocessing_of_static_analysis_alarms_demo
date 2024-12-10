@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Infer",
+    "category": "Buffer Overrun L2",
+    "file": "sys/hashes/sha1.c",
+    "message": "Offset: [0, 63] Size: 5.",
+    "warning_function_name": "ha1_init_hmac(",
+    "warning_line": "sha1_update_byte(ctx, ctx->key_buffer[i] ^ HMAC_IPAD);",
+    "warning_context": "void sha1_init_hmac(sha1_context *ctx, const void *key, size_t key_length)\n{\n    uint8_t i;\n    const uint8_t *k = key;\n\n    memset(ctx->key_buffer, 0, SHA1_BLOCK_LENGTH);\n    if (key_length > SHA1_BLOCK_LENGTH) {\n        /* Hash long keys */\n        sha1_init(ctx);\n        while (key_length--) {\n            sha1_update_byte(ctx, *k++);\n        }\n        sha1_final(ctx, ctx->key_buffer);\n    }\n    else {\n        /* Block length keys are used as is */\n        memcpy(ctx->key_buffer, key, key_length);\n    }\n    /* Start inner hash */\n    sha1_init(ctx);\n    for (i = 0; i < SHA1_BLOCK_LENGTH; i++) {\n        sha1_update_byte(ctx, ctx->key_buffer[i] ^ HMAC_IPAD);\n    }\n}\n"
+}

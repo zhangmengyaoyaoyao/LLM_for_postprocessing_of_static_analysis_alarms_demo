@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "CSA",
-    "Bug Type": "core.NullDereference",
-    "Message": "Access to field 'type' results in a dereference of a null pointer (loaded from variable 'val')",
-    "Code_line": "\tif (val->type == Node_var_array) {",
-    "Code_function": "do_delete(NODE *symbol, int nsubs)\n{\n\tNODE *val, *subs;\n\tint i;\n\n\tassert(symbol->type == Node_var_array);\n\tsubs = val = NULL;\t/* silence the compiler */\n\n\t/*\n\t * The force_string() call is needed to make sure that\n\t * the string subscript is reasonable.  For example, with it:\n\t *\n\t * $ ./gawk --posix 'BEGIN { CONVFMT=\"%ld\"; delete a[1.233]}'\n\t * gawk: cmd. line:1: fatal: `%l' is not permitted in POSIX awk formats\n\t *\n\t * Without it, the code does not fail.\n\t */\n\n#define free_subs(n)    do {                                    \\\n    NODE *s = PEEK(n - 1);                                      \\\n    if (s->type == Node_val) {                                  \\\n        (void) force_string(s);\t/* may have side effects. */    \\\n        DEREF(s);                                               \\\n    }                                                           \\\n} while (--n > 0)"
-}

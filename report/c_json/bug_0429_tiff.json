@@ -1,8 +1,0 @@
-{
-    "Project": "tiff",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L2",
-    "Message": "Offset: [-oo, 2559] Size: 109 by call to `putspan`.",
-    "Code_line": "\t\t\t\t\tputspan(tif, a1-a0, TIFFFaxWhiteCodes);",
-    "Code_function": "Fax3Encode2DRow(TIFF* tif, unsigned char* bp, unsigned char* rp, uint32 bits)\n{\n#define\tPIXEL(buf,ix)\t((((buf)[(ix)>>3]) >> (7-((ix)&7))) & 1)\n        uint32 a0 = 0;\n\tuint32 a1 = (PIXEL(bp, 0) != 0 ? 0 : finddiff(bp, 0, bits, 0));\n\tuint32 b1 = (PIXEL(rp, 0) != 0 ? 0 : finddiff(rp, 0, bits, 0));\n\tuint32 a2, b2;\n\n\tfor (;;) {\n\t\tb2 = finddiff2(rp, b1, bits, PIXEL(rp,b1));\n\t\tif (b2 >= a1) {\n\t\t\tint32 d = b1 - a1;\n\t\t\tif (!(-3 <= d && d <= 3)) {\t/* horizontal mode */\n\t\t\t\ta2 = finddiff2(bp, a1, bits, PIXEL(bp,a1));\n\t\t\t\tputcode(tif, &horizcode);\n\t\t\t\tif (a0+a1 == 0 || PIXEL(bp, a0) == 0) {\n\t\t\t\t\tputspan(tif, a1-a0, TIFFFaxWhiteCodes);\n\t\t\t\t\tputspan(tif, a2-a1, TIFFFaxBlackCodes);\n\t\t\t\t} else {\n\t\t\t\t\tputspan(tif, a1-a0, TIFFFaxBlackCodes);\n\t\t\t\t\tputspan(tif, a2-a1, TIFFFaxWhiteCodes);\n\t\t\t\t}\n\t\t\t\ta0 = a2;\n\t\t\t} else {\t\t\t/* vertical mode */\n\t\t\t\tputcode(tif, &vcodes[d+3]);\n\t\t\t\ta0 = a1;\n\t\t\t}\n\t\t} else {\t\t\t\t/* pass mode */\n\t\t\tputcode(tif, &passcode);\n\t\t\ta0 = b2;\n\t\t}\n\t\tif (a0 >= bits)\n\t\t\tbreak;\n\t\ta1 = finddiff(bp, a0, bits, PIXEL(bp,a0));\n\t\tb1 = finddiff(rp, a0, bits, !PIXEL(bp,a0));\n\t\tb1 = finddiff(rp, b1, bits, PIXEL(bp,a0));\n\t}\n\treturn (1);\n#undef PIXEL\n}"
-}

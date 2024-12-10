@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from rc was never initialized.",
-    "Code_line": "\treturn rc;",
-    "Code_function": "int boot_request_upgrade(int permanent)\n{\n#ifdef CONFIG_MCUBOOT_TRAILER_SWAP_TYPE\n\tu8_t swap_type;\n#endif\n\tint rc;\n\n\trc = boot_magic_write(FLASH_AREA_IMAGE_SECONDARY);\n\tif (rc) {\n\t\tgoto op_end;\n\t}\n\n\tif (permanent) {\n\t\trc = boot_image_ok_write(FLASH_AREA_IMAGE_SECONDARY);\n\n#ifdef CONFIG_MCUBOOT_TRAILER_SWAP_TYPE\n\t\tif (rc) {\n\t\t\tgoto op_end;\n\t\t}\n\n\t\tswap_type = BOOT_SWAP_TYPE_PERM;\n\t} else {\n\t\tswap_type = BOOT_SWAP_TYPE_TEST;\n\t}\n\n\trc = boot_swap_type_write(FLASH_AREA_IMAGE_SECONDARY, swap_type);\n#else\n\t}\n#endif\nop_end:\n\treturn rc;\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "subsys/net/lib/lwm2m/lwm2m_engine.c",
+    "message": "Uninitialized variable: obs->ctx",
+    "warning_function_name": "lwm2m_engine_context_close",
+    "warning_line": "if (obs->ctx == client_ctx) {",
+    "warning_context": "int lwm2m_engine_context_close(struct lwm2m_ctx *client_ctx)\n{\n\tstruct observe_node *obs, *tmp;\n\tsys_snode_t *prev_node = NULL;\n\tint sock_fd = client_ctx->sock_fd;\n\n\t/* Cancel pending retransmit work */\n\tk_delayed_work_cancel(&client_ctx->retransmit_work);\n\n\t/* Remove observes for this context */\n\tSYS_SLIST_FOR_EACH_CONTAINER_SAFE(&engine_observer_list,\n\t\t\t\t\t  obs, tmp, node) {\n\t\tif (obs->ctx == client_ctx) {\n\t\t\tsys_slist_remove(&engine_observer_list, prev_node,\n\t\t\t\t\t &obs->node);\n\t\t\t(void)memset(obs, 0, sizeof(*obs));\n\t\t} else {\n\t\t\tprev_node = &obs->node;\n\t\t}\n\t}\n\n\tlwm2m_socket_del(client_ctx);\n\tclient_ctx->sock_fd = -1;\n\tif (sock_fd >= 0) {\n\t\treturn close(sock_fd);\n\t} else {\n\t\treturn 0;\n\t}\n}\n"
 }

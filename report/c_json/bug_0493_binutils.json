@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset added: [16, +oo] (⇐ [0, +oo] + [16, +oo]) Size: [0, +oo] by call to `bfd_check_format_matches`.",
-    "Code_line": "  if (bfd_check_format_matches (abfd, format, &targets))",
-    "Code_function": "check_format_any (struct bfd *abfd, bfd_format format)\n{\n  char** targets = NULL;\n\n  if (bfd_check_format_matches (abfd, format, &targets))\n    return TRUE;\n\n  if (targets)\n    {\n      bfd_find_target (targets[0], abfd);\n\n      return bfd_check_format (abfd, format);\n    }\n\n  return FALSE;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "bfd/elf.c",
+    "message": "Offset added: [-20, 107] (⇐ [-52, 75] + 32) Size: 4064 by call to `bfd_zalloc`.",
+    "warning_function_name": "bfd_elf_mkcorefile",
+    "warning_line": "elf_tdata (abfd)->core = bfd_zalloc (abfd, sizeof (*elf_tdata (abfd)->core));",
+    "warning_context": "bfd_boolean\nbfd_elf_mkcorefile (bfd *abfd)\n{\n  /* I think this can be done just like an object file.  */\n  if (!abfd->xvec->_bfd_set_format[(int) bfd_object] (abfd))\n    return FALSE;\n  elf_tdata (abfd)->core = bfd_zalloc (abfd, sizeof (*elf_tdata (abfd)->core));\n  return elf_tdata (abfd)->core != NULL;\n}\n"
 }

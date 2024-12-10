@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L2",
-    "Message": "Offset: [1, 20] Size: 2 by call to `bfd_follow_gnu_debugaltlink`.",
-    "Code_line": "      char * debug_filename = bfd_follow_gnu_debugaltlink (unit->abfd, DEBUGDIR);",
-    "Code_function": "read_alt_indirect_string (struct comp_unit * unit,\n\t\t\t  bfd_byte *         buf,\n\t\t\t  bfd_byte *         buf_end,\n\t\t\t  unsigned int *     bytes_read_ptr)\n{\n  bfd_uint64_t offset;\n  struct dwarf2_debug *stash = unit->stash;\n  char *str;\n\n  if (buf + unit->offset_size > buf_end)\n    {\n      * bytes_read_ptr = 0;\n      return NULL;\n    }\n\n  if (unit->offset_size == 4)\n    offset = read_4_bytes (unit->abfd, buf, buf_end);\n  else\n    offset = read_8_bytes (unit->abfd, buf, buf_end);\n\n  *bytes_read_ptr = unit->offset_size;\n\n  if (stash->alt_bfd_ptr == NULL)\n    {\n      bfd *  debug_bfd;\n      char * debug_filename = bfd_follow_gnu_debugaltlink (unit->abfd, DEBUGDIR);\n\n      if (debug_filename == NULL)\n\treturn NULL;\n\n      if ((debug_bfd = bfd_openr (debug_filename, NULL)) == NULL\n\t  || ! bfd_check_format (debug_bfd, bfd_object))\n\t{\n\t  if (debug_bfd)\n\t    bfd_close (debug_bfd);\n\n\t  /* FIXME: Should we report our failure to follow the debuglink ?  */\n\t  free (debug_filename);\n\t  return NULL;\n\t}\n      stash->alt_bfd_ptr = debug_bfd;\n    }\n\n  if (! read_section (unit->stash->alt_bfd_ptr,\n\t\t      stash->debug_sections + debug_str_alt,\n\t\t      NULL, /* FIXME: Do we need to load alternate symbols ?  */\n\t\t      offset,\n\t\t      &stash->alt_dwarf_str_buffer,\n\t\t      &stash->alt_dwarf_str_size))\n    return NULL;\n\n  if (offset >= stash->alt_dwarf_str_size)\n    return NULL;\n  str = (char *) stash->alt_dwarf_str_buffer + offset;\n  if (*str == '\\0')\n    return NULL;\n\n  return str;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "binutils/prdbg.c",
+    "message": "Offset: [8, +oo] (⇐ [0, +oo] + 8) Size: [1, +oo] by call to `append_type`.",
+    "warning_function_name": "pr_struct_field",
+    "warning_line": "if (! append_type (info, \"bitsize \")",
+    "warning_context": "static bfd_boolean\npr_struct_field (void *p, const char *name, bfd_vma bitpos, bfd_vma bitsize,\n\t\t enum debug_visibility visibility)\n{\n  struct pr_handle *info = (struct pr_handle *) p;\n  char ab[20];\n  char *t;\n\n  if (! substitute_type (info, name))\n    return FALSE;\n\n  if (! append_type (info, \"; /* \"))\n    return FALSE;\n\n  if (bitsize != 0)\n    {\n      print_vma (bitsize, ab, TRUE, FALSE);\n      if (! append_type (info, \"bitsize \")\n\t  || ! append_type (info, ab)\n\t  || ! append_type (info, \", \"))\n\treturn FALSE;\n    }\n\n  print_vma (bitpos, ab, TRUE, FALSE);\n  if (! append_type (info, \"bitpos \")\n      || ! append_type (info, ab)\n      || ! append_type (info, \" */\\n\")\n      || ! indent_type (info))\n    return FALSE;\n\n  t = pop_type (info);\n  if (t == NULL)\n    return FALSE;\n\n  if (! pr_fix_visibility (info, visibility))\n    return FALSE;\n\n  return append_type (info, t);\n}\n"
 }

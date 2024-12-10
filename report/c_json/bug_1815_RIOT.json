@@ -1,8 +1,0 @@
-{
-    "Project": "RIOT",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from delta was never initialized.",
-    "Code_line": "                return -ENOSPC;",
-    "Code_function": "static int _decode_value(unsigned val, uint8_t **pkt_pos_ptr, uint8_t *pkt_end)\n{\n    uint8_t *pkt_pos = *pkt_pos_ptr;\n    size_t left = pkt_end - pkt_pos;\n    int res;\n\n    switch (val) {\n        case 13:\n        {\n            /* An 8-bit unsigned integer follows the initial byte and\n               indicates the Option Delta minus 13. */\n            if (left < 1) {\n                return -ENOSPC;\n            }\n            uint8_t delta = *pkt_pos++;\n            res = delta + 13;\n            break;\n        }\n        case 14:\n        {\n            /* A 16-bit unsigned integer in network byte order follows\n             * the initial byte and indicates the Option Delta minus\n             * 269. */\n            if (left < 2) {\n                return -ENOSPC;\n            }\n            uint16_t delta;\n            uint8_t *_tmp = (uint8_t *)&delta;\n            *_tmp++ = *pkt_pos++;\n            *_tmp++ = *pkt_pos++;\n            res = ntohs(delta) + 269;\n            break;\n        }\n        case 15:\n            /* Reserved for the Payload Marker.  If the field is set to\n             * this value but the entire byte is not the payload\n             * marker, this MUST be processed as a message format\n             * error. */\n            return -EBADMSG;\n        default:\n            res = val;\n    }\n\n    *pkt_pos_ptr = pkt_pos;\n    return res;\n}"
-}

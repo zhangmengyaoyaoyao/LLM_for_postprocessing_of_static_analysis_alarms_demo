@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "CSA",
+    "category": "core.NullDereference",
+    "file": "pcomplib.c",
+    "message": "Access to field 'refcount' results in a dereference of a null pointer (loaded from variable 'cs')",
+    "warning_function_name": "progcomp_insert",
+    "warning_line": "cs->refcount++;",
+    "warning_context": "int\nprogcomp_insert (cmd, cs)\n      char *cmd;\n      COMPSPEC *cs;\n{\n  register BUCKET_CONTENTS *item;\n\n  if (cs == NULL)\n    programming_error (_(\"progcomp_insert: %s: NULL COMPSPEC\"), cmd);\n\n  if (prog_completes == 0)\n    progcomp_create ();\n\n  cs->refcount++;\n  item = hash_insert (cmd, prog_completes, 0);\n  if (item->data)\n    free_progcomp (item->data);\n  else\n    item->key = savestring (cmd);\n  item->data = cs;\n\n  return 1;\n}\n"
+}

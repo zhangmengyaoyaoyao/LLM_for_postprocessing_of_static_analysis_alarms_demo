@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Cppcheck",
+    "category": "memleak",
+    "file": "lib/sh/snprintf.c",
+    "message": "Memory leak: lbuf",
+    "warning_function_name": "wchars",
+    "warning_line": "return;",
+    "warning_context": "static void\nwchars (p, wc)\n     struct DATA *p;\n     wint_t wc;\n{\n  char *lbuf, *l;\n  mbstate_t mbs;\n  size_t len;\n\n  lbuf = (char *)malloc (MB_CUR_MAX+1);\n  if (lbuf == 0)\n    return;\n  memset (&mbs, '\\0', sizeof (mbstate_t));\n  len = wcrtomb (lbuf, wc, &mbs);\n  if (len == (size_t)-1)\n    /* conversion failed; bail now. */\n    return;\n  p->width -= len;\n  l = lbuf;\n  PUT_STRING (l, len, p);\n  free (lbuf);\n}\n"
+}

@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(q, K_OBJ_MSGQ));",
-    "Code_function": "static inline int z_vrfy_k_msgq_get(struct k_msgq *q, void *data, s32_t timeout)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(q, K_OBJ_MSGQ));\n\tZ_OOPS(Z_SYSCALL_MEMORY_WRITE(data, q->msg_size));\n\n\treturn z_impl_k_msgq_get(q, data, timeout);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "ctuArrayIndex",
+    "file": "subsys/net/ip/net_shell.c",
+    "message": "Array index out of bounds; 'argv' buffer size is 0 and it is accessed at offset 1.",
+    "warning_function_name": "cmd_net_gptp_port",
+    "warning_line": "if (!argv[arg]) {",
+    "warning_context": "static int cmd_net_gptp_port(const struct shell *shell, size_t argc,\n\t\t\t     char *argv[])\n{\n#if defined(CONFIG_NET_GPTP)\n\tint arg = 1;\n\tchar *endptr;\n\tint port;\n#endif\n\n#if defined(CONFIG_NET_GPTP)\n\tif (!argv[arg]) {\n\t\tPR_WARNING(\"Port number must be given.\\n\");\n\t\treturn -ENOEXEC;\n\t}\n\n\tport = strtol(argv[arg], &endptr, 10);\n\n\tif (*endptr == '\\0') {\n\t\tgptp_print_port_info(shell, port);\n\t} else {\n\t\tPR_WARNING(\"Not a valid gPTP port number: %s\\n\", argv[arg]);\n\t}\n#else\n\tARG_UNUSED(argc);\n\tARG_UNUSED(argv);\n\n\tPR_INFO(\"Set %s to enable %s support.\\n\", \"CONFIG_NET_GPTP\", \"gPTP\");\n#endif\n\n\treturn 0;\n}\n"
 }

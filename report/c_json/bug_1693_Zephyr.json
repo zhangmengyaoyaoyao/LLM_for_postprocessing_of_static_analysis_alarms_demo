@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(mutex, K_OBJ_MUTEX));",
-    "Code_function": "static inline void z_vrfy_k_mutex_unlock(struct k_mutex *mutex)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(mutex, K_OBJ_MUTEX));\n\tZ_OOPS(Z_SYSCALL_VERIFY(mutex->lock_count > 0));\n\tZ_OOPS(Z_SYSCALL_VERIFY(mutex->owner == _current));\n\tz_impl_k_mutex_unlock(mutex);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "ctuArrayIndex",
+    "file": "subsys/net/ip/net_shell.c",
+    "message": "Array index out of bounds; 'argv' buffer size is 0 and it is accessed at offset 1.",
+    "warning_function_name": "cmd_net_stats_iface",
+    "warning_line": "idx = strtol(argv[1], &endptr, 10);",
+    "warning_context": "static int cmd_net_stats_iface(const struct shell *shell, size_t argc,\n\t\t\t       char *argv[])\n{\n#if defined(CONFIG_NET_STATISTICS)\n#if defined(CONFIG_NET_STATISTICS_PER_INTERFACE)\n\tstruct net_shell_user_data data;\n\tstruct net_if *iface;\n\tchar *endptr;\n\tint idx;\n#endif\n#endif\n\n#if defined(CONFIG_NET_STATISTICS)\n#if defined(CONFIG_NET_STATISTICS_PER_INTERFACE)\n\tidx = strtol(argv[1], &endptr, 10);\n\tif (*endptr != '\\0') {\n\t\tPR_WARNING(\"Invalid index %s\\n\", argv[1]);\n\t\treturn -ENOEXEC;\n\t}\n\n\tiface = net_if_get_by_index(idx);\n\tif (!iface) {\n\t\tPR_WARNING(\"No such interface in index %d\\n\", idx);\n\t\treturn -ENOEXEC;\n\t}\n\n\tdata.shell = shell;\n\n\tnet_shell_print_statistics(iface, &data);\n#else\n\tPR_INFO(\"Per network interface statistics not collected.\\n\");\n\tPR_INFO(\"Please enable CONFIG_NET_STATISTICS_PER_INTERFACE\\n\");\n#endif /* CONFIG_NET_STATISTICS_PER_INTERFACE */\n#else\n\tARG_UNUSED(argc);\n\tARG_UNUSED(argv);\n\n\tPR_INFO(\"Set %s to enable %s support.\\n\", \"CONFIG_NET_STATISTICS\",\n\t\t\"statistics\");\n#endif\n\n\treturn 0;\n}\n"
 }

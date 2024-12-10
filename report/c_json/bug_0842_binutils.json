@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: 8 Size: [1, +oo] by call to `append_type`.",
-    "Code_line": "\t  if (! append_type (info, \" vtable \"))",
-    "Code_function": "tg_start_class_type (void *p, const char *tag, unsigned int id,\n\t\t     bfd_boolean structp, unsigned int size,\n\t\t     bfd_boolean vptr, bfd_boolean ownvptr)\n{\n  struct pr_handle *info = (struct pr_handle *) p;\n  char *tv = NULL;\n  const char *name;\n\n  info->indent += 2;\n\n  if (vptr && ! ownvptr)\n    {\n      tv = pop_type (info);\n      if (tv == NULL)\n\treturn FALSE;\n    }\n\n  if (tag != NULL)\n    name = tag;\n  else\n    {\n      char idbuf[20];\n\n      sprintf (idbuf, \"%%anon%u\", id);\n      name = idbuf;\n    }\n\n  if (! push_type (info, name))\n    return FALSE;\n\n  info->stack->flavor = structp ? \"class\" : \"union class\";\n  info->stack->parents = NULL;\n  info->stack->num_parents = 0;\n\n  if (size != 0 || vptr || ownvptr || tag != NULL)\n    {\n      if (vptr)\n\t{\n\t  if (! append_type (info, \" vtable \"))\n\t    return FALSE;\n\t  if (ownvptr)\n\t    {\n\t      if (! append_type (info, \"self \"))\n\t\treturn FALSE;\n\t    }\n\t  else\n\t    {\n\t      if (! append_type (info, tv)\n\t\t  || ! append_type (info, \" \"))\n\t\treturn FALSE;\n\t    }\n\t}\n    }\n\n  info->stack->visibility = DEBUG_VISIBILITY_PRIVATE;\n\n  return TRUE;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "ld/ldlang.c",
+    "message": "pointer `h` last assigned on line 3389 could be null and is dereferenced at line 3392, column 7.",
+    "warning_function_name": "insert_undefined",
+    "warning_line": "if (h->type == bfd_link_hash_new)",
+    "warning_context": "static void\ninsert_undefined (const char *name)\n{\n  struct bfd_link_hash_entry *h;\n\n  h = bfd_link_hash_lookup (link_info.hash, name, TRUE, FALSE, TRUE);\n  if (h == NULL)\n    einfo (_(\"%P%F: bfd_link_hash_lookup failed: %E\\n\"));\n  if (h->type == bfd_link_hash_new)\n    {\n      h->type = bfd_link_hash_undefined;\n      h->u.undef.abfd = NULL;\n      bfd_link_add_undef (link_info.hash, h);\n    }\n}\n"
 }

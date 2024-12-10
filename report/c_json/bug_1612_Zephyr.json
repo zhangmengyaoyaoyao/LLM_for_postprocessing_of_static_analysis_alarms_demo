@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Cppcheck",
-    "Bug Type": "ctuArrayIndex",
-    "Message": "Array index out of bounds; buffer 's' is accessed at offset 0.",
-    "Code_line": "\tt[0]  = s[0]; t[1] = s[5]; t[2] = s[10]; t[3] = s[15];",
-    "Code_function": "\tt[0]  = s[0]; t[1] = s[5]; t[2] = s[10]; t[3] = s[15];"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "drivers/sensor/lps25hb/lps25hb.c",
+    "message": "Uninitialized variable: out",
+    "warning_function_name": "lps25hb_sample_fetch",
+    "warning_line": "data->sample_press = (s32_t)((u32_t)(out[0]) |",
+    "warning_context": "static int lps25hb_sample_fetch(struct device *dev,\n\t\t\t\tenum sensor_channel chan)\n{\n\tstruct lps25hb_data *data = dev->driver_data;\n\tconst struct lps25hb_config *config = dev->config->config_info;\n\tu8_t out[5];\n\tint offset;\n\n\t__ASSERT_NO_MSG(chan == SENSOR_CHAN_ALL);\n\n\tfor (offset = 0; offset < sizeof(out); ++offset) {\n\t\tif (i2c_reg_read_byte(data->i2c_master, config->i2c_slave_addr,\n\t\t\t\t      LPS25HB_REG_PRESS_OUT_XL + offset,\n\t\t\t\t      out + offset) < 0) {\n\t\t\tLOG_DBG(\"failed to read sample\");\n\t\t\treturn -EIO;\n\t\t}\n\t}\n\n\tdata->sample_press = (s32_t)((u32_t)(out[0]) |\n\t\t\t\t\t((u32_t)(out[1]) << 8) |\n\t\t\t\t\t((u32_t)(out[2]) << 16));\n\tdata->sample_temp = (s16_t)((u16_t)(out[3]) |\n\t\t\t\t\t((u16_t)(out[4]) << 8));\n\n\treturn 0;\n}\n"
 }

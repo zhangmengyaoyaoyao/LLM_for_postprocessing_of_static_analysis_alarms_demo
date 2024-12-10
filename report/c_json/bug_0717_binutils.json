@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_S2",
-    "Message": "Offset added: [`info->types.alloc` + 32, +oo] (⇐ `info->types.alloc` + [32, +oo]) Size: [1, +oo] by call to `ieee_alloc_type`.",
-    "Code_line": "  if (! ieee_alloc_type (info, indx, TRUE))",
-    "Code_function": "ieee_read_type_index (struct ieee_info *info, const bfd_byte **pp,\n\t\t      debug_type *ptype)\n{\n  const bfd_byte *start;\n  bfd_vma indx;\n\n  start = *pp;\n\n  if (! ieee_read_number (info, pp, &indx))\n    return FALSE;\n\n  if (indx < 256)\n    {\n      *ptype = ieee_builtin_type (info, start, indx);\n      if (*ptype == NULL)\n\treturn FALSE;\n      return TRUE;\n    }\n\n  indx -= 256;\n  if (! ieee_alloc_type (info, indx, TRUE))\n    return FALSE;\n\n  *ptype = info->types.types[indx].type;\n\n  return TRUE;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "gas/config/obj-elf.c",
+    "message": "pointer `null` is dereferenced by call to `new_logical_line()` at line 1272, column 3.",
+    "warning_function_name": "obj_elf_line",
+    "warning_line": "new_logical_line (NULL, get_absolute_expression ());",
+    "warning_context": "static void\nobj_elf_line (int ignore ATTRIBUTE_UNUSED)\n{\n  /* Assume delimiter is part of expression.  BSD4.2 as fails with\n     delightful bug, so we are not being incompatible here.  */\n  new_logical_line (NULL, get_absolute_expression ());\n  demand_empty_rest_of_line ();\n}\n"
 }

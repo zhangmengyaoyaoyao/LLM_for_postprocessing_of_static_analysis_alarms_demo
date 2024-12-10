@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: [-1, 153] Size: 286 by call to `yy_symbol_print`.",
-    "Code_line": "      yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],",
-    "Code_function": "yy_reduce_print (yyvsp, yyrule)\n    YYSTYPE *yyvsp;\n    int yyrule;\n#endif\n{\n  int yynrhs = yyr2[yyrule];\n  int yyi;\n  unsigned long int yylno = yyrline[yyrule];\n  YYFPRINTF (stderr, \"Reducing stack by rule %d (line %lu):\\n\",\n\t     yyrule - 1, yylno);\n  /* The symbols being reduced.  */\n  for (yyi = 0; yyi < yynrhs; yyi++)\n    {\n      fprintf (stderr, \"   $%d = \", yyi + 1);\n      yy_symbol_print (stderr, yyrhs[yyprhs[yyrule] + yyi],\n\t\t       &(yyvsp[(yyi + 1) - (yynrhs)])\n\t\t       \t\t       );\n      fprintf (stderr, \"\\n\");\n    }\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L2",
+    "file": "binutils/stabs.c",
+    "message": "Offset: [1, 34] Size: 34 by call to `stab_xcoff_builtin_type`.",
+    "warning_function_name": "stab_find_type",
+    "warning_line": "return stab_xcoff_builtin_type (dhandle, info, typenums[1]);",
+    "warning_context": "static debug_type\nstab_find_type (void *dhandle, struct stab_handle *info, const int *typenums)\n{\n  debug_type *slot;\n\n  if (typenums[0] == 0 && typenums[1] < 0)\n    {\n      /* A negative type number indicates an XCOFF builtin type.  */\n      return stab_xcoff_builtin_type (dhandle, info, typenums[1]);\n    }\n\n  slot = stab_find_slot (info, typenums);\n  if (slot == NULL)\n    return DEBUG_TYPE_NULL;\n\n  if (*slot == DEBUG_TYPE_NULL)\n    return debug_make_indirect_type (dhandle, slot, (const char *) NULL);\n\n  return *slot;\n}\n"
 }

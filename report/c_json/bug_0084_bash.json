@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Cppcheck",
+    "category": "arrayIndexOutOfBoundsCond",
+    "file": "support/man2html.c",
+    "message": "Either the condition 'obp>10000' is redundant or the array 'outbuffer[10001]' is accessed at index 10001, which is out of bounds.",
+    "warning_function_name": "out_html",
+    "warning_line": "outbuffer[obp] = '\\0';",
+    "warning_context": "static void\nout_html(char *c)\n{\n\tif (!c)\n\t\treturn;\n\tif (no_newline_output) {\n\t\tint     i = 0;\n\n\t\tno_newline_output = 1;\n\t\twhile (c[i]) {\n\t\t\tif (!no_newline_output)\n\t\t\t\tc[i - 1] = c[i];\n\t\t\tif (c[i] == '\\n')\n\t\t\t\tno_newline_output = 1;\n\t\t\ti++;\n\t\t}\n\t\tif (!no_newline_output)\n\t\t\tc[i - 1] = 0;\n\t}\n\tif (scaninbuff) {\n\t\twhile (*c) {\n\t\t\tif (buffpos >= buffmax) {\n\t\t\t\tchar   *h;\n\n\t\t\t\th = realloc(buffer, buffmax * 2);\n\t\t\t\tif (!h)\n\t\t\t\t\treturn;\n\t\t\t\tbuffer = h;\n\t\t\t\tbuffmax *= 2;\n\t\t\t}\n\t\t\tbuffer[buffpos++] = *c++;\n\t\t}\n\t} else if (output_possible) {\n\t\twhile (*c) {\n\t\t\toutbuffer[obp++] = *c;\n\t\t\tif (*c == '\\n' || obp > HUGE_STR_MAX) {\n\t\t\t\toutbuffer[obp] = '\\0';\n\t\t\t\tadd_links(outbuffer);\n\t\t\t\tobp = 0;\n\t\t\t}\n\t\t\tc++;\n\t\t}\n\t}\n}\n"
+}

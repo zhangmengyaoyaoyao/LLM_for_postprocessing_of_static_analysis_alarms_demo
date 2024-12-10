@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Cppcheck",
-    "Bug Type": "ctuArrayIndex",
-    "Message": "Array index out of bounds; buffer 's' is accessed at offset 0.",
-    "Code_line": "\tt[0]  = s[0]; t[1] = s[13]; t[2] = s[10]; t[3] = s[7];",
-    "Code_function": "\tt[0]  = s[0]; t[1] = s[13]; t[2] = s[10]; t[3] = s[7];"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "drivers/flash/flash_sam0.c",
+    "message": "Uninitialized variable: err",
+    "warning_function_name": "flash_sam0_write_protection",
+    "warning_line": "return err;",
+    "warning_context": "static int flash_sam0_write_protection(struct device *dev, bool enable)\n{\n\toff_t offset;\n\tint err;\n\n\tflash_sam0_sem_take(dev);\n\n\tfor (offset = 0; offset < CONFIG_FLASH_SIZE * 1024;\n\t     offset += LOCK_REGION_SIZE) {\n\t\t*FLASH_MEM(offset) = 0U;\n\n\t\tif (enable) {\n\t\t\tNVMCTRL->CTRLA.reg = NVMCTRL_CTRLA_CMD_LR |\n\t\t\t\t\t     NVMCTRL_CTRLA_CMDEX_KEY;\n\t\t} else {\n\t\t\tNVMCTRL->CTRLA.reg = NVMCTRL_CTRLA_CMD_UR |\n\t\t\t\t\t     NVMCTRL_CTRLA_CMDEX_KEY;\n\t\t}\n\t\terr = flash_sam0_check_status(offset);\n\t\tif (err != 0) {\n\t\t\tgoto done;\n\t\t}\n\t}\n\ndone:\n\tflash_sam0_sem_give(dev);\n\n\treturn err;\n}\n"
 }

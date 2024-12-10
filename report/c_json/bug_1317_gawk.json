@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "awkgram.y",
+    "message": "Offset added: [72, +oo] Size: [0, +oo] by call to `make_params`.",
+    "warning_function_name": "install_function",
+    "warning_line": "f->fparms = make_params(pnames, pcount);",
+    "warning_context": "static int\ninstall_function(char *fname, INSTRUCTION *fi, INSTRUCTION *plist)\n{\n\tNODE *r, *f;\n\tint pcount = 0;\n\n\tr = lookup(fname);\n\tif (r != NULL) {\n\t\terror_ln(fi->source_line, _(\"function name `%s' previously defined\"), fname);\n\t\treturn -1;\n\t}\n\n\tif (plist != NULL)\n\t\tpcount = plist->lasti->param_count + 1;\n\tf = install_symbol(fname, Node_func);\n\tfi->func_body = f;\n\tf->param_cnt = pcount;\n\tf->code_ptr = fi;\n\tf->fparms = NULL; \n\tif (pcount > 0) {\n\t\tchar **pnames;\n\t\tpnames = check_params(fname, pcount, plist);\t/* frees plist */\n\t\tf->fparms = make_params(pnames, pcount);\n\t\tefree(pnames);\n\t\tinstall_params(f);\n\t}\n\treturn 0;\n}\n"
+}

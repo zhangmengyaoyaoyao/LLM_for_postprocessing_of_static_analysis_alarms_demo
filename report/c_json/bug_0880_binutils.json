@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: 1 Size: [0, +oo] by call to `_bfd_elf_strtab_add`.",
-    "Code_line": "  strindex = _bfd_elf_strtab_add (hash_table->dynstr, soname, FALSE);",
-    "Code_function": "elf_add_dt_needed_tag (bfd *abfd,\n\t\t       struct bfd_link_info *info,\n\t\t       const char *soname,\n\t\t       bfd_boolean do_it)\n{\n  struct elf_link_hash_table *hash_table;\n  bfd_size_type strindex;\n\n  if (!_bfd_elf_link_create_dynstrtab (abfd, info))\n    return -1;\n\n  hash_table = elf_hash_table (info);\n  strindex = _bfd_elf_strtab_add (hash_table->dynstr, soname, FALSE);\n  if (strindex == (bfd_size_type) -1)\n    return -1;\n\n  if (_bfd_elf_strtab_refcount (hash_table->dynstr, strindex) != 1)\n    {\n      asection *sdyn;\n      const struct elf_backend_data *bed;\n      bfd_byte *extdyn;\n\n      bed = get_elf_backend_data (hash_table->dynobj);\n      sdyn = bfd_get_linker_section (hash_table->dynobj, \".dynamic\");\n      if (sdyn != NULL)\n\tfor (extdyn = sdyn->contents;\n\t     extdyn < sdyn->contents + sdyn->size;\n\t     extdyn += bed->s->sizeof_dyn)\n\t  {\n\t    Elf_Internal_Dyn dyn;\n\n\t    bed->s->swap_dyn_in (hash_table->dynobj, extdyn, &dyn);\n\t    if (dyn.d_tag == DT_NEEDED\n\t\t&& dyn.d_un.d_val == strindex)\n\t      {\n\t\t_bfd_elf_strtab_delref (hash_table->dynstr, strindex);\n\t\treturn 1;\n\t      }\n\t  }\n    }\n\n  if (do_it)\n    {\n      if (!_bfd_elf_link_create_dynamic_sections (hash_table->dynobj, info))\n\treturn -1;\n\n      if (!_bfd_elf_add_dynamic_entry (info, DT_NEEDED, strindex))\n\treturn -1;\n    }\n  else\n    /* We were just checking for existence of the tag.  */\n    _bfd_elf_strtab_delref (hash_table->dynstr, strindex);\n\n  return 0;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "UNINITIALIZED_VALUE",
+    "file": "binutils/stabs.c",
+    "message": "The value read from type was never initialized.",
+    "warning_function_name": "stab_demangle_arg",
+    "warning_line": "(*pargs)[*pcount] = type;",
+    "warning_context": "static bfd_boolean\nstab_demangle_arg (struct stab_demangle_info *minfo, const char **pp,\n\t\t   debug_type **pargs, unsigned int *pcount,\n\t\t   unsigned int *palloc)\n{\n  const char *start;\n  debug_type type;\n\n  start = *pp;\n  if (! stab_demangle_type (minfo, pp,\n\t\t\t    pargs == NULL ? (debug_type *) NULL : &type)\n      || ! stab_demangle_remember_type (minfo, start, *pp - start))\n    return FALSE;\n\n  if (pargs != NULL)\n    {\n      if (type == DEBUG_TYPE_NULL)\n\treturn FALSE;\n\n      if (*pcount + 1 >= *palloc)\n\t{\n\t  *palloc += 10;\n\t  *pargs = ((debug_type *)\n\t\t    xrealloc (*pargs, *palloc * sizeof **pargs));\n\t}\n      (*pargs)[*pcount] = type;\n      ++*pcount;\n    }\n\n  return TRUE;\n}\n"
 }

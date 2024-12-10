@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Cppcheck",
+    "category": "memleakOnRealloc",
+    "file": "vms/vms_args.c",
+    "message": "Common realloc mistake: 'v_argv' nulled but not freed upon failure",
+    "warning_function_name": "v_add_arg",
+    "warning_line": "v_argv = (char **)realloc((char *)v_argv,",
+    "warning_context": "void\nv_add_arg( int idx, const char *val )\n{\n#ifdef DEBUG_VMS\n    fprintf(stderr, \"v_add_arg: v_argv[%d] \", idx);\n#endif\n    if (idx + 1 >= v_argz) {\t/* 'v_argz' is the current size of v_argv[] */\n\tint old_size = v_argz;\n\n\tv_argz = idx + 10;\t/* increment by arbitrary amount */\n\tif (old_size == 0)\n\t    v_argv = (char **)malloc((unsigned)(v_argz * sizeof(char **)));\n\telse\n\t    v_argv = (char **)realloc((char *)v_argv,\n\t\t\t\t     (unsigned)(v_argz * sizeof(char **)));\n\tif (v_argv == NULL) {\t/* error */\n\t    fatal(\"%s: %s: can't allocate memory (%s)\", \"vms_args\",\n\t\t  \"v_argv\", strerror(errno));\n\t} else {\n\t    while (old_size < v_argz)  v_argv[old_size++] = NULL;\n\t}\n    }\n    v_argv[idx] = (char *)val;\n#ifdef DEBUG_VMS\n    fprintf(stderr, \"= \\\"%s\\\"\\n\", val);\n#endif\n}\n"
+}

@@ -1,0 +1,10 @@
+{
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "bfd/elf-attrs.c",
+    "message": "Offset added: [-20, 107] (⇐ [-52, 75] + 32) Size: 4064.",
+    "warning_function_name": "elf_new_obj_attr",
+    "warning_line": "memset (list, 0, sizeof (obj_attribute_list));",
+    "warning_context": "static obj_attribute *\nelf_new_obj_attr (bfd *abfd, int vendor, int tag)\n{\n  obj_attribute *attr;\n  obj_attribute_list *list;\n  obj_attribute_list *p;\n  obj_attribute_list **lastp;\n\n\n  if (tag < NUM_KNOWN_OBJ_ATTRIBUTES)\n    {\n      /* Known tags are preallocated.  */\n      attr = &elf_known_obj_attributes (abfd)[vendor][tag];\n    }\n  else\n    {\n      /* Create a new tag.  */\n      list = (obj_attribute_list *)\n\tbfd_alloc (abfd, sizeof (obj_attribute_list));\n      memset (list, 0, sizeof (obj_attribute_list));\n      list->tag = tag;\n      /* Keep the tag list in order.  */\n      lastp = &elf_other_obj_attributes (abfd)[vendor];\n      for (p = *lastp; p; p = p->next)\n\t{\n\t  if (tag < p->tag)\n\t    break;\n\t  lastp = &p->next;\n\t}\n      list->next = *lastp;\n      *lastp = list;\n      attr = &list->attr;\n    }\n\n  return attr;\n}\n"
+}

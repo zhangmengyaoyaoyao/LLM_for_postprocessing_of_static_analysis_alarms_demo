@@ -1,0 +1,10 @@
+{
+    "project": "tiff",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "tools/tiffcrop.c",
+    "message": "pointer `sect_buff` last assigned on line 7185 could be null and is dereferenced by call to `_TIFFmemset()` at line 7190, column 7.",
+    "warning_function_name": "createImageSection",
+    "warning_line": "_TIFFmemset(sect_buff, 0, sectsize);",
+    "warning_context": "static int\ncreateImageSection(uint32 sectsize, unsigned char **sect_buff_ptr)\n  {\n  unsigned  char *sect_buff = NULL;\n  unsigned  char *new_buff  = NULL;\n  static    uint32  prev_sectsize = 0;\n  \n  sect_buff = *sect_buff_ptr;\n\n  if (!sect_buff)\n    {\n    sect_buff = (unsigned char *)_TIFFmalloc(sectsize);\n    *sect_buff_ptr = sect_buff;\n    _TIFFmemset(sect_buff, 0, sectsize);\n    }\n  else\n    {\n    if (prev_sectsize < sectsize)\n      {\n      new_buff = _TIFFrealloc(sect_buff, sectsize);\n      if (!new_buff)\n        {\n\tfree (sect_buff);\n        sect_buff = (unsigned char *)_TIFFmalloc(sectsize);\n        }\n      else\n        sect_buff = new_buff;\n\n      _TIFFmemset(sect_buff, 0, sectsize);\n      }\n    }\n\n  if (!sect_buff)\n    {\n    TIFFError(\"createImageSection\", \"Unable to allocate/reallocate section buffer\");\n    return (-1);\n    }\n  prev_sectsize = sectsize;\n  *sect_buff_ptr = sect_buff;\n\n  return (0);\n  }  /* end createImageSection */\n"
+}

@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(stack, K_OBJ_STACK));",
-    "Code_function": "static inline int z_vrfy_k_stack_pop(struct k_stack *stack,\n\t\t\t\t     stack_data_t *data, s32_t timeout)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(stack, K_OBJ_STACK));\n\tZ_OOPS(Z_SYSCALL_MEMORY_WRITE(data, sizeof(stack_data_t)));\n\treturn z_impl_k_stack_pop(stack, data, timeout);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "tests/lib/sprintf/src/main.c",
+    "message": "Uninitialized variable: &count",
+    "warning_function_name": "test_sprintf_misc",
+    "warning_line": "sprintf(buffer, \"test data %n test data\", &count);",
+    "warning_context": "void test_sprintf_misc(void)\n{\n\tint count;\n\tchar buffer[100];\n\n\t/*******************/\n\tsprintf(buffer, \"%p\", (void *) DEADBEEF);\n\tzassert_false((strcmp(buffer, DEADBEEF_PTR_STR) != 0),\n\t\t      \"sprintf(%%p).  Expected '%s', got '%s'\", DEADBEEF_PTR_STR, buffer);\n\t/*******************/\n\tsprintf(buffer, \"test data %n test data\", &count);\n\tzassert_false((count != 10), \"sprintf(%%n).  Expected count to be %d, not %d\",\n\t\t      10, count);\n\n\tzassert_false((strcmp(buffer, \"test data  test data\") != 0),\n\t\t      \"sprintf(%%p).  Expected '%s', got '%s'\",\n\t\t      \"test data  test data\", buffer);\n\n\t/*******************/\n\tsprintf(buffer, \"%*d\", 10, 1234);\n\tzassert_true((strcmp(buffer, \"      1234\") == 0),\n\t\t     \"sprintf(%%p).  Expected '%s', got '%s'\",\n\t\t     \"      1234\", buffer);\n\n\t/*******************/\n\tsprintf(buffer, \"%*d\", -10, 1234);\n\tzassert_true((strcmp(buffer, \"1234      \") == 0),\n\t\t     \"sprintf(%%p).  Expected '%s', got '%s'\",\n\t\t     \"1234      \", buffer);\n\n\t/*******************/\n\tsprintf(buffer, \"% d\", 1234);\n\tzassert_true((strcmp(buffer, \" 1234\") == 0),\n\t\t     \"sprintf(%% d). Expected '%s', got '%s'\",\n\t\t     \" 1234\", buffer);\n\n\t/*******************/\n\tsprintf(buffer, \"%hx\", (unsigned short)1234);\n\tzassert_true((strcmp(\"4d2\", buffer) == 0),\n\t\t     \"sprintf(%%hx).  Expected '4d2', got '%s'\", buffer);\n\n\t/*******************/\n\tsprintf(buffer, \"%lx\", 1234ul);\n\tzassert_true((strcmp(\"4d2\", buffer) == 0),\n\t\t     \"sprintf(%%lx).  Expected '4d2', got '%s'\", buffer);\n\n}\n"
 }

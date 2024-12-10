@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "node.c",
+    "message": "pointer `r->sub.val.sp` last assigned on line 380 could be null and is dereferenced by call to `memcpy()` at line 381, column 3.",
+    "warning_function_name": "make_str_node",
+    "warning_line": "memcpy(r->stptr, s, len);",
+    "warning_context": "NODE *\nmake_str_node(const char *s, size_t len, int flags)\n{\n\tNODE *r;\n\tgetnode(r);\n\tr->type = Node_val;\n\tr->numbr = 0;\n\tr->flags = (MALLOC|STRING|STRCUR);\n\tr->valref = 1;\n\tr->stfmt = -1;\n\tr->wstptr = NULL;\n\tr->wstlen = 0;\n\n\tif ((flags & ALREADY_MALLOCED) != 0)\n\t\tr->stptr = (char *) s;\n\telse {\n\t\temalloc(r->stptr, char *, len + 2, \"make_str_node\");\n\t\tmemcpy(r->stptr, s, len);\n\t}\n\tr->stptr[len] = '\\0';\n       \n\tif ((flags & SCAN) != 0) {\t/* scan for escape sequences */\n\t\tconst char *pf;\n\t\tchar *ptm;\n\t\tint c;\n\t\tconst char *end;\n\t\tmbstate_t cur_state;\n\n\t\tmemset(& cur_state, 0, sizeof(cur_state));\n\n\t\tend = &(r->stptr[len]);\n\t\tfor (pf = ptm = r->stptr; pf < end;) {\n\t\t\t/*\n\t\t\t * Keep multibyte characters together. This avoids\n\t\t\t * problems if a subsequent byte of a multibyte\n\t\t\t * character happens to be a backslash.\n\t\t\t */\n\t\t\tif (gawk_mb_cur_max > 1) {\n\t\t\t\tint mblen = mbrlen(pf, end-pf, &cur_state);\n\n\t\t\t\tif (mblen > 1) {\n\t\t\t\t\tint i;\n\n\t\t\t\t\tfor (i = 0; i < mblen; i++)\n\t\t\t\t\t\t*ptm++ = *pf++;\n\t\t\t\t\tcontinue;\n\t\t\t\t}\n\t\t\t}\n\n\t\t\tc = *pf++;\n\t\t\tif (c == '\\\\') {\n\t\t\t\tc = parse_escape(&pf);\n\t\t\t\tif (c < 0) {\n\t\t\t\t\tif (do_lint)\n\t\t\t\t\t\tlintwarn(_(\"backslash at end of string\"));\n\t\t\t\t\tc = '\\\\';\n\t\t\t\t}\n\t\t\t\t*ptm++ = c;\n\t\t\t} else\n\t\t\t\t*ptm++ = c;\n\t\t}\n\t\tlen = ptm - r->stptr;\n\t\terealloc(r->stptr, char *, len + 1, \"make_str_node\");\n\t\tr->stptr[len] = '\\0';\n\t}\n\tr->stlen = len;\n\n\treturn r;\n}\n"
+}

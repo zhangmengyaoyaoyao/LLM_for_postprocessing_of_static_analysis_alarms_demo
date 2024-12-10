@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(queue, K_OBJ_QUEUE));",
-    "Code_function": "static inline int z_vrfy_k_queue_is_empty(struct k_queue *queue)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(queue, K_OBJ_QUEUE));\n\treturn z_impl_k_queue_is_empty(queue);\n}"
+    "project": "Zephyr",
+    "tool": "Infer",
+    "category": "Null Dereference",
+    "file": "kernel/mailbox.c",
+    "message": "pointer `sending_thread` last assigned on line 432 could be null and is dereferenced at line 433, column 33.",
+    "warning_function_name": "k_mbox_get",
+    "warning_line": "tx_msg = (struct k_mbox_msg *)sending_thread->base.swap_data;",
+    "warning_context": "int k_mbox_get(struct k_mbox *mbox, struct k_mbox_msg *rx_msg, void *buffer,\n\t       s32_t timeout)\n{\n\tstruct k_thread *sending_thread;\n\tstruct k_mbox_msg *tx_msg;\n\tk_spinlock_key_t key;\n\tint result;\n\n\t/* save receiver id so it can be used during message matching */\n\trx_msg->tx_target_thread = _current;\n\n\t/* search mailbox's tx queue for a compatible sender */\n\tkey = k_spin_lock(&mbox->lock);\n\n\t_WAIT_Q_FOR_EACH(&mbox->tx_msg_queue, sending_thread) {\n\t\ttx_msg = (struct k_mbox_msg *)sending_thread->base.swap_data;\n\n\t\tif (mbox_message_match(tx_msg, rx_msg) == 0) {\n\t\t\t/* take sender out of mailbox's tx queue */\n\t\t\tz_unpend_thread(sending_thread);\n\n\t\t\tk_spin_unlock(&mbox->lock, key);\n\n\t\t\t/* consume message data immediately, if needed */\n\t\t\treturn mbox_message_data_check(rx_msg, buffer);\n\t\t}\n\t}\n\n\t/* didn't find a matching sender */\n\n\tif (timeout == K_NO_WAIT) {\n\t\t/* don't wait for a matching sender to appear */\n\t\tk_spin_unlock(&mbox->lock, key);\n\t\treturn -ENOMSG;\n\t}\n\n\t/* wait until a matching sender appears or a timeout occurs */\n\t_current->base.swap_data = rx_msg;\n\tresult = z_pend_curr(&mbox->lock, key, &mbox->rx_msg_queue, timeout);\n\n\t/* consume message data immediately, if needed */\n\tif (result == 0) {\n\t\tresult = mbox_message_data_check(rx_msg, buffer);\n\t}\n\n\treturn result;\n}\n"
 }

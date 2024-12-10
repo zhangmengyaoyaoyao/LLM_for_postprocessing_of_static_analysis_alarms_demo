@@ -2,7 +2,7 @@
 文件夹       | 说明
 ----------- | -----
 prompts  | 存放提示词
-report  | 原始数据。spotbugs_linked是完整的警告（包含手工标记结果），spotbugs/是最终的json格式Java项目警告；c_json预计存放json格式C/C++项目警告，有待完善。
+report  | 原始数据。spotbugs_linked是完整的警告（包含手工标记结果），spotbugs/是最终的json格式Java项目警告；c_json预计存放json格式C/C++项目警告。
 response  | LLMs返回的回答，子文件夹名称代表“LLM/prompt_technique/project_name”
 src  | 核心代码
 src/llm  | 从不同平台调用不同LLMs
@@ -79,6 +79,10 @@ json格式：report/spotbugs_json
 ``` 
 
 ### C/C++
+#### 提取函数上下文
+提取警告所在函数
+若函数长度超过100行，则以警告上下100行代码作为警告上下文
+
 #### 预处理-格式转换
 report/csv2json_c.py: 转换为json格式
 
@@ -96,7 +100,7 @@ bug
 
 
 # 实验进度
-Java项目
+**Java项目**
 
 模型    | 项目1  | 项目2 | 项目3 | 项目4 
 -------- | ----- | ----- | ----- | -----  
@@ -104,6 +108,9 @@ Java项目
 Llama3.1-70B-Instruct | √ | √ | √ | √ 
 GLM-4-flash | √ | √ | √ | √ 
 
+**C项目**
+
+已完成的模型：
 
 # TODO
 已解决 1、提示词的example以md形式改写

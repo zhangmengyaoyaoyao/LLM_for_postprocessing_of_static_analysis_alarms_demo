@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "cint_array.c",
+    "message": "pointer `new` last assigned on line 1129 could be null and is dereferenced by call to `memset()` at line 1130, column 2.",
+    "warning_function_name": "f_copy(NO",
+    "warning_line": "memset(new, '\\0', size * sizeof(NODE *));",
+    "warning_context": "static void\nleaf_copy(NODE *newsymb, NODE *array, NODE *newarray)\n{\n\tNODE **old, **new;\n\tlong size, i;\n\n\tsize = array->array_size;\n\temalloc(new, NODE **, size * sizeof(NODE *), \"leaf_copy\");\n\tmemset(new, '\\0', size * sizeof(NODE *));\n\tnewarray->nodes = new;\n\tnewarray->array_size = size;\n\tnewarray->array_base = array->array_base;\n\tnewarray->flags = array->flags;\n\tnewarray->table_size = array->table_size;\n\n\told = array->nodes;\n\tfor (i = 0; i < size; i++) {\n\t\tif (old[i] == NULL)\n\t\t\tcontinue;\n\t\tif (old[i]->type == Node_val)\n\t\t\tnew[i] = dupnode(old[i]);\n\t\telse {\n\t\t\tNODE *r;\n\t\t\tr = make_array();\n\t\t\tr->vname = estrdup(old[i]->vname, strlen(old[i]->vname));\n\t\t\tr->parent_array = newsymb;\n\t\t\tnew[i] = assoc_copy(old[i], r);\n\t\t}\n\t}\n}\n"
+}

@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "bashline.c",
+    "message": "pointer `value` last assigned on line 2256 could be null and is dereferenced at line 2260, column 4.",
+    "warning_function_name": "variable_completion_function",
+    "warning_line": "value[0] = first_char;",
+    "warning_context": "static char *\nvariable_completion_function (text, state)\n     const char *text;\n     int state;\n{\n  static char **varlist = (char **)NULL;\n  static int varlist_index;\n  static char *varname = (char *)NULL;\n  static int namelen;\n  static int first_char, first_char_loc;\n\n  if (!state)\n    {\n      if (varname)\n\tfree (varname);\n\n      first_char_loc = 0;\n      first_char = text[0];\n\n      if (first_char == '$')\n\tfirst_char_loc++;\n\n      if (text[first_char_loc] == '{')\n\tfirst_char_loc++;\n\n      varname = savestring (text + first_char_loc);\n\n      namelen = strlen (varname);\n      if (varlist)\n\tstrvec_dispose (varlist);\n\n      varlist = all_variables_matching_prefix (varname);\n      varlist_index = 0;\n    }\n\n  if (!varlist || !varlist[varlist_index])\n    {\n      return ((char *)NULL);\n    }\n  else\n    {\n      char *value;\n\n      value = (char *)xmalloc (4 + strlen (varlist[varlist_index]));\n\n      if (first_char_loc)\n\t{\n\t  value[0] = first_char;\n\t  if (first_char_loc == 2)\n\t    value[1] = '{';\n\t}\n\n      strcpy (value + first_char_loc, varlist[varlist_index]);\n      if (first_char_loc == 2)\n\tstrcat (value, \"}\");\n\n      varlist_index++;\n      return (value);\n    }\n}\n"
+}

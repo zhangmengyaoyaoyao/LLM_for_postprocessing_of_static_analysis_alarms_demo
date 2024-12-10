@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "negativeIndex",
+    "file": "tests/emcute/main.c",
+    "message": "Either the condition 'idx<0' is redundant or the array '_subscriptions[4]' is accessed at index -1, which is out of bounds.",
+    "warning_function_name": "sub(",
+    "warning_line": "_subscriptions[idx].cb = _on_pub;",
+    "warning_context": "static int _sub(int argc, char **argv)\n{\n    unsigned flags = EMCUTE_QOS_0;\n    int idx;\n    bool was_set = false;\n\n    if (argc < 2) {\n        printf(\"usage: %s <topic name> [QoS level]\\n\", argv[0]);\n        return 1;\n    }\n\n    if (strlen(argv[1]) > EMCUTE_TOPIC_MAXLEN) {\n        puts(\"error: topic name exceeds maximum possible size\");\n        return 1;\n    }\n    if (argc >= 3) {\n        flags |= _get_qos(argv[2]);\n    }\n\n    idx = _topic_name_find(argv[1]);\n    if (idx < 0) {\n        puts(\"error: no space to subscribe\");\n    }\n\n    _subscriptions[idx].cb = _on_pub;\n    if (_topic_names[idx][0] != '\\0') {\n        was_set = true;\n    }\n    else {\n        strncpy(_topic_names[idx], argv[1], EMCUTE_TOPIC_MAXLEN);\n    }\n    _subscriptions[idx].topic.name = _topic_names[idx];\n    if (emcute_sub(&_subscriptions[idx], flags) != EMCUTE_OK) {\n        printf(\"error: unable to subscribe to %s\\n\", argv[1]);\n        if (was_set) {\n            _topic_names[idx][0] = '\\0';\n        }\n        memset(&_subscriptions[idx], 0, sizeof(emcute_sub_t));\n        return 1;\n    }\n\n    printf(\"success: now subscribed to %s\\n\", argv[1]);\n    return 0;\n}\n"
+}

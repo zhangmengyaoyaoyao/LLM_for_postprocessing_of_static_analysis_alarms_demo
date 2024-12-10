@@ -1,0 +1,10 @@
+{
+    "project": "combine",
+    "tool": "Cppcheck",
+    "category": "memleak",
+    "file": "src/index.c",
+    "message": "Memory leak: index_base_file_name",
+    "warning_function_name": "open_index_file",
+    "warning_line": "return EXIT_FAILURE;",
+    "warning_context": "int\nopen_index_file (filename, streams, new)\n     char *filename;\n     FILE **streams;\n     int new;\n{\n  char *index_base_file_name;\n  char *index_record_file_name;\n  int return_code;\n\n  index_base_file_name = malloc (strlen (filename) + 4);\n  if (index_base_file_name == NULL)\n    return EXIT_FAILURE;\n\n  sprintf (index_base_file_name, \"%s.ib\", filename);\n  streams[0] = fopen (index_base_file_name, \"a+\");\n  if (streams[0] == NULL) {\n    perror (index_base_file_name);\n    return EXIT_FAILURE;\n    }\n\n  if (new != 0) {\n    return_code = truncate (index_base_file_name, 0);\n    if (return_code != 0) {\n      perror (index_base_file_name);\n      return EXIT_FAILURE;\n      }\n    }\n\n  free (index_base_file_name);\n\n  index_record_file_name = malloc (strlen (filename) + 4);\n  if (index_record_file_name == NULL)\n    return EXIT_FAILURE;\n\n  sprintf (index_record_file_name, \"%s.ir\", filename);\n  streams[1] = fopen (index_record_file_name, \"a+\");\n  if (streams[1] == NULL) {\n    perror (index_record_file_name);\n    return EXIT_FAILURE;\n    }\n\n  if (new != 0) {\n    return_code = truncate (index_record_file_name, 0);\n    if (return_code != 0) {\n      perror (index_record_file_name);\n      return EXIT_FAILURE;\n      }\n    }\n\n  free (index_record_file_name);\n\n  return EXIT_SUCCESS;\n  }\n"
+}

@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ_NEVER_INIT(stack, K_OBJ_STACK));",
-    "Code_function": "static inline s32_t z_vrfy_k_stack_alloc_init(struct k_stack *stack,\n\t\t\t\t\t      u32_t num_entries)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ_NEVER_INIT(stack, K_OBJ_STACK));\n\tZ_OOPS(Z_SYSCALL_VERIFY(num_entries > 0));\n\treturn z_impl_k_stack_alloc_init(stack, num_entries);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Divide By Zero",
+    "file": "subsys/settings/src/settings_line.c",
+    "message": "Either the condition 'rem' is redundant or there is division by zero at line 83.",
+    "warning_function_name": "settings_line_write",
+    "warning_line": "rem %= wbs;",
+    "warning_context": "int settings_line_write(const char *name, const char *value, size_t val_len,\n\t\t\toff_t w_loc, void *cb_arg)\n{\n\tsize_t w_size, rem, add;\n\n#ifdef CONFIG_SETTINGS_USE_BASE64\n\t/* minimal buffer for encoding base64 + EOL*/\n\tchar enc_buf[MAX_ENC_BLOCK_SIZE + 1];\n\n\tchar *p_enc = enc_buf;\n\tsize_t enc_len = 0;\n#endif\n\n\tbool done;\n\tchar w_buf[16]; /* write buff, must be aligned either to minimal */\n\t\t\t/* base64 encoding size and write-block-size */\n\tint rc;\n\tu8_t wbs = settings_io_cb.rwbs;\n#ifdef CONFIG_SETTINGS_ENCODE_LEN\n\tu16_t len_field;\n#endif\n\n\trem = strlen(name);\n\n#ifdef CONFIG_SETTINGS_ENCODE_LEN\n\tlen_field = settings_line_len_calc(name, val_len);\n\tmemcpy(w_buf, &len_field, sizeof(len_field));\n\tw_size = 0;\n\n\n\tadd = sizeof(len_field) % wbs;\n\tif (add) {\n\t\tw_size = wbs - add;\n\t\tif (rem < w_size) {\n\t\t\tw_size = rem;\n\t\t}\n\n\t\tmemcpy(w_buf + sizeof(len_field), name, w_size);\n\t\tname += w_size;\n\t\trem -= w_size;\n\t}\n\n\tw_size += sizeof(len_field);\n\tif (w_size % wbs == 0) {\n\t\trc = settings_io_cb.write_cb(cb_arg, w_loc, w_buf, w_size);\n\t\tif (rc) {\n\t\t\treturn -EIO;\n\t\t}\n\t}\n\t/* The Alternative to condition above mean that `rem == 0` as `name` */\n\t/* must have been consumed\t\t\t\t\t     */\n#endif\n\tw_size = rem - rem % wbs;\n\trem %= wbs;\n\n\trc = settings_io_cb.write_cb(cb_arg, w_loc, name, w_size);\n\tw_loc += w_size;\n\tname += w_size;\n\tw_size = rem;\n\n\tif (rem) {\n\t\tmemcpy(w_buf, name, rem);\n\t}\n\n\tw_buf[rem] = '=';\n\tw_size++;\n\n\trem = val_len;\n\tdone = false;\n\n\twhile (1) {\n\t\twhile (w_size < sizeof(w_buf)) {\n#ifdef CONFIG_SETTINGS_USE_BASE64\n\t\t\tif (enc_len) {\n\t\t\t\tadd = MIN(enc_len, sizeof(w_buf) - w_size);\n\t\t\t\tmemcpy(&w_buf[w_size], p_enc, add);\n\t\t\t\tenc_len -= add;\n\t\t\t\tw_size += add;\n\t\t\t\tp_enc += add;\n\t\t\t} else {\n#endif\n\t\t\t\tif (rem) {\n#ifdef CONFIG_SETTINGS_USE_BASE64\n\t\t\t\t\tadd = MIN(rem, MAX_ENC_BLOCK_SIZE/4*3);\n\t\t\t\t\trc = base64_encode(enc_buf, sizeof(enc_buf), &enc_len, value, add);\n\t\t\t\t\tif (rc) {\n\t\t\t\t\t\treturn -EINVAL;\n\t\t\t\t\t}\n\t\t\t\t\tvalue += add;\n\t\t\t\t\trem -= add;\n\t\t\t\t\tp_enc = enc_buf;\n#else\n\t\t\t\t\tadd = MIN(rem, sizeof(w_buf) - w_size);\n\t\t\t\t\tmemcpy(&w_buf[w_size], value, add);\n\t\t\t\t\tvalue += add;\n\t\t\t\t\trem -= add;\n\t\t\t\t\tw_size += add;\n#endif\n\t\t\t\t} else {\n\t\t\t\t\tadd = (w_size) % wbs;\n\t\t\t\t\tif (add) {\n"
 }

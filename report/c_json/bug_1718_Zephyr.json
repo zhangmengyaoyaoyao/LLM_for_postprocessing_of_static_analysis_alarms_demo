@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from state was never initialized.",
-    "Code_line": "\t\tLOG_ERR(\"Unexpected result(%u) set while state is %u\",",
-    "Code_function": "void lwm2m_firmware_set_update_result(u8_t result)\n{\n\tu8_t state;\n\tbool error = false;\n\n\t/* Check LWM2M SPEC appendix E.6.1 */\n\tswitch (result) {\n\tcase RESULT_DEFAULT:\n\t\tlwm2m_firmware_set_update_state(STATE_IDLE);\n\t\tbreak;\n\tcase RESULT_SUCCESS:\n\t\tif (update_state != STATE_UPDATING) {\n\t\t\terror = true;\n\t\t\tstate = update_state;\n\t\t}\n\n\t\tlwm2m_firmware_set_update_state(STATE_IDLE);\n\t\tbreak;\n\tcase RESULT_NO_STORAGE:\n\tcase RESULT_OUT_OF_MEM:\n\tcase RESULT_CONNECTION_LOST:\n\tcase RESULT_UNSUP_FW:\n\tcase RESULT_INVALID_URI:\n\tcase RESULT_UNSUP_PROTO:\n\t\tif (update_state != STATE_DOWNLOADING) {\n\t\t\terror = true;\n\t\t\tstate = update_state;\n\t\t}\n\n\t\tlwm2m_firmware_set_update_state(STATE_IDLE);\n\t\tbreak;\n\tcase RESULT_INTEGRITY_FAILED:\n\t\tif (update_state != STATE_DOWNLOADING &&\n\t\t    update_state != STATE_UPDATING) {\n\t\t\terror = true;\n\t\t\tstate = update_state;\n\t\t}\n\n\t\tlwm2m_firmware_set_update_state(STATE_IDLE);\n\t\tbreak;\n\tcase RESULT_UPDATE_FAILED:\n\t\tif (update_state != STATE_DOWNLOADING &&\n\t\t    update_state != STATE_UPDATING) {\n\t\t\terror = true;\n\t\t\tstate = update_state;\n\t\t}\n\n\t\tlwm2m_firmware_set_update_state(STATE_IDLE);\n\t\tbreak;\n\tdefault:\n\t\tLOG_ERR(\"Unhandled result: %u\", result);\n\t\treturn;\n\t}\n\n\tif (error) {\n\t\tLOG_ERR(\"Unexpected result(%u) set while state is %u\",\n\t\t\tresult, state);\n\t}\n\n\tupdate_result = result;\n\tNOTIFY_OBSERVER(LWM2M_OBJECT_FIRMWARE_ID, 0, FIRMWARE_UPDATE_RESULT_ID);\n\tLOG_DBG(\"Update result = %d\", update_result);\n}"
+    "project": "Zephyr",
+    "tool": "Infer",
+    "category": "Uninitialized Value",
+    "file": "ext/lib/crypto/tinycrypt/source/sha256.c",
+    "message": "The value read from work_space[_] was never initialized.",
+    "warning_function_name": "compress",
+    "warning_line": "s1 = work_space[(i+14)&0x0f];",
+    "warning_context": "static void compress(unsigned int *iv, const uint8_t *data)\n{\n\tunsigned int a, b, c, d, e, f, g, h;\n\tunsigned int s0, s1;\n\tunsigned int t1, t2;\n\tunsigned int work_space[16];\n\tunsigned int n;\n\tunsigned int i;\n\n\ta = iv[0]; b = iv[1]; c = iv[2]; d = iv[3];\n\te = iv[4]; f = iv[5]; g = iv[6]; h = iv[7];\n\n\tfor (i = 0; i < 16; ++i) {\n\t\tn = BigEndian(&data);\n\t\tt1 = work_space[i] = n;\n\t\tt1 += h + Sigma1(e) + Ch(e, f, g) + k256[i];\n\t\tt2 = Sigma0(a) + Maj(a, b, c);\n\t\th = g; g = f; f = e; e = d + t1;\n\t\td = c; c = b; b = a; a = t1 + t2;\n\t}\n\n\tfor ( ; i < 64; ++i) {\n\t\ts0 = work_space[(i+1)&0x0f];\n\t\ts0 = sigma0(s0);\n\t\ts1 = work_space[(i+14)&0x0f];\n\t\ts1 = sigma1(s1);\n\n\t\tt1 = work_space[i&0xf] += s0 + s1 + work_space[(i+9)&0xf];\n\t\tt1 += h + Sigma1(e) + Ch(e, f, g) + k256[i];\n\t\tt2 = Sigma0(a) + Maj(a, b, c);\n\t\th = g; g = f; f = e; e = d + t1;\n\t\td = c; c = b; b = a; a = t1 + t2;\n\t}\n\n\tiv[0] += a; iv[1] += b; iv[2] += c; iv[3] += d;\n\tiv[4] += e; iv[5] += f; iv[6] += g; iv[7] += h;\n}\n"
 }

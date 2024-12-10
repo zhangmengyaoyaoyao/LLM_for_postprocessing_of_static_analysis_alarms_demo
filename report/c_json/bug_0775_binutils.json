@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: [1, +oo] Size: [0, +oo] by call to `stab_modify_type`.",
-    "Code_line": "  return stab_modify_type (info, 'k', info->type_stack->size,",
-    "Code_function": "stab_const_type (void *p)\n{\n  struct stab_write_handle *info = (struct stab_write_handle *) p;\n\n  return stab_modify_type (info, 'k', info->type_stack->size,\n\t\t\t   (long **) NULL, (size_t *) NULL);\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "bfd/coffgen.c",
+    "message": "Offset added: [560, 583] (⇐ [0, 23] + 560) Size: [528, 590] by call to `bfd_zalloc`.",
+    "warning_function_name": "coff_bfd_make_debug_symbol",
+    "warning_line": "new_symbol->native = (combined_entry_type *) bfd_zalloc (abfd, amt);",
+    "warning_context": "asymbol *\ncoff_bfd_make_debug_symbol (bfd *abfd,\n\t\t\t    void * ptr ATTRIBUTE_UNUSED,\n\t\t\t    unsigned long sz ATTRIBUTE_UNUSED)\n{\n  bfd_size_type amt = sizeof (coff_symbol_type);\n  coff_symbol_type *new_symbol = (coff_symbol_type *) bfd_alloc (abfd, amt);\n\n  if (new_symbol == NULL)\n    return NULL;\n  /* @@ The 10 is a guess at a plausible maximum number of aux entries\n     (but shouldn't be a constant).  */\n  amt = sizeof (combined_entry_type) * 10;\n  new_symbol->native = (combined_entry_type *) bfd_zalloc (abfd, amt);\n  if (!new_symbol->native)\n    return NULL;\n  new_symbol->native->is_sym = TRUE;\n  new_symbol->symbol.section = bfd_abs_section_ptr;\n  new_symbol->symbol.flags = BSF_DEBUGGING;\n  new_symbol->lineno = NULL;\n  new_symbol->done_lineno = FALSE;\n  new_symbol->symbol.the_bfd = abfd;\n\n  return & new_symbol->symbol;\n}\n"
 }

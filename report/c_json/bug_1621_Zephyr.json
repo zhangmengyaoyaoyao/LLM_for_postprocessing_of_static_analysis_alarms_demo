@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Cppcheck",
-    "Bug Type": "Null Pointer Dereference",
-    "Message": "Null pointer dereference: conn",
-    "Code_line": "\t\t\ttcp_state_to_str(conn->state, false),",
-    "Code_function": "\t\t\ttcp_state_to_str(conn->state, false),"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "lib/posix/pthread.c",
+    "message": "Either the condition 'thread_spec_data!=NULL' is redundant or there is possible null pointer dereference: thread_spec_data.",
+    "warning_function_name": "pthread_exit",
+    "warning_line": "key_obj = thread_spec_data->key;",
+    "warning_context": "void pthread_exit(void *retval)\n{\n\tstruct posix_thread *self = (struct posix_thread *)pthread_self();\n\tpthread_key_obj *key_obj;\n\tpthread_thread_data *thread_spec_data;\n\tsys_snode_t *node_l;\n\n\t/* Make a thread as cancelable before exiting */\n\tpthread_mutex_lock(&self->cancel_lock);\n\tif (self->cancel_state == PTHREAD_CANCEL_DISABLE) {\n\t\tself->cancel_state = PTHREAD_CANCEL_ENABLE;\n\t}\n\n\tpthread_mutex_unlock(&self->cancel_lock);\n\n\tpthread_mutex_lock(&self->state_lock);\n\tif (self->state == PTHREAD_JOINABLE) {\n\t\tself->retval = retval;\n\t\tself->state = PTHREAD_EXITED;\n\t\tself->retval = retval;\n\t\tpthread_cond_broadcast(&self->state_cond);\n\t} else {\n\t\tself->state = PTHREAD_TERMINATED;\n\t}\n\n\tSYS_SLIST_FOR_EACH_NODE(&self->key_list, node_l) {\n\t\tthread_spec_data = (pthread_thread_data *)node_l;\n\t\tkey_obj = thread_spec_data->key;\n\t\tif ((key_obj->destructor != NULL) && (thread_spec_data != NULL)) {\n\t\t\t(key_obj->destructor)(thread_spec_data->spec_data);\n\t\t}\n\t}\n\n\tpthread_mutex_unlock(&self->state_lock);\n\tk_thread_abort((k_tid_t)self);\n}\n"
 }

@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: 0 Size: [0, 32].",
-    "Code_line": "\tfmt_list[fmt_hiwater] = dupnode(n);",
-    "Code_function": "fmt_index(NODE *n)\n{\n\tint ix = 0;\n\tstatic int fmt_num = 4;\n\tstatic int fmt_hiwater = 0;\n\n\tif (fmt_list == NULL)\n\t\temalloc(fmt_list, NODE **, fmt_num*sizeof(*fmt_list), \"fmt_index\");\n\tn = force_string(n);\n\twhile (ix < fmt_hiwater) {\n\t\tif (cmp_nodes(fmt_list[ix], n) == 0)\n\t\t\treturn ix;\n\t\tix++;\n\t}\n\t/* not found */\n\tn->stptr[n->stlen] = '\\0';\n\tif (do_lint && ! fmt_ok(n))\n\t\tlintwarn(_(\"bad `%sFMT' specification `%s'\"),\n\t\t\t    n == CONVFMT_node->var_value ? \"CONV\"\n\t\t\t  : n == OFMT_node->var_value ? \"O\"\n\t\t\t  : \"\", n->stptr);\n\n\tif (fmt_hiwater >= fmt_num) {\n\t\tfmt_num *= 2;\n\t\terealloc(fmt_list, NODE **, fmt_num * sizeof(*fmt_list), \"fmt_index\");\n\t}\n\tfmt_list[fmt_hiwater] = dupnode(n);\n\treturn fmt_hiwater++;\n}"
-}

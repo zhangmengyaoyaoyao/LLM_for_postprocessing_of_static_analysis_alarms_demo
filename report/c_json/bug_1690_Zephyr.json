@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(timer, K_OBJ_TIMER));",
-    "Code_function": "static inline void *z_vrfy_k_timer_user_data_get(struct k_timer *timer)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(timer, K_OBJ_TIMER));\n\treturn z_impl_k_timer_user_data_get(timer);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "ctuArrayIndex",
+    "file": "subsys/bluetooth/mesh/shell.c",
+    "message": "Array index out of bounds; 'argv' buffer size is 0 and it is accessed at offset 1.",
+    "warning_function_name": "hb_pub_set",
+    "warning_line": "pub.dst = strtoul(argv[1], NULL, 0);",
+    "warning_context": "static int hb_pub_set(const struct shell *shell, size_t argc, char *argv[])\n{\n\tstruct bt_mesh_cfg_hb_pub pub;\n\tu8_t status;\n\tint err;\n\n\tpub.dst = strtoul(argv[1], NULL, 0);\n\tpub.count = strtoul(argv[2], NULL, 0);\n\tpub.period = strtoul(argv[3], NULL, 0);\n\tpub.ttl = strtoul(argv[4], NULL, 0);\n\tpub.feat = strtoul(argv[5], NULL, 0);\n\tpub.net_idx = strtoul(argv[5], NULL, 0);\n\n\terr = bt_mesh_cfg_hb_pub_set(net.net_idx, net.dst, &pub, &status);\n\tif (err) {\n\t\tshell_error(shell, \"Heartbeat Publication Set failed (err %d)\",\n\t\t\t    err);\n\t\treturn 0;\n\t}\n\n\tif (status) {\n\t\tshell_print(shell, \"Heartbeat Publication Set failed \"\n\t\t\t    \"(status 0x%02x)\", status);\n\t} else {\n\t\tshell_print(shell, \"Heartbeat publication successfully set\");\n\t}\n\n\treturn 0;\n}\n"
 }

@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "lib/malloc/stats.c",
+    "message": "Uninitialized variable: fname",
+    "warning_function_name": "_imalloc_fopen",
+    "warning_line": "fp = fopen (fname, \"w\");",
+    "warning_context": "FILE *\n_imalloc_fopen (s, fn, def, defbuf, defsiz)\n     char *s;\n     char *fn;\n     char *def;\n     char *defbuf;\n     size_t defsiz;\n{\n  char fname[1024];\n  long l;\n  FILE *fp;\n\n  l = (long)getpid ();\n  if (fn == 0)\n    {\n      sprintf (defbuf, \"%s%ld\", def, l);\n      fp = fopen(defbuf, \"w\");\n    }\n  else\n    {\n      char *p, *q, *r;\n      char pidbuf[32];\n      int sp;\n\n      sprintf (pidbuf, \"%ld\", l);\n      if ((strlen (pidbuf) + strlen (fn) + 2) >= sizeof (fname))\n\treturn ((FILE *)0);\n      for (sp = 0, p = fname, q = fn; *q; )\n\t{\n\t  if (sp == 0 && *q == '%' && q[1] == 'p')\n\t    {\n\t      sp = 1;\n\t      for (r = pidbuf; *r; )\n\t\t*p++ = *r++;\n\t      q += 2;\n\t    }\n\t  else\n\t    *p++ = *q++;\n\t}\n      *p = '\\0';\n      fp = fopen (fname, \"w\");\n    }\n\n  return fp;\n}\n"
+}

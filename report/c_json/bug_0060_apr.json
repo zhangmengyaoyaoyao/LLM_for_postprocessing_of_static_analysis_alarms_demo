@@ -1,0 +1,10 @@
+{
+    "project": "apr",
+    "tool": "CSA",
+    "category": "core.UndefinedBinaryOperatorResult",
+    "file": "file_io/unix/filestat.c",
+    "message": "The left operand of '/' is a garbage value",
+    "warning_function_name": "apr_file_mtime_set",
+    "warning_line": "tvp[0].tv_sec = apr_time_sec(finfo.atime);",
+    "warning_context": "APR_DECLARE(apr_status_t) apr_file_mtime_set(const char *fname,\n                                              apr_time_t mtime,\n                                              apr_pool_t *pool)\n{\n    apr_status_t status;\n    apr_finfo_t finfo;\n\n    status = apr_stat(&finfo, fname, APR_FINFO_ATIME, pool);\n    if (status) {\n        return status;\n    }\n\n#ifdef HAVE_UTIMES\n    {\n      struct timeval tvp[2];\n    \n      tvp[0].tv_sec = apr_time_sec(finfo.atime);\n      tvp[0].tv_usec = apr_time_usec(finfo.atime);\n      tvp[1].tv_sec = apr_time_sec(mtime);\n      tvp[1].tv_usec = apr_time_usec(mtime);\n      \n      if (utimes(fname, tvp) == -1) {\n        return errno;\n      }\n    }\n#elif defined(HAVE_UTIME)\n    {\n      struct utimbuf buf;\n      \n      buf.actime = (time_t) (finfo.atime / APR_USEC_PER_SEC);\n      buf.modtime = (time_t) (mtime / APR_USEC_PER_SEC);\n      \n      if (utime(fname, &buf) == -1) {\n        return errno;\n      }\n    }\n#else\n    return APR_ENOTIMPL;\n#endif\n\n    return APR_SUCCESS;\n}\n"
+}

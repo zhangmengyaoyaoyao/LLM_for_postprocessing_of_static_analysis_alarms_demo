@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ_NEVER_INIT(q, K_OBJ_MSGQ));",
-    "Code_function": "int z_vrfy_k_msgq_alloc_init(struct k_msgq *q, size_t msg_size,\n\t\t\t    u32_t max_msgs)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ_NEVER_INIT(q, K_OBJ_MSGQ));\n\n\treturn z_impl_k_msgq_alloc_init(q, msg_size, max_msgs);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "subsys/usb/usb_descriptor.c",
+    "message": "Uninitialized variable: dev",
+    "warning_function_name": "usb_get_dev_data_by_cfg",
+    "warning_line": "const struct usb_cfg_data *cfg_cur = dev->config->config_info;",
+    "warning_context": "struct usb_dev_data *usb_get_dev_data_by_cfg(sys_slist_t *list,\n\t\t\t\t\t     struct usb_cfg_data *cfg)\n{\n\tstruct usb_dev_data *dev_data;\n\n\tSYS_SLIST_FOR_EACH_CONTAINER(list, dev_data, node) {\n\t\tstruct device *dev = dev_data->dev;\n\t\tconst struct usb_cfg_data *cfg_cur = dev->config->config_info;\n\n\t\tif (cfg_cur == cfg) {\n\t\t\treturn dev_data;\n\t\t}\n\t}\n\n\tLOG_DBG(\"Device data not found for cfg %p\", cfg);\n\n\treturn NULL;\n}\n"
 }

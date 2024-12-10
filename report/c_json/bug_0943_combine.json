@@ -1,0 +1,10 @@
+{
+    "project": "combine",
+    "tool": "Cppcheck",
+    "category": "memleak",
+    "file": "src/dstring.c",
+    "message": "Memory leak: temp_string",
+    "warning_function_name": "dstrtonum",
+    "warning_line": "return return_val;",
+    "warning_context": "BIGNUMBER\ndstrtonum (string, remainder, base)\n     DStr_string_descriptor *string;\n     DStr_string_descriptor **remainder;\n     int base;\n{\n  BIGNUMBER return_val;\n  char *temp_string;\n  char *temp_remainder;\n\n  if (remainder != NULL)\n    *remainder = string;\n\n  temp_string = malloc (string->length + 1);\n  if (temp_string == NULL)\n    return 0;\n\n  memcpy (temp_string, string->string, string->length);\n  temp_string[string->length] = '\\0';\n\n  return_val = STRTOBIGNUMBER (temp_string, &temp_remainder, base);\n  if (*temp_remainder == '\\0') {\n    /* Either we used the wholde string, or there was an embedded null. */\n    if (temp_remainder - temp_string == string->length) {\n      if (remainder != NULL)\n\t*remainder = NULL;\n      free (temp_string);\n      return return_val;\n      }\n    }\n\n  if (remainder != NULL) {\n    *remainder = dstrnew ();\n    if (*remainder == NULL) {\n      *remainder = string;\n      free (temp_string);\n      return return_val;\n      }\n    (*remainder)->length = string->length - (temp_remainder - temp_string);\n    (*remainder)->string = string->string + (temp_remainder - temp_string);\n    }\n\n  return return_val;\n\n  }\n"
+}

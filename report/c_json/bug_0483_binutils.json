@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Cppcheck",
-    "Bug Type": "uninitvar",
-    "Message": "Uninitialized variable: &rel",
-    "Code_line": "\t      SWAP_RELOC_IN (htab) (output_bfd, p, &rel);",
-    "Code_function": "\t      SWAP_RELOC_IN (htab) (output_bfd, p, &rel);"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_S2",
+    "file": "gas/macro.c",
+    "message": "Offset: [`name->len` + 1, +oo] Size: [1, +oo] by call to `sb_add_char`.",
+    "warning_function_name": "get_token",
+    "warning_line": "sb_add_char (name, in->ptr[idx++]);",
+    "warning_context": "static size_t\nget_token (size_t idx, sb *in, sb *name)\n{\n  if (idx < in->len\n      && is_name_beginner (in->ptr[idx]))\n    {\n      sb_add_char (name, in->ptr[idx++]);\n      while (idx < in->len\n\t     && is_part_of_name (in->ptr[idx]))\n\t{\n\t  sb_add_char (name, in->ptr[idx++]);\n\t}\n      if (idx < in->len\n\t     && is_name_ender (in->ptr[idx]))\n\t{\n\t  sb_add_char (name, in->ptr[idx++]);\n\t}\n    }\n  /* Ignore trailing &.  */\n  if (macro_alternate && idx < in->len && in->ptr[idx] == '&')\n    idx++;\n  return idx;\n}\n"
 }

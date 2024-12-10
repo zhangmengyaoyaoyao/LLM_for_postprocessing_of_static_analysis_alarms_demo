@@ -1,0 +1,10 @@
+{
+    "project": "apr",
+    "tool": "CSA",
+    "category": "core.uninitialized.Assign",
+    "file": "strings/apr_strings.c",
+    "message": "Assigned value is garbage or undefined",
+    "warning_function_name": "apr_pstrcat",
+    "warning_line": "len = saved_lengths[nargs++];",
+    "warning_context": "APR_DECLARE_NONSTD(char *) apr_pstrcat(apr_pool_t *a, ...)\n{\n    char *cp, *argp, *res;\n    apr_size_t saved_lengths[MAX_SAVED_LENGTHS];\n    int nargs = 0;\n\n    /* Pass one --- find length of required string */\n\n    apr_size_t len = 0;\n    va_list adummy;\n\n    va_start(adummy, a);\n\n    while ((cp = va_arg(adummy, char *)) != NULL) {\n        apr_size_t cplen = strlen(cp);\n        if (nargs < MAX_SAVED_LENGTHS) {\n            saved_lengths[nargs++] = cplen;\n        }\n        len += cplen;\n    }\n\n    va_end(adummy);\n\n    /* Allocate the required string */\n\n    res = (char *) apr_palloc(a, len + 1);\n    cp = res;\n\n    /* Pass two --- copy the argument strings into the result space */\n\n    va_start(adummy, a);\n\n    nargs = 0;\n    while ((argp = va_arg(adummy, char *)) != NULL) {\n        if (nargs < MAX_SAVED_LENGTHS) {\n            len = saved_lengths[nargs++];\n        }\n        else {\n            len = strlen(argp);\n        }\n \n        memcpy(cp, argp, len);\n        cp += len;\n    }\n\n    va_end(adummy);\n\n    /* Return the result string */\n\n    *cp = '\\0';\n\n    return res;\n}\n"
+}

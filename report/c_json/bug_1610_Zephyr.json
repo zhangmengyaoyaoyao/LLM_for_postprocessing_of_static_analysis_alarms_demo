@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Cppcheck",
-    "Bug Type": "ctuArrayIndex",
-    "Message": "Array index out of bounds; buffer 'out' is accessed at offset 0.",
-    "Code_line": "\tout[0] = _double_byte(in[0]) ^ triple(in[1]) ^ in[2] ^ in[3];",
-    "Code_function": "\tout[0] = _double_byte(in[0]) ^ triple(in[1]) ^ in[2] ^ in[3];"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "drivers/pwm/pwm_stm32.c",
+    "message": "Uninitialized variable: apb_psc",
+    "warning_function_name": "__get_tim_clk",
+    "warning_line": "if (apb_psc == 1U) {",
+    "warning_context": "static u32_t __get_tim_clk(u32_t bus_clk,\n\t\t\t      clock_control_subsys_t *sub_system)\n{\n\tstruct stm32_pclken *pclken = (struct stm32_pclken *)(sub_system);\n\tu32_t tim_clk, apb_psc;\n\n\tif (pclken->bus == STM32_CLOCK_BUS_APB1) {\n\t\tapb_psc = CONFIG_CLOCK_STM32_APB1_PRESCALER;\n\t}\n#if !defined(CONFIG_SOC_SERIES_STM32F0X) && !defined(CONFIG_SOC_SERIES_STM32G0X)\n\telse {\n\t\tapb_psc = CONFIG_CLOCK_STM32_APB2_PRESCALER;\n\t}\n#endif\n\n\t/*\n\t * If the APB prescaler equals 1, the timer clock frequencies\n\t * are set to the same frequency as that of the APB domain.\n\t * Otherwise, they are set to twice (×2) the frequency of the\n\t * APB domain.\n\t */\n\tif (apb_psc == 1U) {\n\t\ttim_clk = bus_clk;\n\t} else\t{\n\t\ttim_clk = bus_clk * 2U;\n\t}\n\n\treturn tim_clk;\n}\n"
 }

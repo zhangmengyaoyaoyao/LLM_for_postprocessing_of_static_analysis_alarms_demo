@@ -1,0 +1,10 @@
+{
+    "project": "diffutils",
+    "tool": "Cppcheck",
+    "category": "memleak",
+    "file": "gnulib-tests/test-setlocale1.c",
+    "message": "Memory leak: name1",
+    "warning_function_name": "main",
+    "warning_line": "return 1;",
+    "warning_context": "int\nmain (int argc, char *argv[])\n{\n  char *name1;\n  char *name2;\n\n  /* Try to set the locale by implicitly looking at the LC_ALL environment\n     variable.\n     configure should already have checked that the locale is supported.  */\n  if (setlocale (LC_ALL, \"\") == NULL)\n    return 1;\n\n  name1 = strdup (setlocale (LC_ALL, NULL));\n\n  /* Reset the locale.  */\n  if (setlocale (LC_ALL, \"C\") == NULL)\n    return 1;\n\n  /* Try to set the locale by explicitly looking at the LC_ALL environment\n     variable.\n     configure should already have checked that the locale is supported.  */\n  if (setlocale (LC_ALL, getenv (\"LC_ALL\")) == NULL)\n    return 1;\n\n  name2 = strdup (setlocale (LC_ALL, NULL));\n\n  /* Test that the two results are the same.  */\n  ASSERT (strcmp (name1, name2) == 0);\n\n  return 0;\n}\n"
+}

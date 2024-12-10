@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "tests/fault_handler/main.c",
+    "message": "Null pointer dereference: (volatile int*)(0x00000000)",
+    "warning_function_name": "main",
+    "warning_line": "int readback = *((volatile int *) FORBIDDEN_ADDRESS);",
+    "warning_context": "int main(void)\n{\n    puts(\"Fault handler test application\");\n    printf(\"This application will crash by attempting to write to address 0x%08x\\n\", FORBIDDEN_ADDRESS);\n    puts(\"Waiting 1 second before crashing...\");\n    xtimer_usleep(1000000);\n    puts(\"Write to forbidden address \" PRINT_MACRO(FORBIDDEN_ADDRESS));\n    *((volatile int *) FORBIDDEN_ADDRESS) = 12345;\n    int readback = *((volatile int *) FORBIDDEN_ADDRESS);\n    printf(\"readback: 0x%08x\\n\", readback);\n    puts(\"We did not expect the application to survive the previous write.\");\n    puts(\"Trying to execute an invalid instruction\");\n    puts(PRINT_MACRO(INVALID_INSTRUCTION));\n    INVALID_INSTRUCTION;\n    puts(\"Failed to crash the program, hanging...\");\n    while(1);\n    return 0;\n}\n"
+}

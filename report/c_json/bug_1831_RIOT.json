@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "drivers/at24cxxx/at24cxxx.c",
+    "message": "Uninitialized variable: check",
+    "warning_function_name": "t(co",
+    "warning_line": "return check;",
+    "warning_context": "static\nint _set(const at24cxxx_t *dev, uint32_t pos, uint8_t val, size_t len)\n{\n    int check;\n    uint8_t set_buffer[AT24CXXX_SET_BUF_SIZE];\n\n    memset(set_buffer, val, sizeof(set_buffer));\n    while (len) {\n        size_t clen = MIN(sizeof(set_buffer), len);\n        check = _write(dev, pos, set_buffer, clen);\n        if (!check) {\n            len -= clen;\n            pos += clen;\n        }\n        else {\n            break;\n        }\n    }\n    return check;\n}\n"
+}

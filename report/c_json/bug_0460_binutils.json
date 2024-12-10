@@ -1,0 +1,10 @@
+{
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "bfd/binary.c",
+    "message": "Offset: [-162, 189] (⇐ [-164, 187] + 2) Size: 4064.",
+    "warning_function_name": "binary_canonicalize_symtab",
+    "warning_line": "syms[2].the_bfd = abfd;",
+    "warning_context": "static long\nbinary_canonicalize_symtab (bfd *abfd, asymbol **alocation)\n{\n  asection *sec = (asection *) abfd->tdata.any;\n  asymbol *syms;\n  unsigned int i;\n  bfd_size_type amt = BIN_SYMS * sizeof (asymbol);\n\n  syms = (asymbol *) bfd_alloc (abfd, amt);\n  if (syms == NULL)\n    return -1;\n\n  /* Start symbol.  */\n  syms[0].the_bfd = abfd;\n  syms[0].name = mangle_name (abfd, \"start\");\n  syms[0].value = 0;\n  syms[0].flags = BSF_GLOBAL;\n  syms[0].section = sec;\n  syms[0].udata.p = NULL;\n\n  /* End symbol.  */\n  syms[1].the_bfd = abfd;\n  syms[1].name = mangle_name (abfd, \"end\");\n  syms[1].value = sec->size;\n  syms[1].flags = BSF_GLOBAL;\n  syms[1].section = sec;\n  syms[1].udata.p = NULL;\n\n  /* Size symbol.  */\n  syms[2].the_bfd = abfd;\n  syms[2].name = mangle_name (abfd, \"size\");\n  syms[2].value = sec->size;\n  syms[2].flags = BSF_GLOBAL;\n  syms[2].section = bfd_abs_section_ptr;\n  syms[2].udata.p = NULL;\n\n  for (i = 0; i < BIN_SYMS; i++)\n    *alocation++ = syms++;\n  *alocation = NULL;\n\n  return BIN_SYMS;\n}\n"
+}

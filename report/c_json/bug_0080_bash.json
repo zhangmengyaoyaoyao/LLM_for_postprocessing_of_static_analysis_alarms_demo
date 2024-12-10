@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Cppcheck",
+    "category": "arrayIndexOutOfBounds",
+    "file": "lib/readline/vi_mode.c",
+    "message": "Array 'mb[1]' accessed at index 1, which is out of bounds.",
+    "warning_function_name": "rl_vi_change_char",
+    "warning_line": "mb[1] = '\\0';",
+    "warning_context": "int\nrl_vi_change_char (count, key)\n     int count, key;\n{\n  int c;\n  char mb[MB_LEN_MAX];\n\n  if (vi_redoing)\n    {\n      c = _rl_vi_last_replacement;\n      mb[0] = c;\n      mb[1] = '\\0';\n    }\n#if defined (READLINE_CALLBACKS)\n  else if (RL_ISSTATE (RL_STATE_CALLBACK))\n    {\n      _rl_callback_data = _rl_callback_data_alloc (count);\n      _rl_callback_func = _rl_vi_callback_change_char;\n      return (0);\n    }\n#endif\n  else\n    _rl_vi_last_replacement = c = _rl_vi_callback_getchar (mb, MB_LEN_MAX);\n\n  if (c < 0)\n    return -1;\n\n  return (_rl_vi_change_char (count, c, mb));\n}\n"
+}

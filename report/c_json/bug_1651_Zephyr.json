@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Null Dereference",
-    "Message": "pointer `null` is dereferenced by call to `bt_hci_cmd_send_sync()` at line 4583, column 8.",
-    "Code_line": "\terr = bt_hci_cmd_send_sync(BT_HCI_OP_READ_BUFFER_SIZE, NULL, &rsp);",
-    "Code_function": "static int br_init(void)\n{\n#if defined(CONFIG_BT_CONN)\n\tstruct net_buf *rsp;\n\tint err;\n\n\tif (bt_dev.le.mtu) {\n\t\treturn 0;\n\t}\n\n\t/* Use BR/EDR buffer size if LE reports zero buffers */\n\terr = bt_hci_cmd_send_sync(BT_HCI_OP_READ_BUFFER_SIZE, NULL, &rsp);\n\tif (err) {\n\t\treturn err;\n\t}\n\n\tread_buffer_size_complete(rsp);\n\tnet_buf_unref(rsp);\n#endif /* CONFIG_BT_CONN */\n\n\treturn 0;\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "subsys/net/l2/ieee802154/ieee802154_shell.c",
+    "message": "Either the condition 'n' is redundant or there is possible null pointer dereference: p.",
+    "warning_function_name": "parse_channel_set",
+    "warning_line": "n = strchr(p, ':');",
+    "warning_context": "static inline u32_t parse_channel_set(char *str_set)\n{\n\tu32_t channel_set = 0U;\n\tchar *p, *n;\n\n\tp = str_set;\n\n\tdo {\n\t\tu32_t chan;\n\n\t\tn = strchr(p, ':');\n\t\tif (n) {\n\t\t\t*n = '\\0';\n\t\t}\n\n\t\tchan = atoi(p);\n\t\tif (chan > 0 && chan < 32) {\n\t\t\tchannel_set |= BIT(chan - 1);\n\t\t}\n\n\t\tp = n ? n + 1 : n;\n\t} while (n);\n\n\treturn channel_set;\n}\n"
 }

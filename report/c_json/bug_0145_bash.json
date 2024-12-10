@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Infer",
+    "category": "UNINITIALIZED_VALUE",
+    "file": "lib/glob/glob.c",
+    "message": "The value read from r was never initialized.",
+    "warning_function_name": "wextglob_skipname",
+    "warning_line": "return r;",
+    "warning_context": "static int\nwextglob_skipname (pat, dname, flags)\n     wchar_t *pat, *dname;\n     int flags;\n{\n#if EXTENDED_GLOB\n  wchar_t *pp, *pe, *t, n;\n  int r;\n\n  pp = pat + 2;\n  pe = pp + wcslen (pp) - 1;\t/*(*/\n  if (*pe != L')')\n    return 0;\n  if ((t = wcschr (pp, L'|')) == 0)\n    {\n      *pe = L'\\0';\n      r = wchkname (pp, dname); /*(*/\n      *pe = L')';\n      return r;\n    }\n  while (t = glob_patscan_wc (pp, pe, '|'))\n    {\n      n = t[-1];\n      t[-1] = L'\\0';\n      r = wchkname (pp, dname);\n      t[-1] = n;\n      if (r == 0)\n\treturn 0;\n      pp = t;\n    }\n\n  if (pp == pe)\t\t/* glob_patscan_wc might find end of pattern */\n    return r;\n\n  *pe = L'\\0';\n  r = wchkname (pp, dname);\t/*(*/\n  *pe = L')';\n  return r;\n#else\n  return (wchkname (pat, dname));\n#endif\n}\n"
+}

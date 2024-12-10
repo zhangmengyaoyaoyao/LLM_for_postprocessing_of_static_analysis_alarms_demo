@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Null Dereference",
-    "Message": "pointer `null` is dereferenced by call to `bt_hci_cmd_send_sync()` at line 75, column 8.",
-    "Code_line": "\tret = bt_hci_cmd_send_sync(BT_HCI_OP_LE_RAND, NULL, &rsp);",
-    "Code_function": "int prng_init(void)\n{\n\tstruct bt_hci_rp_le_rand *rp;\n\tstruct net_buf *rsp;\n\tint ret;\n\n\t/* Check first that HCI_LE_Rand is supported */\n\tif (!BT_CMD_TEST(bt_dev.supported_commands, 27, 7)) {\n\t\treturn -ENOTSUP;\n\t}\n\n\tret = bt_hci_cmd_send_sync(BT_HCI_OP_LE_RAND, NULL, &rsp);\n\tif (ret) {\n\t\treturn ret;\n\t}\n\n\trp = (void *)rsp->data;\n\n\tret = tc_hmac_prng_init(&prng, rp->rand, sizeof(rp->rand));\n\n\tnet_buf_unref(rsp);\n\n\tif (ret == TC_CRYPTO_FAIL) {\n\t\tBT_ERR(\"Failed to initialize PRNG\");\n\t\treturn -EIO;\n\t}\n\n\t/* re-seed is needed after init */\n\treturn prng_reseed(&prng);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "subsys/net/ip/route.c",
+    "message": "Uninitialized variable: nexthop_route->nbr",
+    "warning_function_name": "net_route_del_by_nexthop",
+    "warning_line": "if (nexthop_route->nbr == nbr_nexthop) {",
+    "warning_context": "int net_route_del_by_nexthop(struct net_if *iface, struct in6_addr *nexthop)\n{\n\tint count = 0, status = 0;\n\tstruct net_nbr *nbr_nexthop;\n\tstruct net_route_nexthop *nexthop_route;\n\tint i, ret;\n\n\tNET_ASSERT(iface);\n\tNET_ASSERT(nexthop);\n\n\tnbr_nexthop = net_ipv6_nbr_lookup(iface, nexthop);\n\n\tfor (i = 0; i < CONFIG_NET_MAX_ROUTES; i++) {\n\t\tstruct net_nbr *nbr = get_nbr(i);\n\t\tstruct net_route_entry *route = net_route_data(nbr);\n\n\t\tif (!route) {\n\t\t\tcontinue;\n\t\t}\n\n\t\tSYS_SLIST_FOR_EACH_CONTAINER(&route->nexthop, nexthop_route,\n\t\t\t\t\t     node) {\n\t\t\tif (nexthop_route->nbr == nbr_nexthop) {\n\t\t\t\t/* This route contains this nexthop */\n\t\t\t\tret = net_route_del(route);\n\t\t\t\tif (!ret) {\n\t\t\t\t\tcount++;\n\t\t\t\t} else {\n\t\t\t\t\tstatus = ret;\n\t\t\t\t}\n\t\t\t\tbreak;\n\t\t\t}\n\t\t}\n\t}\n\n\tif (count) {\n\t\treturn count;\n\t} else if (status < 0) {\n\t\treturn status;\n\t}\n\n\treturn 0;\n}\n"
 }

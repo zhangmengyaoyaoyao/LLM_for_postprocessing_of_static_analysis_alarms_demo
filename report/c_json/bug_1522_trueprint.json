@@ -1,8 +1,0 @@
-{
-    "Project": "trueprint",
-    "Tool": "Infer",
-    "Bug Type": "UNINITIALIZED_VALUE",
-    "Message": "The value read from opt_argv[_] was never initialized.",
-    "Code_line": "  opt_argv[0] = opt_argv[1];",
-    "Code_function": "handle_string_options(char *options)\n\n{\n  int\topt_argc = -1;\n  char\targuments[100][100];\n  char\t*opt_argv[100];\n  int\toptions_index = -1;\n  int\targv_index = 0;\n  boolean\tquoted = FALSE;\n  boolean ended = FALSE;\n\n  if (options == (char *)0) return;\n  if (strlen(options) == 0) return;\n\n  while (ended == FALSE)\n    {\n      switch (options[++options_index])\n\t{\n\tcase ' ':\n\tcase '\t':\n\t  if (quoted)\n\t    {\n\t      if (argv_index == 0) opt_argc += 1;\n\t      arguments[opt_argc][argv_index++] = options[options_index];\n\t      continue;\n\t    }\n\t  if (argv_index > 0)\n\t    {\n\t      arguments[opt_argc][argv_index] = '\\0';\n\t      argv_index = 0;\n\t    }\n\t  break;\n\n\tcase '\\0':\n\t  if (argv_index > 0)\n\t    {\n\t      arguments[opt_argc][argv_index] = '\\0';\n\t      argv_index = 0;\n\t    }\n\t  ended = TRUE;\n\t  break;\n\n\tcase '\"':\n\t  if (quoted) quoted = FALSE;\n\t  else\n\t    quoted = TRUE;\n\t  break;\n\n\tdefault:\n\t  if (argv_index == 0) opt_argc += 1;\n\t  arguments[opt_argc][argv_index++] = options[options_index];\n\t  break;\n\t}\n    }\n  opt_argc += 1;\n\n  for (argv_index=0; argv_index < opt_argc; argv_index++)\n    opt_argv[argv_index+1] = arguments[argv_index];\n\n  opt_argv[0] = opt_argv[1];\n  opt_argc += 1;\n\n  handle_options(opt_argc, opt_argv);\n  return;\n}"
-}

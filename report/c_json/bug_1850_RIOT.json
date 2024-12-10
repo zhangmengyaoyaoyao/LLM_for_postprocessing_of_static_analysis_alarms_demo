@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "sys/clif/clif.c",
+    "message": "Uninitialized variable: &_dummy_attr",
+    "warning_function_name": "clif_decode_link",
+    "warning_line": "clif_attr_t *attr = attrs ? &attrs[link->attrs_len] : &_dummy_attr;",
+    "warning_context": "ssize_t clif_decode_link(clif_t *link, clif_attr_t *attrs, unsigned attrs_len,\n                         const char *buf, size_t maxlen)\n{\n\n    assert(buf);\n    assert(link);\n\n    char *pos;\n    const char *end = buf + maxlen;\n    clif_attr_t _dummy_attr;\n\n    ssize_t size = clif_get_target(buf, maxlen, &pos);\n    if (size < 0) {\n        return CLIF_NOT_FOUND;\n    }\n    link->target = pos;\n    link->target_len = size;\n    link->attrs_len = 0;\n    link->attrs = attrs;\n    pos += size + 1; /* escape the '>' */\n\n    DEBUG(\"Found target (%u): %.*s\\n\", (unsigned)size, (unsigned)size,\n          link->target);\n\n    /* if there is no attr array iterate over the buffer, if not until all\n     * the array is used */\n    while ((!attrs && pos < end) || (attrs && link->attrs_len < attrs_len)) {\n        clif_attr_t *attr = attrs ? &attrs[link->attrs_len] : &_dummy_attr;\n        size = clif_get_attr(pos, end - pos, attr);\n        if (size < 0) {\n            break;\n        }\n        pos += size;\n        link->attrs_len++;\n    }\n\n    return pos - buf;\n}\n"
+}

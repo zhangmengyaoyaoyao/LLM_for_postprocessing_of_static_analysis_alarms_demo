@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Infer",
+    "category": "Buffer Overrun L3",
+    "file": "sys/shell/commands/sc_ccnl.c",
+    "message": "Offset: [0, 6] Size: [0, 7] by call to `ccnl_fib_add_entry`.",
+    "warning_function_name": "_intern_fib_add",
+    "warning_line": "if (ccnl_fib_add_entry(&ccnl_relay, prefix, fibface) != 0) {",
+    "warning_context": "static int _intern_fib_add(char *pfx, char *addr_str)\n{\n    int suite = CCNL_SUITE_NDNTLV;\n    struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(pfx, suite, NULL);\n    if (!prefix) {\n        puts(\"Error: prefix could not be created!\");\n        return -1;\n    }\n\n    struct ccnl_face_s *fibface = _intern_face_get(addr_str);\n    if (fibface == NULL) {\n        return -1;\n    }\n    fibface->flags |= CCNL_FACE_FLAGS_STATIC;\n\n    if (ccnl_fib_add_entry(&ccnl_relay, prefix, fibface) != 0) {\n        printf(\"Error adding (%s : %s) to the FIB\\n\", pfx, addr_str);\n        return -1;\n    }\n\n    return 0;\n}\n"
+}

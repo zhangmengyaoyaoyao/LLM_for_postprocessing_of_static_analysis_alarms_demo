@@ -1,0 +1,10 @@
+{
+    "project": "apr",
+    "tool": "CSA",
+    "category": "core.CallAndMessage",
+    "file": "tables/apr_skiplist.c",
+    "message": "1st function call argument is an uninitialized value",
+    "warning_function_name": "apr_skiplist_add_index",
+    "warning_line": "apr_skiplist_set_compare(ni, comp, compk);",
+    "warning_context": "APR_DECLARE(void) apr_skiplist_add_index(apr_skiplist *sl,\n                        apr_skiplist_compare comp,\n                        apr_skiplist_compare compk)\n{\n    apr_skiplistnode *m;\n    apr_skiplist *ni;\n    int icount = 0;\n    apr_skiplist_find(sl->index, (void *)comp, &m);\n    if (m) {\n        return;                 /* Index already there! */\n    }\n    skiplisti_init(&ni, sl->pool);\n    apr_skiplist_set_compare(ni, comp, compk);\n    /* Build the new index... This can be expensive! */\n    m = apr_skiplist_insert(sl->index, ni);\n    while (m->prev) {\n        m = m->prev;\n        icount++;\n    }\n    for (m = apr_skiplist_getlist(sl); m; apr_skiplist_next(sl, &m)) {\n        int j = icount - 1;\n        apr_skiplistnode *nsln;\n        nsln = apr_skiplist_insert(ni, m->data);\n        /* skip from main index down list */\n        while (j > 0) {\n            m = m->nextindex;\n            j--;\n        }\n        /* insert this node in the indexlist after m */\n        nsln->nextindex = m->nextindex;\n        if (m->nextindex) {\n            m->nextindex->previndex = nsln;\n        }\n        nsln->previndex = m;\n        m->nextindex = nsln;\n    }\n}\n"
+}

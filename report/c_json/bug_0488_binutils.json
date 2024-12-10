@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Cppcheck",
-    "Bug Type": "uninitvar",
-    "Message": "Uninitialized variable: *pbe",
-    "Code_line": "\t  struct alpha_elf_got_entry *ae, *be, **pbe, **start;",
-    "Code_function": "\t  struct alpha_elf_got_entry *ae, *be, **pbe, **start;"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "bfd/elf-vxworks.c",
+    "message": "pointer `sec` last assigned on line 277 could be null and is dereferenced at line 278, column 25.",
+    "warning_function_name": "elf_vxworks_finish_dynamic_entry",
+    "warning_line": "dyn->d_un.d_val = sec->size;",
+    "warning_context": "bfd_boolean\nelf_vxworks_finish_dynamic_entry (bfd *output_bfd, Elf_Internal_Dyn *dyn)\n{\n  asection *sec;\n\n  switch (dyn->d_tag)\n    {\n    default:\n      return FALSE;\n\n    case DT_VX_WRS_TLS_DATA_START:\n      sec = bfd_get_section_by_name (output_bfd, \".tls_data\");\n      dyn->d_un.d_ptr = sec->vma;\n      break;\n\n    case DT_VX_WRS_TLS_DATA_SIZE:\n      sec = bfd_get_section_by_name (output_bfd, \".tls_data\");\n      dyn->d_un.d_val = sec->size;\n      break;\n\n    case DT_VX_WRS_TLS_DATA_ALIGN:\n      sec = bfd_get_section_by_name (output_bfd, \".tls_data\");\n      dyn->d_un.d_val\n\t= (bfd_size_type)1 << bfd_get_section_alignment (output_bfd,\n\t\t\t\t\t\t\t sec);\n      break;\n\n    case DT_VX_WRS_TLS_VARS_START:\n      sec = bfd_get_section_by_name (output_bfd, \".tls_vars\");\n      dyn->d_un.d_ptr = sec->vma;\n      break;\n\n    case DT_VX_WRS_TLS_VARS_SIZE:\n      sec = bfd_get_section_by_name (output_bfd, \".tls_vars\");\n      dyn->d_un.d_val = sec->size;\n      break;\n    }\n  return TRUE;\n}\n"
 }

@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset added: [2, +oo] (⇐ [2, +oo] + [0, +oo]) Size: [1, +oo] by call to `macro_expand`.",
-    "Code_line": "  *error = macro_expand (0, &line_sb, macro, expand);",
-    "Code_function": "check_macro (const char *line, sb *expand,\n\t     const char **error, macro_entry **info)\n{\n  const char *s;\n  char *copy, *cls;\n  macro_entry *macro;\n  sb line_sb;\n\n  if (! is_name_beginner (*line)\n      && (! macro_mri || *line != '.'))\n    return 0;\n\n  s = line + 1;\n  while (is_part_of_name (*s))\n    ++s;\n  if (is_name_ender (*s))\n    ++s;\n\n  copy = (char *) alloca (s - line + 1);\n  memcpy (copy, line, s - line);\n  copy[s - line] = '\\0';\n  for (cls = copy; *cls != '\\0'; cls ++)\n    *cls = TOLOWER (*cls);\n\n  macro = (macro_entry *) hash_find (macro_hash, copy);\n\n  if (macro == NULL)\n    return 0;\n\n  /* Wrap the line up in an sb.  */\n  sb_new (&line_sb);\n  while (*s != '\\0' && *s != '\\n' && *s != '\\r')\n    sb_add_char (&line_sb, *s++);\n\n  sb_new (expand);\n  *error = macro_expand (0, &line_sb, macro, expand);\n\n  sb_kill (&line_sb);\n\n  /* Export the macro information if requested.  */\n  if (info)\n    *info = macro;\n\n  return 1;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "bfd/coffgen.c",
+    "message": "Offset added: [-20, 187] (⇐ [-92, 115] + 72) Size: 4064 by call to `bfd_zalloc`.",
+    "warning_function_name": "coff_make_empty_symbol",
+    "warning_line": "coff_symbol_type *new_symbol = (coff_symbol_type *) bfd_zalloc (abfd, amt);",
+    "warning_context": "asymbol *\ncoff_make_empty_symbol (bfd *abfd)\n{\n  bfd_size_type amt = sizeof (coff_symbol_type);\n  coff_symbol_type *new_symbol = (coff_symbol_type *) bfd_zalloc (abfd, amt);\n\n  if (new_symbol == NULL)\n    return NULL;\n  new_symbol->symbol.section = 0;\n  new_symbol->native = NULL;\n  new_symbol->lineno = NULL;\n  new_symbol->done_lineno = FALSE;\n  new_symbol->symbol.the_bfd = abfd;\n\n  return & new_symbol->symbol;\n}\n"
 }

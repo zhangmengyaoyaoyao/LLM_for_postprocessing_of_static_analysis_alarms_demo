@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Cppcheck",
-    "Bug Type": "arrayIndexOutOfBoundsCond",
-    "Message": "Either the condition '19>=aux->x_csect.x_smclas' is redundant or the array 'names[19]' is accessed at index 19, which is out of bounds.",
-    "Code_line": "      && (NULL != names[aux->x_csect.x_smclas]))",
-    "Code_function": "      && (NULL != names[aux->x_csect.x_smclas]))"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "bfd/merge.c",
+    "message": "Offset added: [133592, 133615] (⇐ [0, 23] + 133592) Size: [528, +oo] by call to `bfd_hash_table_init_n`.",
+    "warning_function_name": "sec_merge_init",
+    "warning_line": "if (! bfd_hash_table_init_n (&table->table, sec_merge_hash_newfunc,",
+    "warning_context": "static struct sec_merge_hash *\nsec_merge_init (unsigned int entsize, bfd_boolean strings)\n{\n  struct sec_merge_hash *table;\n\n  table = (struct sec_merge_hash *) bfd_malloc (sizeof (struct sec_merge_hash));\n  if (table == NULL)\n    return NULL;\n\n  if (! bfd_hash_table_init_n (&table->table, sec_merge_hash_newfunc,\n\t\t\t       sizeof (struct sec_merge_hash_entry), 16699))\n    {\n      free (table);\n      return NULL;\n    }\n\n  table->size = 0;\n  table->first = NULL;\n  table->last = NULL;\n  table->entsize = entsize;\n  table->strings = strings;\n\n  return table;\n}\n"
 }

@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(q, K_OBJ_MSGQ));",
-    "Code_function": "static inline void z_vrfy_k_msgq_purge(struct k_msgq *q)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(q, K_OBJ_MSGQ));\n\tz_impl_k_msgq_purge(q);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "subsys/bluetooth/controller/ll_sw/ull_conn.c",
+    "message": "Null pointer dereference: mfy_sched_offset",
+    "warning_function_name": "event_conn_upd_init",
+    "warning_line": "mfy_sched_offset->fp = fp_mfy_select_or_use;",
+    "warning_context": "static inline void event_conn_upd_init(struct ll_conn *conn,\n\t\t\t\t       u16_t event_counter,\n\t\t\t\t       u32_t ticks_at_expire,\n\t\t\t\t       struct pdu_data *pdu_ctrl_tx,\n\t\t\t\t       struct mayfly *mfy_sched_offset,\n\t\t\t\t       void (*fp_mfy_select_or_use)(void *))\n{\n\t/* move to in progress */\n\tconn->llcp_cu.state = LLCP_CUI_STATE_INPROG;\n\n\t/* set instant */\n\tconn->llcp.conn_upd.instant = event_counter + conn->lll.latency + 6;\n\n\t/* place the conn update req packet as next in tx queue */\n\tpdu_ctrl_tx->ll_id = PDU_DATA_LLID_CTRL;\n\tpdu_ctrl_tx->len = offsetof(struct pdu_data_llctrl, conn_update_ind) +\n\t\t\t   sizeof(struct pdu_data_llctrl_conn_update_ind);\n\tpdu_ctrl_tx->llctrl.opcode = PDU_DATA_LLCTRL_TYPE_CONN_UPDATE_IND;\n\tpdu_ctrl_tx->llctrl.conn_update_ind.win_size = conn->llcp_cu.win_size;\n\tpdu_ctrl_tx->llctrl.conn_update_ind.win_offset =\n\t\tsys_cpu_to_le16(conn->llcp_cu.win_offset_us / 1250U);\n\tpdu_ctrl_tx->llctrl.conn_update_ind.interval =\n\t\tsys_cpu_to_le16(conn->llcp_cu.interval);\n\tpdu_ctrl_tx->llctrl.conn_update_ind.latency =\n\t\tsys_cpu_to_le16(conn->llcp_cu.latency);\n\tpdu_ctrl_tx->llctrl.conn_update_ind.timeout =\n\t\tsys_cpu_to_le16(conn->llcp_cu.timeout);\n\tpdu_ctrl_tx->llctrl.conn_update_ind.instant =\n\t\tsys_cpu_to_le16(conn->llcp.conn_upd.instant);\n\n#if defined(CONFIG_BT_CTLR_SCHED_ADVANCED)\n\t{\n\t\tu32_t retval;\n\n\t\t/* calculate window offset that places the connection in the\n\t\t * next available slot after existing masters.\n\t\t */\n\t\tconn->llcp.conn_upd.ticks_anchor = ticks_at_expire;\n\n#if defined(CONFIG_BT_CTLR_XTAL_ADVANCED)\n\t\tif (conn->evt.ticks_xtal_to_start & XON_BITMASK) {\n\t\t\tu32_t ticks_prepare_to_start =\n\t\t\t\tMAX(conn->evt.ticks_active_to_start,\n\t\t\t\t    conn->evt.ticks_preempt_to_start);\n\n\t\t\tconn->llcp.conn_upd.ticks_anchor -=\n\t\t\t\t(conn->evt.ticks_xtal_to_start &\n\t\t\t\t ~XON_BITMASK) - ticks_prepare_to_start;\n\t\t}\n#endif /* CONFIG_BT_CTLR_XTAL_ADVANCED */\n\n\t\tconn->llcp.conn_upd.pdu_win_offset = (u16_t *)\n\t\t\t&pdu_ctrl_tx->llctrl.conn_update_ind.win_offset;\n\n\t\tmfy_sched_offset->fp = fp_mfy_select_or_use;\n\t\tmfy_sched_offset->param = (void *)conn;\n\n\t\tretval = mayfly_enqueue(TICKER_USER_ID_ULL_HIGH,\n\t\t\t\t\tTICKER_USER_ID_ULL_LOW, 1,\n\t\t\t\t\tmfy_sched_offset);\n\t\tLL_ASSERT(!retval);\n\t}\n#else /* !CONFIG_BT_CTLR_SCHED_ADVANCED */\n\tARG_UNUSED(ticks_at_expire);\n\tARG_UNUSED(mfy_sched_offset);\n\tARG_UNUSED(fp_mfy_select_or_use);\n#endif /* !CONFIG_BT_CTLR_SCHED_ADVANCED */\n}\n"
 }

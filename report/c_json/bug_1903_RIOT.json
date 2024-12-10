@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Infer",
+    "category": "Buffer Overrun L3",
+    "file": "sys/shell/commands/sc_ccnl.c",
+    "message": "Offset: [0, 6] Size: [0, 7] by call to `ccnl_send_interest`.",
+    "warning_function_name": "_ccnl_interest",
+    "warning_line": "int res = ccnl_send_interest(prefix, _int_buf, BUF_SIZE, NULL);",
+    "warning_context": "int _ccnl_interest(int argc, char **argv)\n{\n    if (argc < 2) {\n        _interest_usage(argv[0]);\n        return -1;\n    }\n\n    if (argc > 2) {\n        if (_intern_fib_add(argv[1], argv[2]) < 0) {\n            _interest_usage(argv[0]);\n            return -1;\n        }\n    }\n\n    memset(_int_buf, '\\0', BUF_SIZE);\n\n    struct ccnl_prefix_s *prefix = ccnl_URItoPrefix(argv[1], CCNL_SUITE_NDNTLV, NULL);\n    int res = ccnl_send_interest(prefix, _int_buf, BUF_SIZE, NULL);\n    ccnl_prefix_free(prefix);\n\n    return res;\n}\n"
+}

@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "drivers/sht3x/sht3x.c",
+    "message": "Either the condition 'params!=NULL' is redundant or there is possible null pointer dereference: params.",
+    "warning_function_name": "sht3x_init",
+    "warning_line": "dev->i2c_addr = params->i2c_addr;",
+    "warning_context": "int sht3x_init (sht3x_dev_t *dev, const sht3x_params_t *params)\n{\n    ASSERT_PARAM(dev != NULL);\n    ASSERT_PARAM(params != NULL);\n\n    int res = SHT3X_OK;\n\n    /* inititalize sensor data structure */\n    dev->i2c_dev  = params->i2c_dev;\n    dev->i2c_addr = params->i2c_addr;\n    dev->mode     = params->mode;\n    dev->repeat   = params->repeat;\n\n    dev->meas_start_time = 0;\n    dev->meas_duration = 0;\n    dev->meas_started = false;\n\n    /* try to reset the sensor */\n    if ((res = _reset(dev)) != SHT3X_OK) {\n        return res;\n    }\n\n    DEBUG_DEV(\"sensor initialized\", dev);\n\n    /* start periodic measurements */\n    if ((dev->mode != SHT3X_SINGLE_SHOT) &&\n        (res = _start_measurement (dev)) != SHT3X_OK){\n        return res;\n    }\n\n    return res;\n}\n"
+}

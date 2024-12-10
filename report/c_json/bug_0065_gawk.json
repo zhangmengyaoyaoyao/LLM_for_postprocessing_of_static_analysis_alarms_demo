@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "Infer",
-    "Bug Type": "NULL_DEREFERENCE",
-    "Message": "pointer `databuf` last assigned on line 274 could be null and is dereferenced by call to `memset()` at line 275, column 3.",
-    "Code_line": "\t\tmemset(databuf, '\\0', databuf_size);",
-    "Code_function": "set_record(const char *buf, int cnt)\n{\n\tNODE *n;\n\tstatic char *databuf;\n\tstatic unsigned long databuf_size;\n#define INITIAL_SIZE\t512\n#define MAX_SIZE\t((unsigned long) ~0)\t/* maximally portable ... */\n\n\treset_record();\n\n\t/* buffer management: */\n\tif (databuf_size == 0) {\t/* first time */\n\t\temalloc(databuf, char *, INITIAL_SIZE, \"set_record\");\n\t\tdatabuf_size = INITIAL_SIZE;\n\t\tmemset(databuf, '\\0', INITIAL_SIZE);\n\n\t}\n\t/*\n\t * Make sure there's enough room. Since we sometimes need\n\t * to place a sentinel at the end, we make sure\n\t * databuf_size is > cnt after allocation.\n\t */\n\tif (cnt >= databuf_size) {\n\t\twhile (cnt >= databuf_size && databuf_size <= MAX_SIZE)\n\t\t\tdatabuf_size *= 2;\n\t\terealloc(databuf, char *, databuf_size, \"set_record\");\n\t\tmemset(databuf, '\\0', databuf_size);\n\t}\n\t/* copy the data */\n\tmemcpy(databuf, buf, cnt);\n\n\t/*\n\t * Add terminating '\\0' so that C library routines\n\t * will know when to stop.\n\t */\n\tdatabuf[cnt] = '\\0';\n\n\t/* manage field 0: */\n\tunref(fields_arr[0]);\n\tgetnode(n);\n\tn->stptr = databuf;\n\tn->stlen = cnt;\n\tn->valref = 1;\n\tn->type = Node_val;\n\tn->stfmt = -1;\n\tn->flags = (STRING|STRCUR|MAYBE_NUM|FIELD);\n\tfields_arr[0] = n;\n\n#undef INITIAL_SIZE\n#undef MAX_SIZE\n}"
-}

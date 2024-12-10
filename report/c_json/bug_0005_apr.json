@@ -1,0 +1,10 @@
+{
+    "project": "apr",
+    "tool": "Cppcheck",
+    "category": "memleak",
+    "file": "build/jlibtool.c",
+    "message": "Memory leak: path",
+    "warning_function_name": "load_install_path",
+    "warning_line": "return NULL;",
+    "warning_context": "char * load_install_path(const char *arg)\n{\n    FILE *f;\n    char *path;\n\n    path = malloc(PATH_MAX);\n\n    f = fopen(arg,\"r\");\n    if (f == NULL) {\n        return NULL;\n    }\n    fgets(path, PATH_MAX, f);\n    fclose(f);\n    if (path[strlen(path)-1] == '\\n') {\n        path[strlen(path)-1] = '\\0';\n    }\n    /* Check that we have an absolute path.\n     * Otherwise the file could be a GNU libtool file.\n     */\n    if (path[0] != '/') {\n        return NULL;\n    }\n    return path;\n}\n"
+}

@@ -1,8 +1,0 @@
-{
-    "Project": "bash",
-    "Tool": "Infer",
-    "Bug Type": "UNINITIALIZED_VALUE",
-    "Message": "The value read from state_bak.__count was never initialized.",
-    "Code_line": "      COPY_CHAR_P (t, s, send);",
-    "Code_function": "dequote_string (string)\n     char *string;\n{\n  register char *s, *t;\n  size_t slen;\n  char *result, *send;\n  DECLARE_MBSTATE;\n\n  slen = strlen (string);\n\n  t = result = (char *)xmalloc (slen + 1);\n\n  if (QUOTED_NULL (string))\n    {\n      result[0] = '\\0';\n      return (result);\n    }\n\n  /* If no character in the string can be quoted, don't bother examining\n     each character.  Just return a copy of the string passed to us. */\n  if (strchr (string, CTLESC) == NULL)\n    return (strcpy (result, string));\n\n  send = string + slen;\n  s = string;\n  while (*s)\n    {\n      if (*s == CTLESC)\n\t{\n\t  s++;\n\t  if (*s == '\\0')\n\t    break;\n\t}\n      COPY_CHAR_P (t, s, send);\n    }\n\n  *t = '\\0';\n  return (result);\n}"
-}

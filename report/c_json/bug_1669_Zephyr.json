@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ_INIT(mutex, K_OBJ_MUTEX));",
-    "Code_function": "static inline void z_vrfy_k_mutex_init(struct k_mutex *mutex)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ_INIT(mutex, K_OBJ_MUTEX));\n\tz_impl_k_mutex_init(mutex);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "subsys/usb/class/bluetooth.c",
+    "message": "Possible null pointer dereference: buf",
+    "warning_function_name": "acl_read_cb",
+    "warning_line": "buf->len += size;",
+    "warning_context": "static void acl_read_cb(u8_t ep, int size, void *priv)\n{\n\tstruct net_buf *buf = priv;\n\n\tif (size > 0) {\n\t\tbuf->len += size;\n\t\tbt_buf_set_type(buf, BT_BUF_ACL_OUT);\n\t\tnet_buf_put(&tx_queue, buf);\n\t\tbuf = NULL;\n\t}\n\n\tif (buf) {\n\t\tnet_buf_unref(buf);\n\t}\n\n\tbuf = net_buf_alloc(&acl_tx_pool, K_FOREVER);\n\t__ASSERT_NO_MSG(buf);\n\n\tnet_buf_reserve(buf, BT_BUF_RESERVE);\n\n\t/* Start a new read transfer */\n\tusb_transfer(bluetooth_ep_data[HCI_OUT_EP_IDX].ep_addr, buf->data,\n\t\t     BT_BUF_ACL_SIZE, USB_TRANS_READ, acl_read_cb, buf);\n}\n"
 }

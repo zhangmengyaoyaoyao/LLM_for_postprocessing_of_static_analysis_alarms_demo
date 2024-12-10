@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Cppcheck",
-    "Bug Type": "ctuArrayIndex",
-    "Message": "Array index out of bounds; buffer 'argv' is accessed at offset 0.",
-    "Code_line": "\tpub.addr = strtoul(argv[0], NULL, 0);",
-    "Code_function": "\tpub.addr = strtoul(argv[0], NULL, 0);"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "drivers/sensor/lsm6dso/lsm6dso_shub.c",
+    "message": "Uninitialized variable: buf",
+    "warning_function_name": "lsmdso_hts221_read_conv_data",
+    "warning_line": "ht->y0 = buf[0] / 2;",
+    "warning_context": "static int lsmdso_hts221_read_conv_data(struct lsm6dso_data *data,\n\t\t\t\t\tu8_t i2c_addr)\n{\n\tu8_t buf[16], i;\n\tstruct hts221_data *ht = &data->hts221;\n\n\tfor (i = 0; i < sizeof(buf); i += 7) {\n\t\tunsigned char len = MIN(7, sizeof(buf) - i);\n\n\t\tif (lsm6dso_shub_read_slave_reg(data, i2c_addr,\n\t\t\t\t\t\t(HTS221_REG_CONV_START + i) |\n\t\t\t\t\t\tHTS221_AUTOINCREMENT,\n\t\t\t\t\t\t&buf[i], len) < 0) {\n\t\t\tLOG_DBG(\"shub: failed to read hts221 conv data\");\n\t\t\treturn -EIO;\n\t\t}\n\t}\n\n\tht->y0 = buf[0] / 2;\n\tht->y1 = buf[1] / 2;\n\tht->x0 = sys_le16_to_cpu(buf[6] | (buf[7] << 8));\n\tht->x1 = sys_le16_to_cpu(buf[10] | (buf[11] << 8));\n\n\treturn 0;\n}\n"
 }

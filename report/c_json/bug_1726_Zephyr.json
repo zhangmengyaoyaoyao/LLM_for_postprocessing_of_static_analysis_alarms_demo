@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(signal, K_OBJ_POLL_SIGNAL));",
-    "Code_function": "void z_vrfy_k_poll_signal_check(struct k_poll_signal *signal,\n\t\t\t       unsigned int *signaled, int *result)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(signal, K_OBJ_POLL_SIGNAL));\n\tZ_OOPS(Z_SYSCALL_MEMORY_WRITE(signaled, sizeof(unsigned int)));\n\tZ_OOPS(Z_SYSCALL_MEMORY_WRITE(result, sizeof(int)));\n\tz_impl_k_poll_signal_check(signal, signaled, result);\n}"
+    "project": "Zephyr",
+    "tool": "Infer",
+    "category": "Null Dereference",
+    "file": "subsys/bluetooth/host/hci_core.c",
+    "message": "pointer `null` is dereferenced by call to `bt_hci_cmd_send_sync()` at line 4583, column 8.",
+    "warning_function_name": "br_init",
+    "warning_line": "err = bt_hci_cmd_send_sync(BT_HCI_OP_READ_BUFFER_SIZE, NULL, &rsp);",
+    "warning_context": "static int br_init(void)\n{\n#if defined(CONFIG_BT_CONN)\n\tstruct net_buf *rsp;\n\tint err;\n\n\tif (bt_dev.le.mtu) {\n\t\treturn 0;\n\t}\n\n\t/* Use BR/EDR buffer size if LE reports zero buffers */\n\terr = bt_hci_cmd_send_sync(BT_HCI_OP_READ_BUFFER_SIZE, NULL, &rsp);\n\tif (err) {\n\t\treturn err;\n\t}\n\n\tread_buffer_size_complete(rsp);\n\tnet_buf_unref(rsp);\n#endif /* CONFIG_BT_CONN */\n\n\treturn 0;\n}\n"
 }

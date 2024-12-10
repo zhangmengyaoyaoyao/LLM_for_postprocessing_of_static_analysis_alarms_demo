@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "Infer",
-    "Bug Type": "NULL_DEREFERENCE",
-    "Message": "pointer `str` last assigned on line 417 could be null and is dereferenced by call to `memcpy()` at line 420, column 2.",
-    "Code_line": "\tmemcpy(str, r->stptr, r->stlen);",
-    "Code_function": "concat_exp(int nargs, bool do_subsep)\n{\n\t/* do_subsep is false for Op_concat */\n\tNODE *r;\n\tchar *str;\n\tchar *s;\n\tsize_t len;\n\tsize_t subseplen = 0;\n\tint i;\n\textern NODE **args_array;\n\n\tif (nargs == 1)\n\t\treturn POP_STRING();\n\n\tif (do_subsep)\n\t\tsubseplen = SUBSEPlen;\n\n\tlen = 0;\n\tfor (i = 1; i <= nargs; i++) {\n\t\tr = TOP();\n\t\tif (r->type == Node_var_array) {\n\t\t\twhile (--i > 0)\n\t\t\t\tDEREF(args_array[i]);\t/* avoid memory leak */\n\t\t\tfatal(_(\"attempt to use array `%s' in a scalar context\"), array_vname(r));\n\t\t}\n\t\tr = POP_STRING();\n\t\targs_array[i] = r;\n\t\tlen += r->stlen;\n\t}\n\tlen += (nargs - 1) * subseplen;\n\n\temalloc(str, char *, len + 2, \"concat_exp\");\n\n\tr = args_array[nargs];\n\tmemcpy(str, r->stptr, r->stlen);\n\ts = str + r->stlen;\n\tDEREF(r);\n\tfor (i = nargs - 1; i > 0; i--) {\n\t\tif (subseplen == 1)\n\t\t\t*s++ = *SUBSEP;\n\t\telse if (subseplen > 0) {\n\t\t\tmemcpy(s, SUBSEP, subseplen);\n\t\t\ts += subseplen;\n\t\t}\n\t\tr = args_array[i];\n\t\tmemcpy(s, r->stptr, r->stlen);\n\t\ts += r->stlen;\n\t\tDEREF(r);\n\t}\n\n\treturn make_str_node(str, len, ALREADY_MALLOCED);\n}"
-}

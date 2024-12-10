@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Cppcheck",
-    "Bug Type": "ctuArrayIndex",
-    "Message": "Array index out of bounds; buffer 'in' is accessed at offset 0.",
-    "Code_line": "\tout[0] = multe(in[0]) ^ multb(in[1]) ^ multd(in[2]) ^ mult9(in[3]);",
-    "Code_function": "\tout[0] = multe(in[0]) ^ multb(in[1]) ^ multd(in[2]) ^ mult9(in[3]);"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "drivers/counter/counter_cmos.c",
+    "message": "Uninitialized variable: *pun2",
+    "warning_function_name": "read",
+    "warning_line": "} while (*pun != *pun2);",
+    "warning_context": "u32_t read(struct device *dev)\n{\n\tstruct state state, state2;\n\tu64_t *pun = (u64_t *) &state;\n\tu64_t *pun2 = (u64_t *) &state2;\n\tbool pm;\n\tu32_t epoch;\n\n\tARG_UNUSED(dev);\n\n\t/*\n\t * Read the state until we see the same state twice in a row.\n\t */\n\n\tread_state(&state2);\n\tdo {\n\t\tstate = state2;\n\t\tread_state(&state2);\n\t} while (*pun != *pun2);\n\n\t/*\n\t * Normalize the state; 12hr -> 24hr, BCD -> decimal.\n\t * The order is a bit awkward because we need to interpret\n\t * the HOUR_PM flag before we adjust for BCD.\n\t */\n\n\tif (state.status_b & STATUS_B_24HR) {\n\t\tpm = false;\n\t} else {\n\t\tpm = ((state.hour & HOUR_PM) == HOUR_PM);\n\t\tstate.hour &= ~HOUR_PM;\n\t}\n\n\tif (!(state.status_b & STATUS_B_BIN)) {\n\t\tu8_t *cp = (u8_t *) &state;\n\t\tint i;\n\n\t\tfor (i = 0; i < NR_BCD_VALS; ++i) {\n\t\t\t*cp = decode_bcd(*cp);\n\t\t\t++cp;\n\t\t}\n\t}\n\n\tif (pm) {\n\t\tstate.hour = (state.hour + 12) % 24;\n\t}\n\n\t/*\n\t * Convert date/time to epoch time. We don't care about\n\t * timezones here, because we're just creating a mapping\n\t * that results in a monotonic clock; the absolute value\n\t * is irrelevant.\n\t */\n\n\tepoch = hinnant(state.year + 2000, state.month, state.day);\n\tepoch *= 86400; /* seconds per day */\n\tepoch += state.hour * 3600; /* seconds per hour */\n\tepoch += state.minute * 60; /* seconds per minute */\n\tepoch += state.second;\n\n\treturn epoch;\n}\n"
 }

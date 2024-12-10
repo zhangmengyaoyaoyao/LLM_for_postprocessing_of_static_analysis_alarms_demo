@@ -1,8 +1,0 @@
-{
-    "Project": "bash",
-    "Tool": "CSA",
-    "Bug Type": "core.NullDereference",
-    "Message": "Array access (from variable 'temp') results in a null pointer dereference",
-    "Code_line": "\t    temp[templen++] = *r++;",
-    "Code_function": "strsub (string, pat, rep, global)\n     char *string, *pat, *rep;\n     int global;\n{\n  int patlen, replen, templen, tempsize, repl, i;\n  char *temp, *r;\n\n  patlen = strlen (pat);\n  replen = strlen (rep);\n  for (temp = (char *)NULL, i = templen = tempsize = 0, repl = 1; string[i]; )\n    {\n      if (repl && STREQN (string + i, pat, patlen))\n\t{\n\t  if (replen)\n\t    RESIZE_MALLOCED_BUFFER (temp, templen, replen, tempsize, (replen * 2));\n\n\t  for (r = rep; *r; )\t/* can rep == \"\" */\n\t    temp[templen++] = *r++;\n\n\t  i += patlen ? patlen : 1;\t/* avoid infinite recursion */\n\t  repl = global != 0;\n\t}\n      else\n\t{\n\t  RESIZE_MALLOCED_BUFFER (temp, templen, 1, tempsize, 16);\n\t  temp[templen++] = string[i++];\n\t}\n    }\n  if (temp)\n    temp[templen] = 0;\n  else\n    temp = savestring (string);\n  return (temp);\n}"
-}

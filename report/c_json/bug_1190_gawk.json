@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "cint_array.c",
+    "message": "pointer `array->sub.nodep.r.av` last assigned on line 1049 could be null and is dereferenced by call to `memset()` at line 1050, column 3.",
+    "warning_function_name": "f_lookup(NO",
+    "warning_line": "memset(array->nodes, '\\0', size * sizeof(NODE *));",
+    "warning_context": "static inline NODE **\nleaf_lookup(NODE *symbol, NODE *array, long k, long size, long base)\n{\n\tNODE **lhs;\n\n\tif (array->nodes == NULL) {\n\t\tarray->table_size = 0;\t/* sanity */\n\t\tarray->array_size = size;\n\t\tarray->array_base = base;\n\t\temalloc(array->nodes, NODE **, size * sizeof(NODE *), \"leaf_lookup\");\n\t\tmemset(array->nodes, '\\0', size * sizeof(NODE *));\n\t\tsymbol->array_capacity += size;\n\t}\n\n\tlhs = array->nodes + (k - base); /* leaf element */\n\tif (*lhs == NULL) {\n\t\tarray->table_size++;\t/* one more element in leaf array */\n\t\t*lhs = dupnode(Nnull_string);\n\t}\n\treturn lhs;\n}\n"
+}

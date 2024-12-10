@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_S2",
-    "Message": "Offset added: [12+max(0, `p->symbols_size`), +oo] (⇐ [max(0, `p->symbols_size`), +oo] + 12) Size: [0, +oo] by call to `stab_write_symbol`.",
-    "Code_line": "\t  if (! stab_write_symbol (info, N_LSYM, 0, 0, buf))",
-    "Code_function": "stab_function_type (void *p, int argcount,\n\t\t    bfd_boolean varargs ATTRIBUTE_UNUSED)\n{\n  struct stab_write_handle *info = (struct stab_write_handle *) p;\n  int i;\n\n  /* We have no way to represent the argument types, so we just\n     discard them.  However, if they define new types, we must output\n     them.  We do this by producing empty typedefs.  */\n  for (i = 0; i < argcount; i++)\n    {\n      if (! info->type_stack->definition)\n\tfree (stab_pop_type (info));\n      else\n\t{\n\t  char *s, *buf;\n\n\t  s = stab_pop_type (info);\n\n\t  buf = (char *) xmalloc (strlen (s) + 3);\n\t  sprintf (buf, \":t%s\", s);\n\t  free (s);\n\n\t  if (! stab_write_symbol (info, N_LSYM, 0, 0, buf))\n\t    return FALSE;\n\n\t  free (buf);\n\t}\n    }\n\n  return stab_modify_type (info, 'f', 0, &info->type_cache.function_types,\n\t\t\t   &info->type_cache.function_types_alloc);\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "binutils/ar.c",
+    "message": "Offset: [1, +oo] Size: [0, +oo] by call to `bfd_check_format_matches`.",
+    "warning_function_name": "ranlib_touch",
+    "warning_line": "if (! bfd_check_format_matches (arch, bfd_archive, &matching))",
+    "warning_context": "static int\nranlib_touch (const char *archname)\n{\n#ifdef __GO32__\n  /* I don't think updating works on go32.  */\n  ranlib_only (archname);\n#else\n  int f;\n  bfd *arch;\n  char **matching;\n\n  if (get_file_size (archname) < 1)\n    return 1;\n  f = open (archname, O_RDWR | O_BINARY, 0);\n  if (f < 0)\n    {\n      bfd_set_error (bfd_error_system_call);\n      bfd_fatal (archname);\n    }\n\n  arch = bfd_fdopenr (archname, (const char *) NULL, f);\n  if (arch == NULL)\n    bfd_fatal (archname);\n  if (! bfd_check_format_matches (arch, bfd_archive, &matching))\n    {\n      bfd_nonfatal (archname);\n      if (bfd_get_error () == bfd_error_file_ambiguously_recognized)\n\t{\n\t  list_matching_formats (matching);\n\t  free (matching);\n\t}\n      xexit (1);\n    }\n\n  if (! bfd_has_map (arch))\n    /* xgettext:c-format */\n    fatal (_(\"%s: no archive map to update\"), archname);\n\n  if (deterministic)\n    arch->flags |= BFD_DETERMINISTIC_OUTPUT;\n\n  bfd_update_armap_timestamp (arch);\n\n  if (! bfd_close (arch))\n    bfd_fatal (archname);\n#endif\n  return 0;\n}\n"
 }

@@ -1,0 +1,10 @@
+{
+    "project": "gawk",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "debug.c",
+    "message": "Offset: 12 Size: [0, 14] by call to `assoc_list`.",
+    "warning_function_name": "print_array",
+    "warning_line": "list = assoc_list((NODE *) arr, \"@ind_str_asc\", SORTED_IN);",
+    "warning_context": "static int\nprint_array(volatile NODE *arr, char *arr_name)\n{\n\tNODE *subs;\n\tNODE **list;\n\tint i;\n\tsize_t num_elems = 0;\n\tvolatile NODE *r;\n\tvolatile int ret = 0;\n\tvolatile jmp_buf pager_quit_tag_stack;\n\n\tif (assoc_empty((NODE *) arr)) {\n\t\tgprintf(out_fp, _(\"array `%s' is empty\\n\"), arr_name);\n\t\treturn 0;\n\t}\n\n\tnum_elems = assoc_length((NODE *) arr);\n\n\t/* sort indices, sub_arrays are also sorted! */\n\tlist = assoc_list((NODE *) arr, \"@ind_str_asc\", SORTED_IN);\n\n\tPUSH_BINDING(pager_quit_tag_stack, pager_quit_tag, pager_quit_tag_valid);\n\tif (setjmp(pager_quit_tag) == 0) {\n\t\tfor (i = 0; ret == 0 && i < num_elems; i++) {\n\t\t\tsubs = list[i];\n\t\t\tr = *assoc_lookup((NODE *) arr, subs);\n\t\t\tif (r->type == Node_var_array)\n\t\t\t\tret = print_array(r, r->vname);\n\t\t\telse {\n\t\t\t\tgprintf(out_fp, \"%s[\\\"%s\\\"] = \", arr_name, subs->stptr);\n\t\t\t\tvalinfo((NODE *) r, gprintf, out_fp);\n\t\t\t}\n\t\t}\n\t} else\n\t\tret = 1;\n\n\tPOP_BINDING(pager_quit_tag_stack, pager_quit_tag, pager_quit_tag_valid);\n\n\tfor (i = 0; i < num_elems; i++)\n\t\tunref(list[i]);\n\tefree(list);\n\n\treturn ret;\n}\n"
+}

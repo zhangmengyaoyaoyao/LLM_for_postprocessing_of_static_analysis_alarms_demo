@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "drivers/ccs811/ccs811.c",
+    "message": "Either the condition 'dev!=NULL' is redundant or there is possible null pointer dereference: dev.",
+    "warning_function_name": "ccs811_set_int_mode",
+    "warning_line": "if (dev->params.int_pin == GPIO_UNDEF) {",
+    "warning_context": "int ccs811_set_int_mode(ccs811_t *dev, ccs811_int_mode_t mode)\n{\n    ASSERT_PARAM(dev != NULL);\n\n    if (dev->params.int_pin == GPIO_UNDEF) {\n        DEBUG_DEV(\"nINT pin not configured\", dev);\n        return CCS811_ERROR_NO_INT_PIN;\n    }\n\n    ccs811_meas_mode_reg_t reg;\n\n    /* read measurement mode register value */\n    if (_reg_read(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1) != CCS811_OK) {\n        DEBUG_DEV(\"could not set interrupt mode, could not read register \"\n                  \"CCS811_REG_MEAS_MODE\", dev);\n        return CCS811_ERROR_I2C;\n    }\n\n    reg.int_datardy = mode != CCS811_INT_NONE;\n    reg.int_thresh  = mode == CCS811_INT_THRESHOLD;\n\n    /* write back measurement mode register */\n    if (_reg_write(dev, CCS811_REG_MEAS_MODE, (uint8_t *)&reg, 1) != CCS811_OK) {\n        DEBUG_DEV(\"could not set interrupt mode, could not write register \"\n                  \"CCS811_REG_MEAS_MODE\", dev);\n        return CCS811_ERROR_I2C;\n    }\n\n    dev->params.int_mode = mode;\n\n    return CCS811_OK;\n}\n"
+}

@@ -1,8 +1,0 @@
-{
-    "Project": "bash",
-    "Tool": "Infer",
-    "Bug Type": "UNINITIALIZED_VALUE",
-    "Message": "The value read from r was never initialized.",
-    "Code_line": "    return r;",
-    "Code_function": "extglob_skipname (pat, dname, flags)\n     char *pat, *dname;\n     int flags;\n{\n  char *pp, *pe, *t;\n  int n, r;\n\n  pp = pat + 2;\n  pe = pp + strlen (pp) - 1;\t/*(*/\n  if (*pe != ')')\n    return 0;\n  if ((t = strchr (pp, '|')) == 0)\t/* easy case first */\n    {\n      *pe = '\\0';\n      r = skipname (pp, dname, flags);\t/*(*/\n      *pe = ')';\n      return r;\n    }\n  while (t = glob_patscan (pp, pe, '|'))\n    {\n      n = t[-1];\n      t[-1] = '\\0';\n      r = skipname (pp, dname, flags);\n      t[-1] = n;\n      if (r == 0)\t/* if any pattern says not skip, we don't skip */\n        return r;\n      pp = t;\n    }\t/*(*/\n\n  if (pp == pe)\t\t/* glob_patscan might find end of pattern */\n    return r;\n\n  *pe = '\\0';\n#  if defined (HANDLE_MULTIBYTE)\n  r = mbskipname (pp, dname, flags);\t/*(*/\n#  else\n  r = skipname (pp, dname, flags);\t/*(*/\n#  endif\n  *pe = ')';\n  return r;\n}"
-}

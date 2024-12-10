@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "sys/net/gnrc/netif/gnrc_netif_device_type.c",
+    "message": "Uninitialized variable: opt",
+    "warning_function_name": "nrc_netif_init_6ln(",
+    "warning_line": "gnrc_netapi_opt_t opt = { .opt = NETOPT_SRC_LEN,",
+    "warning_context": "void gnrc_netif_init_6ln(gnrc_netif_t *netif)\n{\n    switch (netif->device_type) {\n        case NETDEV_TYPE_IEEE802154: {\n            /* see https://tools.ietf.org/html/rfc6775#section-5.2 */\n            uint16_t src_len = IEEE802154_LONG_ADDRESS_LEN;\n            gnrc_netapi_opt_t opt = { .opt = NETOPT_SRC_LEN,\n                                      .data = &src_len,\n                                      .data_len = sizeof(src_len) };\n\n            /* XXX we are supposed to be in interface context here, so use driver\n             * directly everything else would deadlock anyway */\n            netif->ops->set(netif, &opt);\n        }\n        /* intentionally falls through */\n        case NETDEV_TYPE_BLE:\n#ifdef MODULE_CC110X\n        case NETDEV_TYPE_CC110X:\n#endif\n#ifdef MODULE_ESP_NOW\n        case NETDEV_TYPE_ESP_NOW:\n#endif\n        case NETDEV_TYPE_NRFMIN:\n#if IS_ACTIVE(CONFIG_GNRC_IPV6_NIB_6LN)\n            netif->flags |= GNRC_NETIF_FLAGS_6LN;\n#endif  /* CONFIG_GNRC_IPV6_NIB_6LN */\n            /* intentionally falls through */\n        default:\n            break;\n    }\n}\n"
+}

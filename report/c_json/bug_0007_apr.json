@@ -1,0 +1,10 @@
+{
+    "project": "apr",
+    "tool": "Cppcheck",
+    "category": "memleak",
+    "file": "build/jlibtool.c",
+    "message": "Memory leak: newarg",
+    "warning_function_name": "load_noinstall_path",
+    "warning_line": "return expanded_path;",
+    "warning_context": "char * load_noinstall_path(const char *arg, int pathlen)\n{\n    char *newarg, *expanded_path;\n    int newpathlen;\n\n    newarg = (char *)malloc(strlen(arg) + 10);\n    strcpy(newarg, arg);\n    newarg[pathlen] = 0;\n\n    newpathlen = pathlen;\n    strcat(newarg, \".libs\");\n    newpathlen += sizeof(\".libs\") - 1;\n    newarg[newpathlen] = 0;\n\n#ifdef HAS_REALPATH\n    expanded_path = malloc(PATH_MAX);\n    expanded_path = realpath(newarg, expanded_path);\n    /* Uh, oh.  There was an error.  Fall back on our first guess. */\n    if (!expanded_path) {\n        expanded_path = newarg;\n    }\n#else\n    /* We might get ../ or something goofy.  Oh, well. */\n    expanded_path = newarg;\n#endif\n\n    return expanded_path;\n}\n"
+}

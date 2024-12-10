@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: [1, +oo] Size: [0, +oo] by call to `stab_modify_type`.",
-    "Code_line": "  return stab_modify_type (info, '&', 4, &info->type_cache.reference_types,",
-    "Code_function": "stab_reference_type (void *p)\n{\n  struct stab_write_handle *info = (struct stab_write_handle *) p;\n\n  /* FIXME: The size should depend upon the architecture.  */\n  return stab_modify_type (info, '&', 4, &info->type_cache.reference_types,\n\t\t\t   &info->type_cache.reference_types_alloc);\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "UNINITIALIZED_VALUE",
+    "file": "binutils/objdump.c",
+    "message": "The value read from n was never initialized.",
+    "warning_function_name": "ATTRIBUTE_PRINTF_2",
+    "warning_line": "return n;",
+    "warning_context": "static int ATTRIBUTE_PRINTF_2\nobjdump_sprintf (SFILE *f, const char *format, ...)\n{\n  size_t n;\n  va_list args;\n\n  while (1)\n    {\n      size_t space = f->alloc - f->pos;\n  \n      va_start (args, format);\n      n = vsnprintf (f->buffer + f->pos, space, format, args);\n      va_end (args);\n\n      if (space > n)\n\tbreak;\n      \n      f->alloc = (f->alloc + n) * 2;\n      f->buffer = (char *) xrealloc (f->buffer, f->alloc);\n    }\n  f->pos += n;\n  \n  return n;\n}\n"
 }

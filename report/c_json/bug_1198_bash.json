@@ -1,8 +1,0 @@
-{
-    "Project": "bash",
-    "Tool": "Infer",
-    "Bug Type": "NULL_DEREFERENCE",
-    "Message": "pointer `temp` last assigned on line 132 could be null and is dereferenced at line 133, column 7.",
-    "Code_line": "      temp->name = savestring (name);",
-    "Code_function": "add_alias (name, value)\n     char *name, *value;\n{\n  BUCKET_CONTENTS *elt;\n  alias_t *temp;\n  int n;\n\n  if (aliases == 0)\n    {\n      initialize_aliases ();\n      temp = (alias_t *)NULL;\n    }\n  else\n    temp = find_alias (name);\n\n  if (temp)\n    {\n      free (temp->value);\n      temp->value = savestring (value);\n      temp->flags &= ~AL_EXPANDNEXT;\n      n = value[strlen (value) - 1];\n      if (n == ' ' || n == '\\t')\n\ttemp->flags |= AL_EXPANDNEXT;\n    }\n  else\n    {\n      temp = (alias_t *)xmalloc (sizeof (alias_t));\n      temp->name = savestring (name);\n      temp->value = savestring (value);\n      temp->flags = 0;\n\n      n = value[strlen (value) - 1];\n      if (n == ' ' || n == '\\t')\n\ttemp->flags |= AL_EXPANDNEXT;\n\n      elt = hash_insert (savestring (name), aliases, HASH_NOSRCH);\n      elt->data = temp;\n#if defined (PROGRAMMABLE_COMPLETION)\n      set_itemlist_dirty (&it_aliases);\n#endif\n    }\n}"
-}

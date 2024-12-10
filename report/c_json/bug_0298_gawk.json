@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset added: 33 (⇐ 1 + 32) Size: [0, +oo] by call to `bcalloc`.",
-    "Code_line": "\t\t\t\tlist_append(list, instruction(Op_lint));",
-    "Code_function": "add_lint(INSTRUCTION *list, LINTTYPE linttype)\n{\n#ifndef NO_LINT\n\tINSTRUCTION *ip;\n\n\tswitch (linttype) {\n\tcase LINT_assign_in_cond:\n\t\tip = list->lasti;\n\t\tif (ip->opcode == Op_var_assign || ip->opcode == Op_field_assign) {\n\t\t\tassert(ip != list->nexti);\n\t\t\tfor (ip = list->nexti; ip->nexti != list->lasti; ip = ip->nexti)\n\t\t\t\t;\n\t\t}\n\n\t\tif (ip->opcode == Op_assign || ip->opcode == Op_assign_concat) {\n\t\t\tlist_append(list, instruction(Op_lint));\n\t\t\tlist->lasti->lint_type = linttype;\n\t\t}\n\t\tbreak;\n\n\tcase LINT_no_effect:\n\t\tif (list->lasti->opcode == Op_pop && list->nexti != list->lasti) {\n\t\t\tfor (ip = list->nexti; ip->nexti != list->lasti; ip = ip->nexti)\n\t\t\t\t;\n\n\t\t\tif (do_lint) {\t\t/* compile-time warning */\n\t\t\t\tif (isnoeffect(ip->opcode))\n\t\t\t\t\tlintwarn_ln(ip->source_line, (\"statement may have no effect\"));\n\t\t\t}\n\n\t\t\tif (ip->opcode == Op_push) {\t\t/* run-time warning */\n\t\t\t\tlist_append(list, instruction(Op_lint));\n\t\t\t\tlist->lasti->lint_type = linttype;\n\t\t\t}\n\t\t}\n\t\tbreak;\n\n\tdefault:\n\t\tbreak;\n\t}\n#endif\n}"
-}

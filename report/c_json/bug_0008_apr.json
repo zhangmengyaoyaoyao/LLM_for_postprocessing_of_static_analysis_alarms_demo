@@ -1,0 +1,10 @@
+{
+    "project": "apr",
+    "tool": "Infer",
+    "category": "NULL_DEREFERENCE",
+    "file": "file_io/unix/filedup.c",
+    "message": "pointer `*new_file` last assigned on line 144 could be null and is dereferenced at line 145, column 5.",
+    "warning_function_name": "apr_file_setaside",
+    "warning_line": "(*new_file)->pool = p;",
+    "warning_context": "APR_DECLARE(apr_status_t) apr_file_setaside(apr_file_t **new_file,\n                                            apr_file_t *old_file,\n                                            apr_pool_t *p)\n{\n    *new_file = (apr_file_t *)apr_pmemdup(p, old_file, sizeof(apr_file_t));\n    (*new_file)->pool = p;\n    if (old_file->buffered) {\n        (*new_file)->buffer = apr_palloc(p, old_file->bufsize);\n        (*new_file)->bufsize = old_file->bufsize;\n        if (old_file->direction == 1) {\n            memcpy((*new_file)->buffer, old_file->buffer, old_file->bufpos);\n        }\n        else {\n            memcpy((*new_file)->buffer, old_file->buffer, old_file->dataRead);\n        }\n#if APR_HAS_THREADS\n        if (old_file->thlock) {\n            apr_thread_mutex_create(&((*new_file)->thlock),\n                                    APR_THREAD_MUTEX_DEFAULT, p);\n            apr_thread_mutex_destroy(old_file->thlock);\n        }\n#endif /* APR_HAS_THREADS */\n    }\n    if (old_file->fname) {\n        (*new_file)->fname = apr_pstrdup(p, old_file->fname);\n    }\n    if (!(old_file->flags & APR_FOPEN_NOCLEANUP)) {\n        apr_pool_cleanup_register(p, (void *)(*new_file), \n                                  apr_unix_file_cleanup,\n                                  ((*new_file)->flags & APR_INHERIT)\n                                     ? apr_pool_cleanup_null\n                                     : apr_unix_child_file_cleanup);\n    }\n\n    old_file->filedes = -1;\n    apr_pool_cleanup_kill(old_file->pool, (void *)old_file,\n                          apr_unix_file_cleanup);\n#ifndef WAITIO_USES_POLL\n    (*new_file)->pollset = NULL;\n#endif\n    return APR_SUCCESS;\n}\n"
+}

@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ_INIT(thread, K_OBJ_THREAD));",
-    "Code_function": "static inline void z_vrfy_k_object_access_grant(void *object,\n\t\t\t\t\t\tstruct k_thread *thread)\n{\n\tstruct _k_object *ko;\n\n\tZ_OOPS(Z_SYSCALL_OBJ_INIT(thread, K_OBJ_THREAD));\n\tko = validate_any_object(object);\n\tZ_OOPS(Z_SYSCALL_VERIFY_MSG(ko != NULL, \"object %p access denied\",\n\t\t\t\t    object));\n\tz_thread_perms_set(ko, thread);\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Null Pointer Dereference",
+    "file": "subsys/net/lib/sockets/sockets_select.c",
+    "message": "Null pointer dereference: (zsock_fd_set*)0",
+    "warning_function_name": "zsock_select",
+    "warning_line": "for (i = 0; i < STRUCT_MEMBER_ARRAY_SIZE(zsock_fd_set, bitset); i++) {",
+    "warning_context": "int zsock_select(int nfds, zsock_fd_set *readfds, zsock_fd_set *writefds,\n\t\t zsock_fd_set *exceptfds, struct zsock_timeval *timeout)\n{\n\tstruct zsock_pollfd pfds[CONFIG_NET_SOCKETS_POLL_MAX];\n\tint i, res, poll_timeout;\n\tint num_pfds = 0;\n\tint num_selects = 0;\n\tint fd_no = 0;\n\n\tfor (i = 0; i < STRUCT_MEMBER_ARRAY_SIZE(zsock_fd_set, bitset); i++) {\n\t\tu32_t bit_mask = 1U;\n\t\tu32_t read_mask = 0U, write_mask = 0U, except_mask = 0U;\n\t\tu32_t ored_mask;\n\n\t\tif (readfds != NULL) {\n\t\t\tread_mask = readfds->bitset[i];\n\t\t}\n\n\t\tif (writefds != NULL) {\n\t\t\twrite_mask = writefds->bitset[i];\n\t\t}\n\n\t\tif (exceptfds != NULL) {\n\t\t\texcept_mask = exceptfds->bitset[i];\n\t\t}\n\n\t\tored_mask = read_mask | write_mask | except_mask;\n\t\tif (ored_mask == 0U) {\n\t\t\tcontinue;\n\t\t}\n\n\t\tdo {\n\t\t\tif (ored_mask & bit_mask) {\n\t\t\t\tint events = 0;\n\n\t\t\t\tif (num_pfds >= ARRAY_SIZE(pfds)) {\n\t\t\t\t\terrno = ENOMEM;\n\t\t\t\t\treturn -1;\n\t\t\t\t}\n\n\t\t\t\tif (read_mask & bit_mask) {\n\t\t\t\t\tevents |= ZSOCK_POLLIN;\n\t\t\t\t}\n\n\t\t\t\tif (write_mask & bit_mask) {\n\t\t\t\t\tevents |= ZSOCK_POLLOUT;\n\t\t\t\t}\n\n\t\t\t\tif (except_mask & bit_mask) {\n\t\t\t\t\tevents |= ZSOCK_POLLPRI;\n\t\t\t\t}\n\n\t\t\t\tpfds[num_pfds].fd = fd_no;\n\t\t\t\tpfds[num_pfds++].events = events;\n\t\t\t}\n\n\t\t\tbit_mask <<= 1;\n\t\t\tfd_no++;\n\t\t} while (bit_mask != 0U);\n\t}\n\n\tpoll_timeout = -1;\n\tif (timeout != NULL) {\n\t\tpoll_timeout = timeout->tv_sec * 1000\n\t\t\t       + timeout->tv_usec / 1000;\n\t}\n\n\tres = zsock_poll(pfds, num_pfds, poll_timeout);\n\tif (res == -1) {\n\t\treturn -1;\n\t}\n\n\tif (readfds != NULL) {\n\t\tZSOCK_FD_ZERO(readfds);\n\t}\n\n\tif (writefds != NULL) {\n\t\tZSOCK_FD_ZERO(writefds);\n\t}\n\n\tif (exceptfds != NULL) {\n\t\tZSOCK_FD_ZERO(exceptfds);\n\t}\n\n\tfor (i = 0; i < num_pfds && res > 0; i++) {\n\t\tshort revents = pfds[i].revents;\n\t\tint fd = pfds[i].fd;\n\n\t\tif (revents == 0) {\n\t\t\tcontinue;\n\t\t}\n\n\t\t/* POSIX: \"EBADF: One or more of the file descriptor sets\n\t\t * specified a file descriptor that is not a valid open\n\t\t * file descriptor.\"\n\t\t * So, unlike poll(), a single invalid fd aborts the entire\n\t\t * select().\n\t\t */\n\t\tif (revents & ZSOCK_POLLNVAL) {\n\t\t\terrno = EBADF;\n\t\t\treturn -1;\n"
 }

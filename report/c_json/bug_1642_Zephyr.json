@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from work_space[_] was never initialized.",
-    "Code_line": "\t\ts0 = work_space[(i+1)&0x0f];",
-    "Code_function": "static void compress(unsigned int *iv, const uint8_t *data)\n{\n\tunsigned int a, b, c, d, e, f, g, h;\n\tunsigned int s0, s1;\n\tunsigned int t1, t2;\n\tunsigned int work_space[16];\n\tunsigned int n;\n\tunsigned int i;\n\n\ta = iv[0]; b = iv[1]; c = iv[2]; d = iv[3];\n\te = iv[4]; f = iv[5]; g = iv[6]; h = iv[7];\n\n\tfor (i = 0; i < 16; ++i) {\n\t\tn = BigEndian(&data);\n\t\tt1 = work_space[i] = n;\n\t\tt1 += h + Sigma1(e) + Ch(e, f, g) + k256[i];\n\t\tt2 = Sigma0(a) + Maj(a, b, c);\n\t\th = g; g = f; f = e; e = d + t1;\n\t\td = c; c = b; b = a; a = t1 + t2;\n\t}\n\n\tfor ( ; i < 64; ++i) {\n\t\ts0 = work_space[(i+1)&0x0f];\n\t\ts0 = sigma0(s0);\n\t\ts1 = work_space[(i+14)&0x0f];\n\t\ts1 = sigma1(s1);\n\n\t\tt1 = work_space[i&0xf] += s0 + s1 + work_space[(i+9)&0xf];\n\t\tt1 += h + Sigma1(e) + Ch(e, f, g) + k256[i];\n\t\tt2 = Sigma0(a) + Maj(a, b, c);\n\t\th = g; g = f; f = e; e = d + t1;\n\t\td = c; c = b; b = a; a = t1 + t2;\n\t}\n\n\tiv[0] += a; iv[1] += b; iv[2] += c; iv[3] += d;\n\tiv[4] += e; iv[5] += f; iv[6] += g; iv[7] += h;\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "subsys/net/ip/route.c",
+    "message": "Uninitialized variable: nexthop_route->nbr",
+    "warning_function_name": "net_route_get_nexthop",
+    "warning_line": "NET_ASSERT(nexthop_route->nbr->idx != NET_NBR_LLADDR_UNKNOWN);",
+    "warning_context": "struct in6_addr *net_route_get_nexthop(struct net_route_entry *route)\n{\n\tstruct net_route_nexthop *nexthop_route;\n\tstruct net_ipv6_nbr_data *ipv6_nbr_data;\n\n\tif (!route) {\n\t\treturn NULL;\n\t}\n\n\tSYS_SLIST_FOR_EACH_CONTAINER(&route->nexthop, nexthop_route, node) {\n\t\tstruct in6_addr *addr;\n\n\t\tNET_ASSERT(nexthop_route->nbr->idx != NET_NBR_LLADDR_UNKNOWN);\n\n\t\tif (nexthop_route->nbr->idx == NET_NBR_LLADDR_UNKNOWN) {\n\t\t\tcontinue;\n\t\t}\n\n\t\tipv6_nbr_data = net_ipv6_nbr_data(nexthop_route->nbr);\n\t\tif (ipv6_nbr_data) {\n\t\t\taddr = &ipv6_nbr_data->addr;\n\t\t\tNET_ASSERT(addr);\n\n\t\t\treturn addr;\n\t\t} else {\n\t\t\tNET_ERR(\"could not get neighbor data from next hop\");\n\t\t}\n\t}\n\n\treturn NULL;\n}\n"
 }

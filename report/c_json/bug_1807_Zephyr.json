@@ -1,0 +1,10 @@
+{
+    "project": "Zephyr",
+    "tool": "Infer",
+    "category": "Uninitialized Value",
+    "file": "subsys/settings/src/settings_line.c",
+    "message": "The value read from rc was never initialized.",
+    "warning_function_name": "settings_line_entry_copy",
+    "warning_line": "return rc;",
+    "warning_context": "int settings_line_entry_copy(void *dst_ctx, off_t dst_off, void *src_ctx,\n\t\t\t     off_t src_off, size_t len)\n{\n\tint rc;\n\tchar buf[16];\n\tsize_t chunk_size;\n\n\twhile (len) {\n\t\tchunk_size = MIN(len, sizeof(buf));\n\n\t\trc = settings_io_cb.read_cb(src_ctx, src_off, buf, &chunk_size);\n\t\tif (rc) {\n\t\t\tbreak;\n\t\t}\n\n\t\trc = settings_io_cb.write_cb(dst_ctx, dst_off, buf, chunk_size);\n\t\tif (rc) {\n\t\t\tbreak;\n\t\t}\n\n\t\tsrc_off += chunk_size;\n\t\tdst_off += chunk_size;\n\t\tlen -= chunk_size;\n\t}\n\n\treturn rc;\n}\n"
+}

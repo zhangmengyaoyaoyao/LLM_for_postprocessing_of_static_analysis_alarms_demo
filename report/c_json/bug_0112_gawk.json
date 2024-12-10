@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: [1, +oo] Size: [0, +oo] by call to `assoc_list`.",
-    "Code_line": "\tlist = assoc_list(func_table, \"@unsorted\", ASORTI);",
-    "Code_function": "check_param_names(void)\n{\n\tint i, j;\n\tNODE **list;\n\tNODE *f;\n\tlong max;\n\tbool result = true;\n\tNODE n;\n\n\tif (func_table->table_size == 0)\n\t\treturn result;\n\n\tmax = func_table->table_size * 2;\n\n\tmemset(& n, 0, sizeof n);\n\tn.type = Node_val;\n\tn.flags = STRING|STRCUR;\n\tn.stfmt = -1;\n\n\t/*\n\t * assoc_list() returns an array with two elements per awk array\n\t * element. Elements i and i+1 in the C array represent the key\n\t * and value of element j in the awk array. Thus the loops use += 2\n\t * to go through the awk array.\n\t *\n\t * In this case, the name is in list[i], and the function is\n\t * in list[i+1]. Just what we need.\n\t */\n\n\tlist = assoc_list(func_table, \"@unsorted\", ASORTI);\n\n\tfor (i = 0; i < max; i += 2) {\n\t\tf = list[i+1];\n\t\tif (f->type == Node_builtin_func || f->param_cnt == 0)\n\t\t\tcontinue;\n\n\t\t/* loop over each param in function i */\n\t\tfor (j = 0; j < f->param_cnt; j++) {\n\t\t\t/* compare to function names */\n\n\t\t\t/* use a fake node to avoid malloc/free of make_string */\n\t\t\tn.stptr = f->fparms[j].param;\n\t\t\tn.stlen = strlen(f->fparms[j].param);\n\n\t\t\tif (in_array(func_table, & n)) {\n\t\t\t\terror(\n\t\t\t_(\"function `%s': can't use function `%s' as a parameter name\"),\n\t\t\t\t\tlist[i]->stptr,\n\t\t\t\t\tf->fparms[j].param);\n\t\t\t\tresult = false;\n\t\t\t}\n\t\t}\n\t}\n\n\tefree(list);\n\treturn result;\n}"
-}

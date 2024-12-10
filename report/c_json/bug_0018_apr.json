@@ -1,0 +1,10 @@
+{
+    "project": "apr",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L1",
+    "file": "strings/apr_snprintf.c",
+    "message": "Offset: 80 Size: 80 by call to `apr_ecvt`.",
+    "warning_function_name": "apr_gcvt",
+    "warning_line": "p1 = apr_ecvt(number, ndigit, &decpt, &sign, buf1);",
+    "warning_context": "static char *apr_gcvt(double number, int ndigit, char *buf, boolean_e altform)\n{\n    int sign, decpt;\n    register char *p1, *p2;\n    register int i;\n    char buf1[NDIG];\n\n    p1 = apr_ecvt(number, ndigit, &decpt, &sign, buf1);\n    p2 = buf;\n    if (sign)\n        *p2++ = '-';\n    for (i = ndigit - 1; i > 0 && p1[i] == '0'; i--)\n        ndigit--;\n    if ((decpt >= 0 && decpt - ndigit > 4)\n        || (decpt < 0 && decpt < -3)) {                /* use E-style */\n        decpt--;\n        *p2++ = *p1++;\n        *p2++ = '.';\n        for (i = 1; i < ndigit; i++)\n            *p2++ = *p1++;\n        *p2++ = 'e';\n        if (decpt < 0) {\n            decpt = -decpt;\n            *p2++ = '-';\n        }\n        else\n            *p2++ = '+';\n        if (decpt / 100 > 0)\n            *p2++ = decpt / 100 + '0';\n        if (decpt / 10 > 0)\n            *p2++ = (decpt % 100) / 10 + '0';\n        *p2++ = decpt % 10 + '0';\n    }\n    else {\n        if (decpt <= 0) {\n            if (*p1 != '0')\n                *p2++ = '.';\n            while (decpt < 0) {\n                decpt++;\n                *p2++ = '0';\n            }\n        }\n        for (i = 1; i <= ndigit; i++) {\n            *p2++ = *p1++;\n            if (i == decpt)\n                *p2++ = '.';\n        }\n        if (ndigit < decpt) {\n            while (ndigit++ < decpt)\n                *p2++ = '0';\n            *p2++ = '.';\n        }\n    }\n    if (p2[-1] == '.' && !altform)\n        p2--;\n    *p2 = '\\0';\n    return (buf);\n}\n"
+}

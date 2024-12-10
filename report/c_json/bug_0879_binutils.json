@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L2",
-    "Message": "Offset: [17, 18] (⇐ [0, 1] + 17) Size: 18 by call to `_bfd_generic_link_add_one_symbol`.",
-    "Code_line": "\t  if (!(_bfd_generic_link_add_one_symbol",
-    "Code_function": "elf_i386_always_size_sections (bfd *output_bfd,\n\t\t\t       struct bfd_link_info *info)\n{\n  asection *tls_sec = elf_hash_table (info)->tls_sec;\n\n  if (tls_sec)\n    {\n      struct elf_link_hash_entry *tlsbase;\n\n      tlsbase = elf_link_hash_lookup (elf_hash_table (info),\n\t\t\t\t      \"_TLS_MODULE_BASE_\",\n\t\t\t\t      FALSE, FALSE, FALSE);\n\n      if (tlsbase && tlsbase->type == STT_TLS)\n\t{\n\t  struct elf_i386_link_hash_table *htab;\n\t  struct bfd_link_hash_entry *bh = NULL;\n\t  const struct elf_backend_data *bed\n\t    = get_elf_backend_data (output_bfd);\n\n\t  htab = elf_i386_hash_table (info);\n\t  if (htab == NULL)\n\t    return FALSE;\n\n\t  if (!(_bfd_generic_link_add_one_symbol\n\t\t(info, output_bfd, \"_TLS_MODULE_BASE_\", BSF_LOCAL,\n\t\t tls_sec, 0, NULL, FALSE,\n\t\t bed->collect, &bh)))\n\t    return FALSE;\n\n\t  htab->tls_module_base = bh;\n\n\t  tlsbase = (struct elf_link_hash_entry *)bh;\n\t  tlsbase->def_regular = 1;\n\t  tlsbase->other = STV_HIDDEN;\n\t  (*bed->elf_backend_hide_symbol) (info, tlsbase, TRUE);\n\t}\n    }\n\n  return TRUE;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "UNINITIALIZED_VALUE",
+    "file": "binutils/stabs.c",
+    "message": "The value read from type was never initialized.",
+    "warning_function_name": "stab_demangle_arg",
+    "warning_line": "if (type == DEBUG_TYPE_NULL)",
+    "warning_context": "static bfd_boolean\nstab_demangle_arg (struct stab_demangle_info *minfo, const char **pp,\n\t\t   debug_type **pargs, unsigned int *pcount,\n\t\t   unsigned int *palloc)\n{\n  const char *start;\n  debug_type type;\n\n  start = *pp;\n  if (! stab_demangle_type (minfo, pp,\n\t\t\t    pargs == NULL ? (debug_type *) NULL : &type)\n      || ! stab_demangle_remember_type (minfo, start, *pp - start))\n    return FALSE;\n\n  if (pargs != NULL)\n    {\n      if (type == DEBUG_TYPE_NULL)\n\treturn FALSE;\n\n      if (*pcount + 1 >= *palloc)\n\t{\n\t  *palloc += 10;\n\t  *pargs = ((debug_type *)\n\t\t    xrealloc (*pargs, *palloc * sizeof **pargs));\n\t}\n      (*pargs)[*pcount] = type;\n      ++*pcount;\n    }\n\n  return TRUE;\n}\n"
 }

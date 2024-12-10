@@ -1,8 +1,0 @@
-{
-    "Project": "gawk",
-    "Tool": "CSA",
-    "Bug Type": "core.NullDereference",
-    "Message": "Dereference of null pointer",
-    "Code_line": "\t\t*p++ = buf[0];",
-    "Code_function": "g_readline(const char *prompt)\n{\n\tchar *line;\n\tsize_t line_size = 100;\n\tstatic char buf[2];\n\tchar *p, *end;\n\tint n;\n\n\tif (input_from_tty && prompt && *prompt)\n\t\tfprintf(out_fp, \"%s\", prompt);\n\n\temalloc(line, char *, line_size + 1, \"g_readline\");\n\tp = line;\n\tend = line + line_size;\n\twhile ((n = read(input_fd, buf, 1)) > 0) {\n\t\tif (buf[0] == '\\n') {\n\t\t\tif (p > line && p[-1] == '\\r')\n\t\t\t\tp--;\n\t\t\tbreak;\n\t\t}\n\t\tif (p == end) {\n\t\t\terealloc(line, char *, 2 * line_size + 1, \"g_readline\");\n\t\t\tp = line + line_size;\n\t\t\tline_size *= 2;\n\t\t\tend = line + line_size;\n\t\t}\n\t\t*p++ = buf[0];\n\t}\n\tif (n == -1 || (n == 0 && p == line)) {\n\t\tefree(line);\n\t\treturn NULL;\n\t}\n\t*p = '\\0';\n\treturn line;\n}"
-}

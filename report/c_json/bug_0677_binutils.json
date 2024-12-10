@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: [0, 34] Size: [3, 36] by call to `pop_insert`.",
-    "Code_line": "  pop_insert (potable);",
-    "Code_function": "pobegin (void)\n{\n  po_hash = hash_new ();\n\n  /* Do the target-specific pseudo ops.  */\n  pop_table_name = \"md\";\n  md_pop_insert ();\n\n  /* Now object specific.  Skip any that were in the target table.  */\n  pop_table_name = \"obj\";\n  pop_override_ok = 1;\n  obj_pop_insert ();\n\n  /* Now portable ones.  Skip any that we've seen already.  */\n  pop_table_name = \"standard\";\n  pop_insert (potable);\n\n  /* Now CFI ones.  */\n  pop_table_name = \"cfi\";\n  pop_override_ok = 1;\n  cfi_pop_insert ();\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_S2",
+    "file": "binutils/wrstabs.c",
+    "message": "Offset added: [12+max(0, `p->symbols_size`), +oo] (⇐ [max(0, `p->symbols_size`), +oo] + 12) Size: [0, +oo] by call to `stab_write_symbol`.",
+    "warning_function_name": "stab_function_type",
+    "warning_line": "if (! stab_write_symbol (info, N_LSYM, 0, 0, buf))",
+    "warning_context": "static bfd_boolean\nstab_function_type (void *p, int argcount,\n\t\t    bfd_boolean varargs ATTRIBUTE_UNUSED)\n{\n  struct stab_write_handle *info = (struct stab_write_handle *) p;\n  int i;\n\n  /* We have no way to represent the argument types, so we just\n     discard them.  However, if they define new types, we must output\n     them.  We do this by producing empty typedefs.  */\n  for (i = 0; i < argcount; i++)\n    {\n      if (! info->type_stack->definition)\n\tfree (stab_pop_type (info));\n      else\n\t{\n\t  char *s, *buf;\n\n\t  s = stab_pop_type (info);\n\n\t  buf = (char *) xmalloc (strlen (s) + 3);\n\t  sprintf (buf, \":t%s\", s);\n\t  free (s);\n\n\t  if (! stab_write_symbol (info, N_LSYM, 0, 0, buf))\n\t    return FALSE;\n\n\t  free (buf);\n\t}\n    }\n\n  return stab_modify_type (info, 'f', 0, &info->type_cache.function_types,\n\t\t\t   &info->type_cache.function_types_alloc);\n}\n"
 }

@@ -1,0 +1,10 @@
+{
+    "project": "RIOT",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "tests/unittests/tests-gnrc_ipv6_nib/tests-gnrc_ipv6_nib-internal.c",
+    "message": "Uninitialized variable: node",
+    "warning_function_name": "est_nib_nc_add__success_duplicate(",
+    "warning_line": "TEST_ASSERT(node == _nib_nc_add(&addr, iface,",
+    "warning_context": "static void test_nib_nc_add__success_duplicate(void)\n{\n    _nib_onl_entry_t *node;\n    ipv6_addr_t addr = { .u64 = { { .u8 = GLOBAL_PREFIX },\n                                  { .u64 = TEST_UINT64 } } };\n    unsigned iface = 0;\n\n    for (int i = 0; i < CONFIG_GNRC_IPV6_NIB_NUMOF; i++) {\n        addr.u64[1].u64++;\n        iface++;\n        TEST_ASSERT_NOT_NULL((node = _nib_nc_add(&addr, iface,\n                                                 GNRC_IPV6_NIB_NC_INFO_NUD_STATE_INCOMPLETE)));\n        node->info |= GNRC_IPV6_NIB_NC_INFO_AR_STATE_REGISTERED;\n    }\n    TEST_ASSERT(node == _nib_nc_add(&addr, iface,\n                                    GNRC_IPV6_NIB_NC_INFO_NUD_STATE_UNREACHABLE));\n}\n"
+}

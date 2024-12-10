@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Cppcheck",
-    "Bug Type": "ctuArrayIndex",
-    "Message": "Array index out of bounds; buffer 'in' is accessed at offset 0.",
-    "Code_line": "\tout[0] = _double_byte(in[0]) ^ triple(in[1]) ^ in[2] ^ in[3];",
-    "Code_function": "\tout[0] = _double_byte(in[0]) ^ triple(in[1]) ^ in[2] ^ in[3];"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "drivers/sensor/ens210/ens210.c",
+    "message": "Uninitialized variable: ret",
+    "warning_function_name": "ens210_wait_boot",
+    "warning_line": "if (ret < 0) {",
+    "warning_context": "static int ens210_wait_boot(struct device *i2c_dev)\n{\n\tint cnt;\n\tint ret;\n\tstruct ens210_sys_stat sys_stat;\n\n\tfor (cnt = 0; cnt <= CONFIG_ENS210_MAX_STAT_RETRIES; cnt++) {\n\t\tret =  i2c_reg_read_byte(i2c_dev, DT_INST_0_AMS_ENS210_BASE_ADDRESS,\n\t\t\t\t\t ENS210_REG_SYS_STAT,\n\t\t\t\t\t (u8_t *)&sys_stat);\n\n\t\tif (ret < 0) {\n\t\t\tk_sleep(K_MSEC(1));\n\t\t\tcontinue;\n\t\t}\n\n\t\tif (sys_stat.sys_active) {\n\t\t\treturn 0;\n\t\t}\n\n\t\tif (cnt == 0) {\n\t\t\tens210_sys_reset(i2c_dev);\n\t\t}\n\n\t\tens210_sys_enable(i2c_dev);\n\n\t\tk_sleep(K_MSEC(2));\n\t}\n\n\tif (ret < 0) {\n\t\tLOG_ERR(\"Failed to read SYS_STATE\");\n\t}\n\n\n\tLOG_ERR(\"Sensor is not in active state\");\n\treturn -EIO;\n}\n"
 }

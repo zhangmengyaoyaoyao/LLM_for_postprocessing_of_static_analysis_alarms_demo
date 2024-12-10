@@ -1,0 +1,10 @@
+{
+    "project": "combine",
+    "tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "src/index.c",
+    "message": "Uninitialized variable: &index_hdr.hash_size",
+    "warning_function_name": "initialize_index",
+    "warning_line": "return_val = fwrite (&index_hdr, sizeof (index_hdr), 1, *index_file);",
+    "warning_context": "int\ninitialize_index (entries, number_size, hash_method, filename, index_file)\n     INDEXNUM entries;\n     INDEXNUM number_size;\n     INDEXNUM hash_method;\n     char *filename;\n     FILE **index_file;\n{\n  comb_index_hdr index_hdr;\n  comb_index_hdr_ll index_hdr_more;\n  comb_hash_entry_ll index_entry;\n  long long int i;\n  int return_val;\n\n  *index_file = fopen (filename, \"w\");\n  if (*index_file == NULL)\n    FATAL_PERROR (filename);\n\n  index_hdr.magic_number = 'DpV!';\n  index_hdr.version = 1;\n  index_hdr.hash_method = hash_method;\n  index_hdr.hash_number_size = number_size;\n\n  return_val = fwrite (&index_hdr, sizeof (index_hdr), 1, *index_file);\n  if (return_val != 1)\n    FATAL_ERROR (_(\"error writing to index file\"));\n\n  /* Assuming the long long version for now */\n  index_hdr_more.hash_size = entries;\n  return_val\n    = fwrite (&index_hdr_more, sizeof (index_hdr_more), 1, *index_file);\n  if (return_val != 1)\n    FATAL_ERROR (_(\"error writing to index file\"));\n\n  index_entry.file_position = 0;\n  index_entry.record_length = 0;\n  index_entry.key_position = 0;\n  index_entry.key_length = 0;\n  index_entry.next_same_key = 0;\n  index_entry.prev_same_key = 0;\n\n  for (i = 0; i < entries; i++) {\n    return_val = fwrite (&index_entry, sizeof (index_entry), 1, *index_file);\n    if (return_val != 1)\n      FATAL_ERROR (_(\"error writing to index file\"));\n    }\n\n  return 0;\n  }\n"
+}

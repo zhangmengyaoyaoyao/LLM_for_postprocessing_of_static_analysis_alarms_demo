@@ -1,8 +1,10 @@
 {
-    "Project": "binutils",
-    "Tool": "Infer",
-    "Bug Type": "BUFFER_OVERRUN_L3",
-    "Message": "Offset: [15, +oo] (⇐ [0, +oo] + 15) Size: [1, +oo] by call to `append_type`.",
-    "Code_line": "      if (! append_type (info, \"/* bitstring */\"))",
-    "Code_function": "pr_set_type (void *p, bfd_boolean bitstringp)\n{\n  struct pr_handle *info = (struct pr_handle *) p;\n\n  if (! substitute_type (info, \"\"))\n    return FALSE;\n\n  if (! prepend_type (info, \"set { \")\n      || ! append_type (info, \" }\"))\n    return FALSE;\n\n  if (bitstringp)\n    {\n      if (! append_type (info, \"/* bitstring */\"))\n\treturn FALSE;\n    }\n\n  return TRUE;\n}"
+    "project": "binutils",
+    "tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "gas/macro.c",
+    "message": "Offset: [4, +oo] Size: [1, +oo] by call to `buffer_and_nest`.",
+    "warning_function_name": "expand_irp",
+    "warning_line": "if (! buffer_and_nest (NULL, \"ENDR\", &sub, get_line))",
+    "warning_context": "const char *\nexpand_irp (int irpc, size_t idx, sb *in, sb *out, size_t (*get_line) (sb *))\n{\n  sb sub;\n  formal_entry f;\n  struct hash_control *h;\n  const char *err;\n\n  idx = sb_skip_white (idx, in);\n\n  sb_new (&sub);\n  if (! buffer_and_nest (NULL, \"ENDR\", &sub, get_line))\n    return _(\"unexpected end of file in irp or irpc\");\n\n  sb_new (&f.name);\n  sb_new (&f.def);\n  sb_new (&f.actual);\n\n  idx = get_token (idx, in, &f.name);\n  if (f.name.len == 0)\n    return _(\"missing model parameter\");\n\n  h = hash_new ();\n  err = hash_jam (h, sb_terminate (&f.name), &f);\n  if (err != NULL)\n    return err;\n\n  f.index = 1;\n  f.next = NULL;\n  f.type = FORMAL_OPTIONAL;\n\n  sb_reset (out);\n\n  idx = sb_skip_comma (idx, in);\n  if (idx >= in->len)\n    {\n      /* Expand once with a null string.  */\n      err = macro_expand_body (&sub, out, &f, h, 0);\n    }\n  else\n    {\n      bfd_boolean in_quotes = FALSE;\n\n      if (irpc && in->ptr[idx] == '\"')\n\t{\n\t  in_quotes = TRUE;\n\t  ++idx;\n\t}\n\n      while (idx < in->len)\n\t{\n\t  if (!irpc)\n\t    idx = get_any_string (idx, in, &f.actual);\n\t  else\n\t    {\n\t      if (in->ptr[idx] == '\"')\n\t\t{\n\t\t  size_t nxt;\n\n\t\t  if (irpc)\n\t\t    in_quotes = ! in_quotes;\n\n\t\t  nxt = sb_skip_white (idx + 1, in);\n\t\t  if (nxt >= in->len)\n\t\t    {\n\t\t      idx = nxt;\n\t\t      break;\n\t\t    }\n\t\t}\n\t      sb_reset (&f.actual);\n\t      sb_add_char (&f.actual, in->ptr[idx]);\n\t      ++idx;\n\t    }\n\n\t  err = macro_expand_body (&sub, out, &f, h, 0);\n\t  if (err != NULL)\n\t    break;\n\t  if (!irpc)\n\t    idx = sb_skip_comma (idx, in);\n\t  else if (! in_quotes)\n\t    idx = sb_skip_white (idx, in);\n\t}\n    }\n\n  hash_die (h);\n  sb_kill (&f.actual);\n  sb_kill (&f.def);\n  sb_kill (&f.name);\n  sb_kill (&sub);\n\n  return err;\n}\n"
 }

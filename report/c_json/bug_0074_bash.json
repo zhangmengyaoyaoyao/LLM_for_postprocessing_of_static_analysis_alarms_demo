@@ -1,0 +1,10 @@
+{
+    "project": "bash",
+    "tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "lib/malloc/stats.c",
+    "message": "Uninitialized variable: v.ncoalesce",
+    "warning_function_name": "malloc_bucket_stats",
+    "warning_line": "return v;",
+    "warning_context": "struct bucket_stats\nmalloc_bucket_stats (size)\n     int size;\n{\n  struct bucket_stats v;\n\n  v.nfree = 0;\n\n  if (size < 0 || size >= NBUCKETS)\n    {\n      v.blocksize = 0;\n      v.nused = v.nmal = v.nmorecore = v.nlesscore = v.nsplit = 0;\n      return v;\n    }\n\n  v.blocksize = 1 << (size + 3);\n  v.nused = _mstats.nmalloc[size];\n  v.nmal = _mstats.tmalloc[size];\n  v.nmorecore = _mstats.nmorecore[size];\n  v.nlesscore = _mstats.nlesscore[size];\n  v.nsplit = _mstats.nsplit[size];\n  v.ncoalesce = _mstats.ncoalesce[size];\n\n  v.nfree = malloc_free_blocks (size);\t/* call back to malloc.c */\n\n  return v;\n}\n"
+}

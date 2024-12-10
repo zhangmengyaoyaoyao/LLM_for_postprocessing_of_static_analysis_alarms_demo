@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Uninitialized Value",
-    "Message": "The value read from expr_copy was never initialized.",
-    "Code_line": "\tZ_OOPS(Z_SYSCALL_OBJ(thread, K_OBJ_THREAD));",
-    "Code_function": "static inline int z_vrfy_k_float_disable(struct k_thread *thread)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(thread, K_OBJ_THREAD));\n\treturn z_impl_k_float_disable(thread);\n}"
+    "project": "Zephyr",
+    "tool": "Infer",
+    "category": "Null Dereference",
+    "file": "subsys/logging/log_cmds.c",
+    "message": "pointer `tmp_name` last assigned on line 150 could be null and is dereferenced by call to `strncmp()` at line 152, column 7.",
+    "warning_function_name": "module_id_get",
+    "warning_line": "if (strncmp(tmp_name, name, 64) == 0) {",
+    "warning_context": "static int module_id_get(const char *name)\n{\n\tu32_t modules_cnt = log_sources_count();\n\tconst char *tmp_name;\n\tu32_t i;\n\n\tfor (i = 0U; i < modules_cnt; i++) {\n\t\ttmp_name = log_source_name_get(CONFIG_LOG_DOMAIN_ID, i);\n\n\t\tif (strncmp(tmp_name, name, 64) == 0) {\n\t\t\treturn i;\n\t\t}\n\t}\n\treturn -1;\n}\n"
 }

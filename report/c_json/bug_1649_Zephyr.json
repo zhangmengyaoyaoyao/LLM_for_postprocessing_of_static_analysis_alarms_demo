@@ -1,8 +1,10 @@
 {
-    "Project": "Zephyr",
-    "Tool": "Infer",
-    "Bug Type": "Null Dereference",
-    "Message": "pointer `null` is dereferenced by call to `bt_hci_cmd_send_sync()` at line 4128, column 8.",
-    "Code_line": "\terr = bt_hci_cmd_send_sync(BT_HCI_OP_READ_LOCAL_FEATURES, NULL, &rsp);",
-    "Code_function": "static int common_init(void)\n{\n\tstruct net_buf *rsp;\n\tint err;\n\n\tif (!(bt_dev.drv->quirks & BT_QUIRK_NO_RESET)) {\n\t\t/* Send HCI_RESET */\n\t\terr = bt_hci_cmd_send_sync(BT_HCI_OP_RESET, NULL, &rsp);\n\t\tif (err) {\n\t\t\treturn err;\n\t\t}\n\t\thci_reset_complete(rsp);\n\t\tnet_buf_unref(rsp);\n\t}\n\n\t/* Read Local Supported Features */\n\terr = bt_hci_cmd_send_sync(BT_HCI_OP_READ_LOCAL_FEATURES, NULL, &rsp);\n\tif (err) {\n\t\treturn err;\n\t}\n\tread_local_features_complete(rsp);\n\tnet_buf_unref(rsp);\n\n\t/* Read Local Version Information */\n\terr = bt_hci_cmd_send_sync(BT_HCI_OP_READ_LOCAL_VERSION_INFO, NULL,\n\t\t\t\t   &rsp);\n\tif (err) {\n\t\treturn err;\n\t}\n\tread_local_ver_complete(rsp);\n\tnet_buf_unref(rsp);\n\n\t/* Read Bluetooth Address */\n\tif (!atomic_test_bit(bt_dev.flags, BT_DEV_USER_ID_ADDR)) {\n\t\terr = bt_hci_cmd_send_sync(BT_HCI_OP_READ_BD_ADDR, NULL, &rsp);\n\t\tif (err) {\n\t\t\treturn err;\n\t\t}\n\t\tread_bdaddr_complete(rsp);\n\t\tnet_buf_unref(rsp);\n\t}\n\n\t/* Read Local Supported Commands */\n\terr = bt_hci_cmd_send_sync(BT_HCI_OP_READ_SUPPORTED_COMMANDS, NULL,\n\t\t\t\t   &rsp);\n\tif (err) {\n\t\treturn err;\n\t}\n\tread_supported_commands_complete(rsp);\n\tnet_buf_unref(rsp);\n\n\tif (IS_ENABLED(CONFIG_BT_HOST_CRYPTO)) {\n\t\t/* Initialize the PRNG so that it is safe to use it later\n\t\t * on in the initialization process.\n\t\t */\n\t\terr = prng_init();\n\t\tif (err) {\n\t\t\treturn err;\n\t\t}\n\t}\n\n#if defined(CONFIG_BT_HCI_ACL_FLOW_CONTROL)\n\terr = set_flow_control();\n\tif (err) {\n\t\treturn err;\n\t}\n#endif /* CONFIG_BT_HCI_ACL_FLOW_CONTROL */\n\n\treturn 0;\n}"
+    "project": "Zephyr",
+    "tool": "Cppcheck",
+    "category": "Uninitialized Variable",
+    "file": "subsys/net/ip/tp.c",
+    "message": "Uninitialized variable: tp_pkt->pkt",
+    "warning_function_name": "tp_pkt_unref",
+    "warning_line": "if (tp_pkt->pkt == pkt) {",
+    "warning_context": "void tp_pkt_unref(struct net_pkt *pkt, const char *file, int line)\n{\n\tbool found = false;\n\tstruct tp_pkt *tp_pkt;\n\n\tSYS_SLIST_FOR_EACH_CONTAINER(&tp_pkts, tp_pkt, next) {\n\t\tif (tp_pkt->pkt == pkt) {\n\t\t\tfound = true;\n\t\t\tbreak;\n\t\t}\n\t}\n\n\ttp_assert(found, \"Invalid %s(%p): %s:%d\", __func__, pkt, file, line);\n\n\tsys_slist_find_and_remove(&tp_pkts, (sys_snode_t *) tp_pkt);\n\n\tnet_pkt_unref(tp_pkt->pkt);\n\n\tk_free(tp_pkt);\n}\n"
 }
