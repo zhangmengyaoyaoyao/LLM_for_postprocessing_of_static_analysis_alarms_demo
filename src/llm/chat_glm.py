@@ -14,7 +14,7 @@ project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
 # 添加项目根目录到 sys.path
 sys.path.append(project_root)
-import construct_prompts as constructor
+import construct_prompts as Constructor
 
 # your api key
 key = ""
@@ -31,14 +31,16 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
     
     # 存储输出的路径
     if project_name == "unknown":
+        constructor = Constructor.C_Constructor()
         output_dir = os.path.join("response", model, "C_project", prompts_technique)
     else:
+        constructor = Constructor.Java_Constructor()
         output_dir = os.path.join("response", model, tool, prompts_technique, project_name)
     os.makedirs(output_dir, exist_ok=True)
 
     # temp
     # if prompts_technique == "chain_of_thought":
-    #     json_files = json_files[292:]
+    json_files = json_files[1673:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):

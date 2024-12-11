@@ -1,0 +1,5 @@
+The warning indicates a potential buffer overflow in the function `TIFFFetchPerSampleAnys` when calling `TIFFFetchAnyArray`. The issue arises when `dir->tdir_count` exceeds the size of the buffer `buf`. The function attempts to allocate more memory if needed, but the check `dir->tdir_count > NITEMS(buf)` is not sufficient to prevent an overflow if `buf` is not large enough.
+
+This is a potential security vulnerability and should be addressed. The buffer size should be checked against `dir->tdir_count` before attempting to use the buffer, and the allocation should be done with a size that matches `dir->tdir_count` to avoid any overflow.
+
+@@ actionable @@
