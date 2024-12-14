@@ -1,0 +1,16 @@
+The warning from SpotBugs indicates that there is a potential buffer overflow in the function `coff_make_empty_symbol` due to the addition of an offset to the size parameter passed to `bfd_zalloc`. The warning suggests that the offset calculation might result in a negative size, which is not valid for memory allocation.
+
+Here is the relevant code snippet:
+
+```c
+bfd_size_type amt = sizeof (coff_symbol_type);
+coff_symbol_type *new_symbol = (coff_symbol_type *) bfd_zalloc (abfd, amt);
+```
+
+The warning context shows that `amt` is calculated as `sizeof (coff_symbol_type)`, which should be a positive value. However, the warning message indicates that the offset added to the base size might result in a negative size, which is not possible in a typical scenario.
+
+Given that the `amt` is calculated as the size of `coff_symbol_type`, which should be a positive value, and the warning suggests a negative size, it seems that there might be an error in the offset calculation or the interpretation of the warning. Without more context or the actual implementation of the offset calculation, it is difficult to determine the exact cause of the warning.
+
+However, since the warning is about a potential buffer overflow, which is a critical issue, it is advisable to investigate this further. The warning is actionable because it indicates a potential security vulnerability that should be addressed.
+
+@@ actionable @@

@@ -1,0 +1,54 @@
+## warning
+```json
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "binutils/bfdtest2.c",
+    "message": "Offset added: [16, +oo] (⇐ [0, +oo] + [16, +oo]) Size: [0, +oo] by call to `bfd_check_format_matches`.",
+    "warning_function_name": "check_format_any",
+    "warning_line": "if (bfd_check_format_matches (abfd, format, &targets))",
+    "warning_context": "static bfd_boolean
+check_format_any (struct bfd *abfd, bfd_format format)
+{
+  char** targets = NULL;
+
+  if (bfd_check_format_matches (abfd, format, &targets))
+    return TRUE;
+
+  if (targets)
+    {
+      bfd_find_target (targets[0], abfd);
+
+      return bfd_check_format (abfd, format);
+    }
+
+  return FALSE;
+}
+"
+}
+```
+
+## Your Answer
+The warning indicates a potential buffer overflow in the `check_format_any` function of the `binutils` project. The function adds an offset of `[16, +oo]` to the buffer size, which could lead to a buffer overflow if the buffer is not properly managed. The context provided does not show any explicit buffer handling or checks that would prevent an overflow. Therefore, this warning is actionable and should be investigated to ensure that the buffer is not being accessed beyond its bounds.
+
+@@ actionable @@
+
+## warning
+```json
+{
+  "Project": "gawk",
+  "Tool": "Infer",
+  "category": "BUFFER_OVERRUN_L3",
+  "file": "builtin.c",
+  "message": "Offset: [1, +oo] Size: [0, +oo] by call to `make_regnode`.",
+  "warning_function_name": "call_match",
+  "warning_line": "regex = make_regnode(Node_regex, regex);",
+  "warning_context": "NODE *\ncall_match(int nargs)\n{\n\tNODE *regex, *text, *array;\n\tNODE *result;\n\n\tregex = text = array = NULL;\n\tif (nargs == 3)\n\t\tarray = POP();\n\tregex = POP();\n\n\t/* Don't need to pop the string just to push it back ... */\n\n\tregex = make_regnode(Node_regex, regex);\n\tPUSH(regex);\n\n\tif (array)\n\t\tPUSH(array);\n\n\tresult = do_match(nargs);\n\treturn result;\n}\n"
+} 
+```
+
+## Your Answer
+The warning from the `gawk` project indicates a potential buffer overflow in the `call_match` function. The `make_regnode` function is called with an offset of `[1, +oo]` and a size of `[0, +oo]`, which suggests that the function may be writing beyond the allocated buffer. The context provided does not show any explicit buffer handling or checks that would prevent an overflow. This warning is actionable and should be investigated to ensure that the buffer is not being accessed beyond its bounds.
+
+@@ actionable @@

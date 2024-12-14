@@ -1,0 +1,21 @@
+To determine whether the warning is actionable, let's analyze the warning message and the context step-by-step:
+
+1. **Warning Message**: The warning states that the condition `'fp_digits>0'` is redundant or the array `_tenmap[8]` is accessed at index `-2`, which is out of bounds.
+
+2. **Context Analysis**:
+   - The function `fmt_s32_dfp` is responsible for formatting a decimal number with a specified number of fractional digits.
+   - The warning points to the line `uint32_t e = _tenmap[fp_digits];`.
+   - The array `_tenmap` is used to store the powers of ten for formatting decimal numbers.
+   - The warning suggests that accessing `_tenmap[fp_digits]` at index `-2` is out of bounds, which is likely due to the negative value of `fp_digits`.
+
+3. **Analysis of the Code**:
+   - The condition `assert(fp_digits > -(int)TENMAP_SIZE);` ensures that `fp_digits` is within the valid range for the `_tenmap` array.
+   - The code then checks `if (fp_digits > 0)`, which seems to be redundant because the `assert` statement already ensures that `fp_digits` is within bounds.
+   - The negative value of `fp_digits` is handled by multiplying it by `-1`, which is a valid operation, but it leads to accessing `_tenmap[fp_digits]` at index `-2`, which is out of bounds.
+
+4. **Conclusion**:
+   - The warning is actionable because the code is accessing an array out of bounds, which can lead to undefined behavior or a crash.
+   - The redundant condition `fp_digits > 0` can be removed, and the code should handle the case where `fp_digits` is negative more carefully.
+
+Therefore, the conclusion is:
+@@ actionable @@

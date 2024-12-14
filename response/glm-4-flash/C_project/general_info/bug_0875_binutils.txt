@@ -1,0 +1,39 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `ieee_define_named_type` in the file `binutils/ieee.c`. The warning suggests that the offset and size used in the call to `ieee_real_write_byte` may exceed the bounds of the buffer.
+
+The context of the warning is within a conditional block that handles the case where the `buflist` is `NULL`. In this case, the function attempts to write to the `global_types` buffer, which is not empty. The warning points out that the offset and size used in the write operation may be incorrect.
+
+Here is the relevant part of the code:
+
+```c
+else
+{
+  if (! ieee_buffer_emptyp(&info->global_types))
+  {
+    if (! ieee_change_buffer(info, &info->global_types))
+      return FALSE;
+  }
+  else
+  {
+    if (! ieee_change_buffer(info, &info->global_types)
+        || ! ieee_write_byte(info, (int) ieee_bb_record_enum)
+        || ! ieee_write_byte(info, 2)
+        || ! ieee_write_number(info, 0)
+        || ! ieee_write_id(info, ""))
+      return FALSE;
+  }
+  // ... (rest of the code)
+  return (ieee_write_byte(info, (int) ieee_nn_record)
+          && ieee_write_number(info, name_indx)
+          && ieee_write_id(info, name)
+          && ieee_write_byte(info, (int) ieee_ty_record_enum)
+          && ieee_write_number(info, type_indx)
+          && ieee_write_byte(info, 0xce)
+          && ieee_write_number(info, name_indx));
+}
+```
+
+The warning is actionable because it points to a specific line of code (`|| ! ieee_write_byte (info, 2)`) where a buffer write operation is performed. If the buffer is not empty, `ieee_change_buffer` should have already adjusted the buffer pointer to the correct position. However, if `ieee_change_buffer` fails, the subsequent write operations may write past the end of the buffer, leading to a buffer overflow.
+
+Therefore, the warning should be addressed to ensure that the buffer is properly managed and that the write operations do not exceed the buffer bounds.
+
+@@ actionable @@

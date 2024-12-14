@@ -1,0 +1,17 @@
+The warning from SpotBugs indicates a potential buffer overrun in the function `ha1_init_hmac` within the file `sys/hashes/sha1.c`. The specific line of code that triggers the warning is:
+
+```c
+sha1_update_byte(ctx, ctx->key_buffer[i] ^ HMAC_IPAD);
+```
+
+The warning context shows that the function initializes the `key_buffer` with zeros and then, if the key length is greater than `SHA1_BLOCK_LENGTH`, it hashes the key. If the key length is less than or equal to `SHA1_BLOCK_LENGTH`, it copies the key directly into `key_buffer`. After that, it starts the inner hash by updating the bytes of `key_buffer` with `HMAC_IPAD`.
+
+The warning suggests that there might be an issue with the `sha1_update_byte` call, as it is updating the buffer with an offset that could potentially exceed the buffer size if `ctx->key_buffer` is not properly initialized or if there is an error in the logic that determines the size of the buffer.
+
+However, the code snippet provided does not show any explicit buffer size issues. The `key_buffer` is initialized to `SHA1_BLOCK_LENGTH` bytes, and the loop iterates over `SHA1_BLOCK_LENGTH` elements. The `sha1_update_byte` function is called within a loop that iterates over the length of `key_buffer`, which should not exceed its size.
+
+Given the information provided, the warning seems to be a false positive. The code appears to handle the buffer size correctly, and there is no indication that the `key_buffer` will be overrun.
+
+Therefore, the conclusion is:
+
+@@ unactionable @@

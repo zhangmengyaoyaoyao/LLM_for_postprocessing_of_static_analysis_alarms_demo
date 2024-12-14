@@ -1,0 +1,21 @@
+The warning from SpotBugs indicates that there is a potential memory leak because the variable `pattern` is nulled out but not freed upon failure. This is a common mistake when using `realloc` in C, where if `realloc` fails, the original memory block is not freed, and the pointer is set to NULL.
+
+Looking at the context, the `realloc` call is inside a loop that processes lines from a file. The `pattern` variable is being used to store a pattern from the file. If `realloc` fails, the `pattern` pointer is set to NULL, but there is no corresponding `free` call to release the original memory block if it was allocated previously.
+
+This is indeed an actionable warning. The code should check if `realloc` fails and if so, free the original memory block before setting the pointer to NULL. Here is an example of how the code could be modified to handle this:
+
+```c
+if (pattern_alloced < (size_t) (p - line)) {
+    char *temp_pattern = realloc(pattern, p - line);
+    if (temp_pattern == NULL) {
+        free(pattern); // Free the original memory block if realloc fails
+        printf("%lu: Cannot record pattern: %m\n", linenum);
+        ret = 1;
+        break;
+    }
+    pattern = temp_pattern;
+    pattern_alloced = p - line;
+}
+```
+
+@@ actionable @@

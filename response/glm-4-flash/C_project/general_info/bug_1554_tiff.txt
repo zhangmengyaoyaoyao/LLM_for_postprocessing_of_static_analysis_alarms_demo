@@ -1,0 +1,20 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `TIFFFetchPerSampleAnys`. The warning is triggered by the call to `TIFFFetchAnyArray` with an offset of 1 and a size that is potentially unbounded (denoted as `[0, +oo]`).
+
+The context of the warning is within a conditional statement that checks if the number of items to be fetched (`dir->tdir_count`) exceeds the number of items that can be held in the buffer `buf`. If it does, a new buffer is allocated using `_TIFFCheckMalloc`.
+
+The issue here is that the `TIFFFetchAnyArray` function is called with the potentially unbounded size, which could lead to a buffer overflow if not handled correctly.
+
+To determine if this warning is actionable, we need to consider the following:
+
+1. The `TIFFFetchAnyArray` function is designed to fetch an array of data from a TIFF file. The size of the array is determined by the `dir->tdir_count` and the `samples` per pixel.
+2. The check `if (dir->tdir_count > NITEMS(buf))` is meant to ensure that the buffer `buf` is not being accessed beyond its bounds.
+3. If `dir->tdir_count` exceeds `NITEMS(buf)`, a new buffer is allocated with `_TIFFCheckMalloc`, which should be safe as long as the allocation is successful.
+
+Given this context, the warning seems to be actionable because:
+
+- The check `dir->tdir_count > NITEMS(buf)` is meant to prevent buffer overflows, but it does not account for the possibility of `dir->tdir_count` being larger than the allocated buffer size after the allocation.
+- The allocation with `_TIFFCheckMalloc` should be safe, but if there is a failure in allocation, the program would not handle it properly, potentially leading to a buffer overflow.
+
+Therefore, the warning is actionable, and the code should be reviewed to ensure that the allocation and subsequent use of the buffer are safe.
+
+@@ actionable @@

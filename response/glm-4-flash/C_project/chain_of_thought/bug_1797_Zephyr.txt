@@ -1,0 +1,17 @@
+To determine whether the warning is actionable, let's analyze the warning message and the context step-by-step:
+
+1. **Warning Message**: The message states that "The value read from expr_copy was never initialized." This suggests that there is a variable `expr_copy` that is being used without being initialized.
+
+2. **Context**: The warning is from the function `z_vrfy_k_poll` in the file `kernel/poll.c`. The function is responsible for validating and copying a buffer of `k_poll_event` structures.
+
+3. **Variable `expr_copy`**: The variable `expr_copy` is declared as `struct k_poll_event *events_copy = NULL;` at the beginning of the function. It is intended to be a copy of the `events` buffer passed to the function.
+
+4. **Initialization**: The variable `events_copy` is initialized to `NULL` at the start of the function. However, the warning suggests that it is being used without being initialized properly.
+
+5. **Usage**: The variable `events_copy` is used in a loop to validate each `k_poll_event` in the buffer. The loop is iterating over `events_copy[i]`, which suggests that `events_copy` is being used as expected.
+
+6. **Potential Issue**: The warning could be due to a misunderstanding or a false positive. The variable `events_copy` is initialized to `NULL` and then assigned a non-NULL value after a successful allocation. The loop then uses `events_copy[i]` correctly.
+
+Based on the analysis, the warning seems to be a false positive. The variable `events_copy` is properly initialized and used within the function. Therefore, the warning is not actionable.
+
+@@ unactionable @@

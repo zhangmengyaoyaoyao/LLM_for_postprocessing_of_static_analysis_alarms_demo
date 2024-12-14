@@ -1,0 +1,7 @@
+The warning from SpotBugs indicates that the value `server_addr_len` is read from `server_addr.sa_family` but was never initialized. This is a potential issue because if `server_addr_len` is used later in the code without being initialized, it could lead to undefined behavior.
+
+Looking at the code, `server_addr_len` is indeed not initialized before it is used in the `net_context_connect` function. However, the initialization of `server_addr_len` is conditional based on the family of the `server_addr`. The code checks if `server_addr.sa_family` is `AF_INET` or `AF_INET6` and sets `server_addr_len` accordingly.
+
+The warning is actionable because the code should ensure that `server_addr_len` is initialized before it is used. The correct approach would be to initialize `server_addr_len` to `sizeof(struct sockaddr)` before the conditional checks, which would cover both `AF_INET` and `AF_INET6` cases, and then set it to the correct size based on the actual family.
+
+@@ actionable @@

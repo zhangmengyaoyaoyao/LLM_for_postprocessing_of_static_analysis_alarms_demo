@@ -1,0 +1,7 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `macro_expand_body` function of the `gas/macro.c` file. The specific issue is that the `sb_add_char` function is called with an offset that could potentially exceed the buffer size (`out->len`), which could lead to a buffer overflow.
+
+The context of the warning suggests that the `sb_add_char` function is being called with the character `&`. The `out->len` variable is used as an offset, and the size is unbounded (`+oo`), which is a concern because if `out->len` is large, this could lead to writing beyond the allocated buffer for `out`.
+
+Given that this is a potential buffer overflow, it is a critical issue that should be addressed. The function `sb_add_char` should ensure that the offset does not exceed the buffer size, or the code should be reviewed to ensure that `out->len` is always a valid offset.
+
+@@ actionable @@

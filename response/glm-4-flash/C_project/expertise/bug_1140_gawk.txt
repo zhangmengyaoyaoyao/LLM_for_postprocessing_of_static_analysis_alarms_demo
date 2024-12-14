@@ -1,0 +1,9 @@
+The warning provided by SpotBugs (via Infer) indicates a potential buffer overflow in the `push_frame` function of the `eval.c` file in the `gawk` project. The specific issue is that the `fcall_list` array is being accessed with an offset of 1, and the size is given as `[0, +oo]`, which suggests that the array is being accessed beyond its bounds.
+
+The context of the warning shows that the `fcall_list` is dynamically allocated and resized based on the `fcall_count`. The `memmove` function is used to shift elements in the array to make room for a new frame. However, if the `fcall_count` is greater than 1, the `memmove` operation is performed, which could potentially write past the end of the `fcall_list` if not handled correctly.
+
+This is a classic example of a buffer overflow issue, which can lead to undefined behavior, crashes, or security vulnerabilities. The warning is actionable because it points to a specific line of code (`fcall_list[1] = f;`) that could be causing the problem.
+
+Given that buffer overflows are a well-known issue and can have serious consequences, it is important to address this warning. The fact that the warning persists in later revisions suggests that it was not properly addressed, indicating that it is actionable.
+
+@@ actionable @@

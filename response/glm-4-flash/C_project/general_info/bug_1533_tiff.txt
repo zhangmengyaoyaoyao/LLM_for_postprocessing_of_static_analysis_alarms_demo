@@ -1,0 +1,18 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `DECLAREcpFunc` function within the `tools/tiffcp.c` file. The warning is about an offset and size that are outside the bounds of the buffer when calling `TIFFWriteScanline`.
+
+The context of the warning is within a loop that iterates over `row` and `s` (samples per pixel). The `TIFFWriteScanline` function is called with an offset of `row` and a size of `[0, +oo]`, which is problematic because the size is not being set correctly, potentially leading to writing beyond the allocated buffer.
+
+Here is the relevant part of the code:
+
+```c
+if (TIFFWriteScanline(out, outbuf, row, s) < 0) {
+    TIFFError(TIFFFileName(out), "Error, can't write scanline %lu", (unsigned long) row);
+    goto bad;
+}
+```
+
+The `outbuf` is being passed to `TIFFWriteScanline` without a size check, and the size is not being set to the actual size of the buffer. This could lead to a buffer overflow if the `TIFFWriteScanline` function does not handle the size correctly.
+
+Given this context, the warning is actionable because it points to a potential security vulnerability that could be exploited if the `TIFFWriteScanline` function does not properly check the size parameter.
+
+@@ actionable @@

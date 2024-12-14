@@ -1,0 +1,19 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `decode_line_info` in the file `bfd/dwarf2.c`. The warning is about an offset and size that could lead to reading beyond the end of the buffer if certain conditions are not met.
+
+The context of the warning is within a loop that reads the `standard_opcode_lengths` array. The loop reads one byte at a time into the array, and the warning suggests that the loop might read beyond the buffer if the `line_ptr` is not properly managed.
+
+Here is the relevant part of the code:
+
+```c
+for (i = 1; i < lh.opcode_base; ++i)
+  {
+    lh.standard_opcode_lengths[i] = read_1_byte (abfd, line_ptr, line_end);
+    line_ptr += 1;
+  }
+```
+
+The warning is actionable because it points to a potential buffer overflow that could lead to undefined behavior, including crashes or security vulnerabilities. The code should ensure that the loop does not read beyond the `line_end` pointer, which is the end of the buffer.
+
+To mitigate this issue, the code should include a check to ensure that `line_ptr` does not exceed `line_end` before each read operation. If the check is missing, the warning should be addressed by adding such a check.
+
+@@ actionable @@

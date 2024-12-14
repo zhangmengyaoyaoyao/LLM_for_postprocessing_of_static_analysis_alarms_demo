@@ -1,0 +1,15 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `print_formatted_time` function due to the call to `sh_xrealloc`. The warning suggests that the buffer may be resized beyond its intended size, which could lead to a buffer overflow.
+
+The context of the warning shows that `RESIZE_MALLOCED_BUFFER` is called multiple times within a loop that processes the `format` string. The `ssize` variable is calculated based on the length of the `format` string plus 64, and the buffer is allocated with `xmalloc` initially. The `sh_xrealloc` call is used to resize the buffer as needed.
+
+The calculation of `ssize` is:
+```c
+ssize = (len + 64) - (len % 64);
+```
+This calculation ensures that the buffer size is a multiple of 64, which is likely intended to align the buffer for performance reasons or to simplify memory management.
+
+However, the warning is actionable because the resizing logic does not seem to be bounded by the actual length of the `format` string plus the additional 64 bytes. If the `format` string is very long, the buffer could potentially be resized to a size much larger than necessary, which could lead to a buffer overflow if the buffer is written past its end.
+
+To mitigate this issue, the resizing logic should be reviewed and potentially modified to ensure that the buffer is not resized beyond the actual required size. This might involve calculating the buffer size based on the maximum possible length of the `format` string and the additional characters, and then ensuring that the `sh_xrealloc` call does not exceed this size.
+
+@@ actionable @@

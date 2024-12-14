@@ -1,0 +1,21 @@
+## warning
+```json
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "bfd/stabs.c",
+    "message": "Offset: [4, +oo] (\u21d0 [0, +oo] + 4) Size: [1, +oo].",
+    "warning_function_name": "_bfd_discard_section_stabs",
+    "warning_line": "type = sym[TYPEOFF];",
+    "warning_context": "bfd_boolean\n_bfd_discard_section_stabs (bfd *abfd,\n\t\t\t    asection *stabsec,\n\t\t\t    void * psecinfo,\n\t\t\t    bfd_boolean (*reloc_symbol_deleted_p) (bfd_vma, void *),\n\t\t\t    void * cookie)\n{\n  bfd_size_type count, amt;\n  struct stab_section_info *secinfo;\n  bfd_byte *stabbuf = NULL;\n  bfd_byte *sym, *symend;\n  bfd_size_type skip;\n  bfd_size_type *pstridx;\n  int deleting;\n\n  if (stabsec->size == 0)\n    /* This file does not contain stabs debugging information.  */\n    return FALSE;\n\n  if (stabsec->size % STABSIZE != 0)\n    /* Something is wrong with the format of these stab symbols.\n       Don't try to optimize them.  */\n    return FALSE;\n\n  if ((stabsec->output_section != NULL\n       && bfd_is_abs_section (stabsec->output_section)))\n    /* At least one of the sections is being discarded from the\n       link, so we should just ignore them.  */\n    return FALSE;\n\n  /* We should have initialized our data in _bfd_link_section_stabs.\n     If there was some bizarre error reading the string sections, though,\n     we might not have.  Bail rather than asserting.  */\n  if (psecinfo == NULL)\n    return FALSE;\n\n  count = stabsec->rawsize / STABSIZE;\n  secinfo = (struct stab_section_info *) psecinfo;\n\n  /* Read the stabs information from abfd.  */\n  if (!bfd_malloc_and_get_section (abfd, stabsec, &stabbuf))\n    goto error_return;\n\n  /* Look through the stabs symbols and discard any information for\n     discarded functions.  */\n  skip = 0;\n  deleting = -1;\n\n  symend = stabbuf + stabsec->rawsize;\n  for (sym = stabbuf, pstridx = secinfo->stridxs;\n       sym < symend;\n       sym += STABSIZE, ++pstridx)\n    {\n      int type;\n\n      if (*pstridx == (bfd_size_type) -1)\n\t/* This stab was deleted in a previous pass.  */\n\tcontinue;\n\n      type = sym[TYPEOFF];\n\n      if (type == (int) N_FUN)\n\t{\n\t  int strx = bfd_get_32 (abfd, sym + STRDXOFF);\n\n\t  if (strx == 0)\n\t    {\n\t      if (deleting)\n\t\t{\n\t\t  skip++;\n\t\t  *pstridx = -1;\n\t\t}\n\t      deleting = 0;\n\t      continue;\n\t    }\n\t  deleting = 1;\n\t}\n\n      if (type == (int) N_STSYM || type == (int) N_LCSYM)\n\t{\n\t  if ((*reloc_symbol_deleted_p) (sym + VALOFF - stabbuf, cookie))\n\t    {\n\t      *pstridx = -1;\n\t      skip++;\n\t    }\n\t}\n    }\n\n  free (stabbuf);\n  return TRUE;\n}
+```
+
+## Your Answer
+The warning indicates a potential buffer overflow in the `_bfd_discard_section_stabs` function. The message "Offset: [4, +oo] (\u21d0 [0, +oo] + 4) Size: [1, +oo]" suggests that the buffer is being accessed beyond its bounds. This could lead to undefined behavior, including crashes or security vulnerabilities.
+
+The context provided shows that the function is iterating over stabs symbols and potentially modifying the `sym` buffer. The warning line "type = sym[TYPEOFF];" is part of this iteration, and if the `sym` buffer is not properly managed, it could lead to the buffer overflow.
+
+Given the potential severity of the issue, this warning is actionable. It should be investigated to ensure that the buffer is being accessed safely and that any potential buffer overflows are addressed.
+
+@@ actionable @@

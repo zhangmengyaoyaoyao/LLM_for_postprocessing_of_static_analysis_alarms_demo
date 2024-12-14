@@ -1,0 +1,58 @@
+## warning
+```json
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "binutils/bfdtest2.c",
+    "message": "Offset added: [16, +oo] (⇐ [0, +oo] + [16, +oo]) Size: [0, +oo] by call to `bfd_check_format_matches`.",
+    "warning_function_name": "check_format_any",
+    "warning_line": "if (bfd_check_format_matches (abfd, format, &targets))",
+    "warning_context": "static bfd_boolean
+check_format_any (struct bfd *abfd, bfd_format format)
+{
+  char** targets = NULL;
+
+  if (bfd_check_format_matches (abfd, format, &targets))
+    return TRUE;
+
+  if (targets)
+    {
+      bfd_find_target (targets[0], abfd);
+
+      return bfd_check_format (abfd, format);
+    }
+
+  return FALSE;
+}
+"
+}
+```
+
+## Your Answer
+The warning indicates that there is a potential buffer overflow in the `check_format_any` function due to the addition of an offset that could exceed the buffer size. The function `bfd_check_format_matches` is being called with a pointer to a variable `targets` that is not initialized, and the size of the buffer is not checked before the operation. This could lead to undefined behavior if the buffer is not large enough to accommodate the operation.
+
+However, the context provided does not show any direct evidence of a buffer overflow occurring. The function checks if `targets` is not NULL before attempting to use it, which is a good practice. The warning is a potential issue, but without additional context or evidence of a buffer overflow in the actual code execution, it is difficult to determine if this is an actionable warning.
+
+@@ unknown @@
+
+## warning
+```json
+{
+  "Project": "gawk",
+  "Tool": "Infer",
+  "category": "BUFFER_OVERRUN_L3",
+  "file": "symbol.c",
+  "message": "Offset: 7 Size: [0, 9] by call to `install_symbol`.",
+  "warning_function_name": "init_symbol_table",
+  "warning_line": "func_table = install_symbol(estrdup(\"FUNCTAB\", 7), Node_var_array);",
+  "warning_context": "void\ninit_symbol_table()\n{\n\tgetnode(global_table);\n\tmemset(global_table, '\\0', sizeof(NODE));\n\tnull_array(global_table);\n\n\tgetnode(param_table);\n\tmemset(param_table, '\\0', sizeof(NODE));\n\tnull_array(param_table);\n\n\tinstalling_specials = true;\n\tfunc_table = install_symbol(estrdup(\"FUNCTAB\", 7), Node_var_array);\n\n\tsymbol_table = install_symbol(estrdup(\"SYMTAB\", 6), Node_var_array);\n\tinstalling_specials = false;\n}\n"
+}
+```
+
+## Your Answer
+The warning indicates a potential buffer overflow in the `init_symbol_table` function due to the call to `install_symbol` with an offset of 7 and a size range of [0, 9]. The `estrdup` function is used to duplicate a string, but the context does not provide information about the size of the buffer that `install_symbol` expects or the size of the string being duplicated.
+
+Without knowing the buffer size expected by `install_symbol`, it is not possible to determine if this is an actionable warning. If the buffer is not large enough to accommodate the operation, it could lead to a buffer overflow. However, if the buffer size is sufficient, this could be a false positive.
+
+@@ unknown @@

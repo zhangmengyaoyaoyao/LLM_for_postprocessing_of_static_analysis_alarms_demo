@@ -1,0 +1,23 @@
+The warning from SpotBugs indicates that the value `server_addr_len` is read from `server_addr.sa_family` but was never initialized. This is a potential issue because if `server_addr.sa_family` is not set before this point, `server_addr_len` would be uninitialized and could lead to undefined behavior when used later in the code.
+
+Given the context, it seems that `server_addr_len` is intended to be set based on the size of the `sockaddr` structure (`sizeof(struct sockaddr_in)` or `sizeof(struct sockaddr_in6)`), which is determined by the family of the `server_addr`. The code checks for `AF_INET` and `AF_INET6` and sets `local_addr` accordingly, but it does not explicitly initialize `server_addr_len`.
+
+Here is the relevant part of the code:
+
+```c
+if (IS_ENABLED(CONFIG_NET_IPV4) && server_addr.sa_family == AF_INET) {
+    local_addr = (struct sockaddr *)&local_addr4;
+    server_addr_len = sizeof(struct sockaddr_in);
+    local_addr4.sin_port = 0U;
+}
+
+if (IS_ENABLED(CONFIG_NET_IPV6) && server_addr.sa_family == AF_INET6) {
+    local_addr = (struct sockaddr *)&local_addr6;
+    server_addr_len = sizeof(struct sockaddr_in6);
+    local_addr6.sin6_port = 0U;
+}
+```
+
+The warning is actionable because the code should explicitly initialize `server_addr_len` before using it. This could be done by setting `server_addr_len` to `sizeof(struct sockaddr)` before the conditional checks, which would ensure that it is initialized regardless of the family of `server_addr`.
+
+@@ actionable @@

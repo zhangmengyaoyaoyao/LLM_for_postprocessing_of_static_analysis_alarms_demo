@@ -1,0 +1,30 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `TIFFWriteShortArray` function call. The warning is generated because the offset is set to `[3, +oo]` and the size is `[0, +oo]`, which suggests that the function is being called with an invalid buffer and size.
+
+Looking at the code context, the `TIFFWriteShortArray` function is called within a switch statement that handles different data types. The warning is specifically on the line where `TIFFWriteShortArray` is called:
+
+```c
+if (!TIFFWriteShortArray(tif, dir, (uint16*)bp))
+```
+
+The `bp` pointer is assigned to `w`, which is a pointer to a buffer (`buf`) that is allocated dynamically if the size of the data exceeds the size of `buf`. The allocation is done with `_TIFFmalloc`, and if it fails, an error is logged and the function returns `0`.
+
+The issue here is that the `TIFFWriteShortArray` function is being called with a pointer to a buffer that may not be large enough to hold the data, as indicated by the warning. This could lead to a buffer overflow if the data being written is larger than the buffer size.
+
+The code checks for this condition before the allocation:
+
+```c
+if (n * TIFFDataWidth(type) > sizeof buf) {
+    w = (char*) _TIFFmalloc(n * TIFFDataWidth(type));
+    if (w == NULL) {
+        TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+                     "No space to write array");
+        return (0);
+    }
+}
+```
+
+However, the warning suggests that the check might not be sufficient, or there could be a logic error elsewhere in the code that is not visible in the provided snippet.
+
+Given that the warning is about a potential buffer overflow, which is a serious security issue, it is important to investigate and fix the problem. Therefore, the warning is actionable.
+
+@@ actionable @@

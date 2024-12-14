@@ -1,0 +1,19 @@
+The warning from SpotBugs indicates that the variable `ptr_esf` is uninitialized before it is used in the `return ptr_esf;` statement. To determine if this warning is actionable, we need to analyze the context in which `ptr_esf` is used.
+
+From the provided code snippet, `ptr_esf` is assigned a value in the following lines:
+
+```c
+if (exc_return & EXC_RETURN_MODE_THREAD) {
+    ptr_esf = (z_arch_esf_t *)__TZ_get_PSP_NS();
+} else {
+    ptr_esf = (z_arch_esf_t *)__TZ_get_MSP_NS();
+}
+```
+
+This assignment occurs within a conditional block that is executed based on the value of `exc_return`. The variable `ptr_esf` is assigned a pointer to the Non-Secure state stack frame using the appropriate function (`__TZ_get_PSP_NS()` or `__TZ_get_MSP_NS()`) based on the condition.
+
+Given that `ptr_esf` is assigned a value before it is returned, the warning about an uninitialized variable is incorrect. The variable is initialized before use.
+
+Therefore, the warning is not actionable.
+
+@@ actionable @@

@@ -1,0 +1,9 @@
+The warning from SpotBugs indicates that there is an out-of-bounds access on the array `_tenmap[8]` at line 18 of the function `fmt_s32_dfp`. The array `_tenmap` is likely meant to be used for formatting decimal places, and the index `-2` suggests that the code is trying to access an element before the start of the array.
+
+The condition `fp_digits > 0` is indeed redundant because the array `_tenmap` is being accessed with an index that is derived from `fp_digits`, which is already checked to be greater than `-(int)TENMAP_SIZE` earlier in the function. This check ensures that `fp_digits` is non-negative, but it does not prevent the out-of-bounds access.
+
+The code should check that `fp_digits` is within the bounds of the `_tenmap` array before attempting to access it. If `fp_digits` is negative, it should be converted to a positive index within the bounds of the array.
+
+Given this analysis, the warning is actionable because the code is indeed accessing an array out of bounds, which could lead to undefined behavior or a crash.
+
+@@ actionable @@

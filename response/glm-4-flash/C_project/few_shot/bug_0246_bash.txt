@@ -1,0 +1,192 @@
+## example1
+### Bug Report
+```json
+{
+    "Project": "combine",
+    "Tool": "Cppcheck",
+    "category": "memleak",
+    "file": "src/dstring.c",
+    "message": "Memory leak: temp_string",
+    "warning_function_name": "dstrtonum",
+    "warning_line": "return return_val;",
+    "warning_context": "BIGNUMBER
+dstrtonum (string, remainder, base)
+     DStr_string_descriptor *string;
+     DStr_string_descriptor **remainder;
+     int base;
+{
+  BIGNUMBER return_val;
+  char *temp_string;
+  char *temp_remainder;
+
+  if (remainder != NULL)
+    *remainder = string;
+
+  temp_string = malloc (string->length + 1);
+  if (temp_string == NULL)
+    return 0;
+
+  memcpy (temp_string, string->string, string->length);
+  temp_string[string->length] = '\0';
+
+  return_val = STRTOBIGNUMBER (temp_string, &temp_remainder, base);
+  if (*temp_remainder == '\0') {
+    /* Either we used the wholde string, or there was an embedded null. */
+    if (temp_remainder - temp_string == string->length) {
+      if (remainder != NULL)
+	*remainder = NULL;
+      free (temp_string);
+      return return_val;
+      }
+    }
+
+  if (remainder != NULL) {
+    *remainder = dstrnew ();
+    if (*remainder == NULL) {
+      *remainder = string;
+      free (temp_string);
+      return return_val;
+      }
+    (*remainder)->length = string->length - (temp_remainder - temp_string);
+    (*remainder)->string = string->string + (temp_remainder - temp_string);
+    }
+
+  return return_val;
+
+  }
+"
+}
+```
+
+### Your Answer
+The warning indicates a memory leak in the function `dstrtonum`. The variable `temp_string` is allocated memory using `malloc`, but it is not freed before the function returns. This is a clear memory leak and should be addressed. The code should include a `free(temp_string)` before returning to prevent the memory leak.
+
+@@ actionable @@ 
+
+## example2
+### Bug Report
+```json
+{
+    "Project": "bash",
+    "Tool": "CSA",
+    "category": "core.NullDereference",
+    "file": "subst.c",
+    "message": "Access to field 'word' results in a dereference of a null pointer (loaded from field 'word')",
+    "warning_function_name": "quote_list",
+    "warning_line": "t = w->word->word;",
+    "warning_context": "static WORD_LIST *
+quote_list (list)
+     WORD_LIST *list;
+{
+  register WORD_LIST *w;
+  char *t;
+
+  for (w = list; w; w = w->next)
+    {
+      t = w->word->word;
+      w->word->word = quote_string (t);
+      if (*t == 0)
+	w->word->flags |= W_HASQUOTEDNULL;	/* XXX - turn on W_HASQUOTEDNULL here? */
+      w->word->flags |= W_QUOTED;
+      free (t);
+    }
+  return list;
+}
+"
+}
+```
+
+### Your Answer
+The warning indicates a potential null pointer dereference in the function `quote_list`. The variable `t` is assigned the value of `w->word->word`, which could be null if `w->word` is null. This is a potential bug that could lead to a crash or undefined behavior. The code should include a null check before dereferencing `w->word->word`.
+
+@@ actionable @@ 
+
+## example3
+### Bug Report
+```json
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "binutils/bfdtest2.c",
+    "message": "Offset added: [16, +oo] (⇐ [0, +oo] + [16, +oo]) Size: [0, +oo] by call to `bfd_check_format_matches`.",
+    "warning_function_name": "check_format_any",
+    "warning_line": "if (bfd_check_format_matches (abfd, format, &targets))",
+    "warning_context": "static bfd_boolean
+check_format_any (struct bfd *abfd, bfd_format format)
+{
+  char** targets = NULL;
+
+  if (bfd_check_format_matches (abfd, format, &targets))
+    return TRUE;
+
+  if (targets)
+  {
+    bfd_find_target (targets[0], abfd);
+
+    return bfd_check_format (abfd, format);
+  }
+
+  return FALSE;
+}
+"
+}
+```
+
+### Your Answer
+The warning indicates a potential buffer overflow in the function `check_format_any`. The variable `targets` is used as an output parameter for `bfd_check_format_matches`, but it is not checked for size before being used. This could lead to a buffer overflow if `targets` is not large enough to hold the returned values. The code should include a check for the size of `targets` before using it.
+
+@@ actionable @@ 
+
+## example4
+### Bug Report
+```json
+{
+    "Project": "gawk",
+    "Tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "dfa.c",
+    "message": "Uninitialized variable: wc",
+    "warning_function_name": "dfambcache",
+    "warning_line": "d->mbrtowc_cache[uc] = mbrtowc (&wc, &c, 1, &s) <= 1 ? wc : WEOF;",
+    "warning_context": "static void
+dfambcache (struct dfa *d)
+{
+  int i;
+  for (i = CHAR_MIN; i <= CHAR_MAX; ++i)
+    {
+      char c = i;
+      unsigned char uc = i;
+      mbstate_t s = { 0 };
+      wchar_t wc;
+      d->mbrtowc_cache[uc] = mbrtowc (&wc, &c, 1, &s) <= 1 ? wc : WEOF;
+    }
+}
+"
+}
+```
+
+### Your Answer
+The warning indicates an uninitialized variable `wc` in the function `dfambcache`. The variable `wc` is used in the expression `mbrtowc(&wc, &c, 1, &s) <= 1 ? wc : WEOF;`, but it is not initialized before use. This could lead to undefined behavior. The code should initialize `wc` before using it.
+
+@@ actionable @@ 
+
+## example5
+### Bug Report
+```json
+{
+  "Project": "bash",
+  "Tool": "Infer",
+  "category": "NULL_DEREFERENCE",
+  "file": "builtins/mkbuiltins.c",
+  "message": "pointer `defs->output` last assigned on line 951 could be null and is dereferenced by call to `fprintf()` at line 956, column 7.",
+  "warning_function_name": "produces_handler",
+  "warning_line": "fprintf (defs->output, \"/* %s, created from %s. */\\n\",",
+  "warning_context": "int\nproduces_handler (self, defs, arg)\n     char *self;\n     DEF_FILE *defs;\n     char *arg;\n{\n  /* If just hacking documentation, don't change any of the production\n     files. */\n  if (only_documentation)\n    return (0);\n\n  output_cpp_line_info++;\n\n  if (defs->production)\n    line_error (defs->production, \"%s already has a %s definition\", defs->filename, self);\n  else\n    {\n      defs->production = get_arg (self, defs, arg);\n\n      if (inhibit_production)\n\treturn (0);\n\n      defs->output = fopen (defs->production, \"w\");\n\n      if (!defs->output)\n\tfile_error (defs->production);\n\n      fprintf (defs->output, \"/* %s, created from %s. */\\n\",\n\t       defs->production, defs->filename);\n    }\n  return (0);\n}\n"
+}
+```
+
+### Your Answer
+The warning indicates a potential null pointer dereference in the function `produces_handler`. The pointer `defs->output` could be null if `fopen` fails to open the file specified by `defs->production`. The code should check if `defs->output` is null before dereferencing it in `fprintf`.
+
+@@ actionable @@

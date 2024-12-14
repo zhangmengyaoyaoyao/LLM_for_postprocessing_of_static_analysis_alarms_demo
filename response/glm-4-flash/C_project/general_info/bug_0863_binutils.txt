@@ -1,0 +1,11 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `ieee_pop_type_used`. The warning points out that the offset and size used in the call to `ieee_real_write_byte` may exceed the bounds of the buffer, which could lead to undefined behavior.
+
+The context of the warning suggests that the buffer being written to is either `info->types` or `info->global_types`, depending on the value of `ts->type.localp`. The buffer is checked for emptiness before writing, but the check is done using `ieee_buffer_emptyp`, which is not described in the provided context.
+
+Given the information provided, it is not clear whether the `ieee_buffer_emptyp` function is reliable or if there is a possibility that the buffer could be non-empty when it should be. If `ieee_buffer_emptyp` does not correctly check for emptiness, then the buffer overflow warning is actionable.
+
+However, without more information about the implementation of `ieee_buffer_emptyp`, it is difficult to determine the exact cause of the warning. If `ieee_buffer_emptyp` is known to be reliable, then the warning might be a false positive.
+
+Considering the potential for a buffer overflow and the lack of information about the reliability of the `ieee_buffer_emptyp` function, the warning is actionable.
+
+@@ actionable @@

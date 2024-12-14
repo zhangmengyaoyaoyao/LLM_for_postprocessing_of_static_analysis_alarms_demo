@@ -1,0 +1,17 @@
+To determine whether the warning is actionable, let's analyze the warning message and the context provided:
+
+1. **Warning Message**: "Potential leak of memory pointed to by 'oret'"
+2. **File and Function**: The warning is from the `remove_pattern` function in the `subst.c` file.
+3. **Warning Context**: The warning occurs on the line `free (wparam);` which is inside a conditional block that handles multibyte character handling.
+4. **Potential Leak**: The warning suggests that there might be a memory leak because the memory pointed to by `oret` is not freed before returning from the function.
+
+Now, let's break down the code snippet to understand the potential issue:
+
+- The function `remove_pattern` handles both multibyte and wide character strings.
+- When handling multibyte strings, it converts the input string to wide characters and then calls `remove_wpattern`.
+- After processing, it converts the wide character string back to a multibyte string using `wcsrtombs`.
+- The memory allocated for the wide character string (`wparam`) is freed, but the memory allocated for the original wide character string (`oret`) is not freed before returning.
+
+Given this analysis, the warning is actionable because there is a potential memory leak due to the missing `free` call for `oret`. This can be fixed by adding a `free (oret);` before returning from the function.
+
+@@ actionable @@

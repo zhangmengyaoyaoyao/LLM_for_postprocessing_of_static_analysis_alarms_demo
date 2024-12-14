@@ -1,0 +1,20 @@
+## warning
+```json
+{
+  "Project": "gawk",
+  "Tool": "Infer",
+  "category": "BUFFER_OVERRUN_L3",
+  "file": "extension/gawkfts.c",
+  "message": "Offset added: [1, +oo] Size: [0, +oo].",
+  "warning_function_name": "fts_read",
+  "warning_line": "memmove(t, p->fts_name, (size_t)(p->fts_namelen + 1));",
+  "warning_context": "\t\t}\n\n\t\t/* Rebuild if only read the names and now traversing. */\n\t\tif (sp->fts_child && ISSET(FTS_NAMEONLY)) {\n\t\t\tCLR(FTS_NAMEONLY);\n\t\t\tfts_lfree(sp->fts_child);\n\t\t\tsp->fts_child = NULL;\n\t\t}\n\n\t\t/*\n\t\t * Cd to the subdirectory.\n\t\t *\n\t\t * If have already read and now fail to chdir, whack the list\n\t\t * to make the names come out right, and set the parent errno\n\t\t * so the application will eventually get an error condition.\n\t\t * Set the FTS_DONTCHDIR flag so that when we logically change\n\t\t * directories back to the parent we don't do a chdir.\n\t\t *\n\t\t * If haven't read do so.  If the read fails, fts_build sets\n\t\t * FTS_STOP or the fts_info field of the node.\n\t\t */\n\t\tif (sp->fts_child) {\n\t\t\tif (fts_safe_changedir(sp, p, -1, p->fts_accpath)) {\n\t\t\t\tp->fts_errno = errno;\n\t\t\t\tp->fts_flags |= FTS_DONTCHDIR;\n\t\t\t\tfor (p = sp->fts_child; p; p = p->fts_link)\n\t\t\t\t\tp->fts_accpath =\n\t\t\t\t\t    p->fts_parent->fts_accpath;\n\t\t\t}\n\t\t} else if ((sp->fts_child = fts_build(sp, BREAD)) == NULL) {\n\t\t\tif (ISSET(FTS_STOP))\n\t\t\t\treturn (NULL);\n\t\t\treturn (p);\n\t\t}\n\t\tp = sp->fts_child;\n\t\tsp->fts_child = NULL;\n\t\tgoto name;\n\t}\n\n\t/* Move to the next node on this level. */\nnext:\ttmp = p;\n\tif ((p = p->fts_link) != NULL) {\n\t\tfts_free(tmp);\n\n\t\t/*\n\t\t * If reached the top, return to the original directory, and\n\t\t * load the paths for the next root.\n\t\t */\n\t\tif (p->fts_level == FTS_ROOTLEVEL) {\n\t\t\tif (FCHDIR(sp, sp->fts_rfd)) {\n\t\t\t\tSET(FTS_STOP);\n\t\t\t\treturn (NULL);\n\t\t\t}\n\t\t\tfts_load(sp, p);\n\t\t\treturn (sp->fts_cur = p);\n\t\t}\n\n\t\t/*\n\t\t * User may have called fts_set on the node.  If skipped,\n\t\t * ignore.  If followed, get a file descriptor so we can\n\t\t * get back if necessary.\n\t\t */\n\t\tif (p->fts_instr == FTS_SKIP)\n\t\t\tgoto next;\n\t\tif (p->fts_instr == FTS_FOLLOW) {\n\t\t\tp->fts_info = fts_stat(sp, p, 1);\n\t\t\tif (p->fts_info == FTS_D && !ISSET(FTS_NOCHDIR)) {\n\t\t\t\tif ((p->fts_symfd =\n\t\t\t\t    open(\".\", O_RDONLY | O_CLOEXEC, 0)) == -1) {\n\t\t\t\t\tp->fts_errno = errno;\n\t\t\t\t\tp->fts_info = FTS_ERR;\n\t\t\t\t} else\n\t\t\t\t\tp->fts_flags |= FTS_SYMFOLLOW;\n\t\t\t}\n\t\t\tp->fts_instr = FTS_NOINSTR;\n\t\t}\n\nname:\t\tt = sp->fts_path + NAPPEND(p->fts_parent);\n\t\t*t++ = '/';\n\t\tmemmove(t, p->fts_name, (size_t)(p->fts_namelen + 1));\n\t\treturn (sp->fts_cur = p);\n\t}\n\n\t/* Move up to the parent node. */\n\tp = tmp->fts_parent;\n\tfts_free(tmp);\n\n\tif (p->fts_level == FTS_ROOTPARENTLEVEL) {\n\t\t/*\n\t\t * Done; free everything up and set errno to 0 so the user\n\t\t * can distinguish between error and EOF.\n\t\t */\n\t\tfts_free(p);\n\t\terrno = 0;\n\t\treturn (sp->fts_cur = NULL);\n\t}\n\n\t/* Nul terminate the pathname. */\n\tsp->fts_path[p->fts_pathlen] = '\\0';\n\n\t/*\n"
+}
+```
+
+## Your Answer
+The warning indicates a potential buffer overflow in the `memmove` function call. The `memmove` function is being called with a destination buffer size of `[0, +oo]`, which is likely incorrect. The size of the destination buffer should be known and should not be infinite. This could lead to a buffer overflow if the source data is larger than the destination buffer size.
+
+Given that the warning is about a potential buffer overflow, it is important to investigate and correct the issue to prevent security vulnerabilities and crashes.
+
+@@ actionable @@

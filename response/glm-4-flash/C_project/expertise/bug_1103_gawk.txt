@@ -1,0 +1,9 @@
+The warning provided by SpotBugs indicates a potential buffer overflow in the `fts_read` function of the `gawk` project. The specific issue is that the `fts_stat` function is called with an offset of 2 and a size of 1, which could potentially lead to a buffer overflow if the buffer is not properly sized.
+
+Given the context of the code, it appears that the `fts_stat` function is being used to re-stat a file after following a symlink. The `fts_stat` function is expected to fill in the `fts_info` field of the `FTSENT` structure, which is used to store information about the file system entry.
+
+The warning is actionable because it points to a specific potential vulnerability in the code. If the buffer that `fts_info` points to is not large enough to hold the data being written by `fts_stat`, it could lead to a buffer overflow. This is a serious issue that could be exploited to execute arbitrary code or cause a denial of service.
+
+The code should be reviewed to ensure that the buffer pointed to by `fts_info` is large enough to handle the data being written. If the buffer is not large enough, it should be resized or the code should be modified to use a different mechanism that does not rely on a fixed-size buffer.
+
+@@ actionable @@

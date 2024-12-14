@@ -1,0 +1,9 @@
+The warning from SpotBugs indicates that the first function call argument is an uninitialized value. Specifically, the warning is on the line `apr_skiplist_set_compare(ni, comp, compk);` within the function `apr_skiplist_add_index`.
+
+Looking at the context, `ni` is a pointer to `apr_skiplist` that is initialized with `skiplisti_init(&ni, sl->pool);` before this line. The `comp` and `compk` arguments are passed to the function as parameters. The warning suggests that `comp` or `compk` might be uninitialized.
+
+However, the function signature of `apr_skiplist_set_compare` is `APR_DECLARE(void) apr_skiplist_set_compare(apr_skiplist *sl, apr_skiplist_compare comp, apr_skiplist_compare compk)`, which indicates that `comp` and `compk` are expected to be pointers to `apr_skiplist_compare` functions. If `comp` and `compk` are indeed pointers, then they should not be uninitialized as they are passed as arguments to the function.
+
+Given this, the warning seems to be a false positive. The `comp` and `compk` arguments are passed to the function and should be valid pointers to functions. If the warning persists, it is likely an unactionable warning, indicating no real issue was found.
+
+@@ unactionable @@

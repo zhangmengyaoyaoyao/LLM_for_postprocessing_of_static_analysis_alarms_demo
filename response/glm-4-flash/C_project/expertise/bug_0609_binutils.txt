@@ -1,0 +1,9 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `_bfd_coff_read_internal_relocs` in the file `bfd/coffgen.c`. The warning is about an offset being added and a size being allocated with `bfd_zalloc`, which suggests that the size might be incorrect or not properly validated before allocation.
+
+Given the context, the issue seems to be related to the calculation of the amount of memory to allocate (`amt`) for the `internal_relocs` array. The calculation is based on `sec->reloc_count * relsz`, but there is no explicit check to ensure that `sec->reloc_count` is non-negative or that `relsz` is positive.
+
+This could potentially lead to a buffer overflow if `sec->reloc_count` is negative or if `relsz` is zero. However, the code also includes checks for `free_external` and `free_internal` before attempting to free them, which suggests that the code is designed to handle allocation failures.
+
+The warning is actionable because it points to a potential vulnerability in the code that could lead to a buffer overflow. This is a serious issue that should be addressed by ensuring that the allocation size is calculated correctly and that the input values are validated.
+
+@@ actionable @@

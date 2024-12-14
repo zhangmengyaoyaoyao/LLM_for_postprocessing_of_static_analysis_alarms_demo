@@ -1,0 +1,9 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `ieee_write_number` in the file `binutils/ieee.c`. The warning is about an offset and size that are used in a call to `ieee_real_write_byte`, which suggests that the size of the data being written might exceed the buffer's capacity.
+
+The warning context shows that the function is converting a `bfd_vma` value to a byte array and then writing it out. The size of the data being written is calculated by `c = (ab + 20) - p;`, which is intended to be the number of bytes written to the array `ab`.
+
+The warning message specifically points out that the offset and size used in the call to `ieee_real_write_byte` are `[max(490, `info->curbuf->c`), `info->curbuf->c`] Size: 490`. This suggests that the function is potentially writing 490 bytes to a buffer that might not be large enough, as `info->curbuf->c` could be less than 490.
+
+Given that the warning is about a potential buffer overflow, which is a serious security issue, this warning is actionable. It should be investigated to ensure that the buffer is large enough to hold the data being written.
+
+@@ actionable @@

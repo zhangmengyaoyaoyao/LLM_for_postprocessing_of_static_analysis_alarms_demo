@@ -1,0 +1,14 @@
+The warning from SpotBugs indicates a potential buffer overrun in the function `_intern_fib_add`. The warning is related to the call to `ccnl_fib_add_entry`, which is passed a pointer to `ccnl_relay`, a `prefix`, and a `fibface`. The warning suggests that the offset and size are out of bounds, which could lead to a buffer overflow.
+
+To determine if this warning is actionable, we need to consider the following:
+
+1. The context of the `ccnl_fib_add_entry` function and how it uses the provided parameters.
+2. The expected size of the `prefix` and `fibface` and whether they are being used correctly within the function.
+
+The provided context shows that `prefix` is created by `ccnl_URItoPrefix`, which should return a pointer to a `ccnl_prefix_s` structure. The `fibface` is retrieved by `_intern_face_get`, which should return a pointer to a `ccnl_face_s` structure. Both of these structures are expected to be valid and correctly sized.
+
+However, the warning does not provide enough information about the `ccnl_fib_add_entry` function itself. It is possible that the function expects a certain size for the `prefix` and `fibface` that is not being respected in the code. Without knowing the exact implementation of `ccnl_fib_add_entry`, it is difficult to determine if the warning is valid or not.
+
+Given the lack of information about the function's expected behavior and the potential for a buffer overflow, the warning should be treated with caution.
+
+@@ actionable @@

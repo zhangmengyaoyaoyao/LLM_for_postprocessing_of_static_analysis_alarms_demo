@@ -1,0 +1,11 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `TIFFWriteLongArray` function call. The warning is generated because the offset is set to `[1, +oo]` and the size is `[0, +oo]`, which suggests that the function is being called with an offset that is not zero and with a size that is effectively unbounded.
+
+Looking at the code context, the `TIFFWriteLongArray` function is called within a switch statement that handles different data types. The warning is specifically on the `TIFF_LONG` case, where the function is called with a pointer `bp` that is derived from a buffer `buf` or allocated memory `_TIFFmalloc`.
+
+The code checks if the size of the array (`n`) times the width of the data type (`TIFFDataWidth(type)`) exceeds the size of the buffer `buf`. If it does, it allocates more memory using `_TIFFmalloc`. This suggests that the intention is to handle cases where the array is too large to fit in the buffer `buf`.
+
+However, the warning is generated because the `TIFFWriteLongArray` is called with an offset of 1, which is not zero. This could potentially lead to a buffer overflow if the underlying implementation of `TIFFWriteLongArray` does not handle non-zero offsets correctly.
+
+Given this context, the warning is actionable because it points to a potential security vulnerability that could be exploited if the `TIFFWriteLongArray` function does not properly handle non-zero offsets.
+
+@@ actionable @@

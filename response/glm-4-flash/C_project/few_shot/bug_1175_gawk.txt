@@ -1,0 +1,31 @@
+## example4
+# Bug Report
+```json
+{
+    "Project": "gawk",
+    "Tool": "Cppcheck",
+    "category": "uninitvar",
+    "file": "dfa.c",
+    "message": "Uninitialized variable: wc",
+    "warning_function_name": "dfambcache",
+    "warning_line": "d->mbrtowc_cache[uc] = mbrtowc (&wc, &c, 1, &s) <= 1 ? wc : WEOF;",
+    "warning_context": "static void\n"
+    "dfambcache (struct dfa *d)\n"
+    "{\n"
+    "  int i;\n"
+    "  for (i = CHAR_MIN; i <= CHAR_MAX; ++i)\n"
+    "    {\n"
+    "      char c = i;\n"
+    "      unsigned char uc = i;\n"
+    "      mbstate_t s = { 0 }; // This is uninitialized\n"
+    "      wchar_t wc;\n"
+    "      d->mbrtowc_cache[uc] = mbrtowc (&wc, &c, 1, &s) <= 1 ? wc : WEOF;\n"
+    "    }\n"
+    "}\n"
+}
+```
+
+## Your Answer
+The warning indicates that the variable `s` is uninitialized before being used in the `mbrtowc` function. This can lead to undefined behavior, as the `mbstate_t` structure is expected to be properly initialized for multibyte character handling. The warning is actionable because it points to a potential source of bugs that could affect the correctness of the program.
+
+@@ actionable @@

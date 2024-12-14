@@ -1,0 +1,62 @@
+## warning
+```json
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "binutils/bfdtest2.c",
+    "message": "Offset added: [16, +oo] (⇐ [0, +oo] + [16, +oo]) Size: [0, +oo] by call to `bfd_check_format_matches`.",
+    "warning_function_name": "check_format_any",
+    "warning_line": "if (bfd_check_format_matches (abfd, format, &targets))",
+    "warning_context": "static bfd_boolean
+check_format_any (struct bfd *abfd, bfd_format format)
+{
+  char** targets = NULL;
+
+  if (bfd_check_format_matches (abfd, format, &targets))
+    return TRUE;
+
+  if (targets)
+    {
+      bfd_find_target (targets[0], abfd);
+
+      return bfd_check_format (abfd, format);
+    }
+
+  return FALSE;
+}
+"
+}
+```
+
+## Your Answer
+The warning indicates that there is a potential buffer overflow in the `check_format_any` function due to the addition of an offset that is not properly constrained. The function `bfd_check_format_matches` is being called with an offset that is not bounded, which could lead to a buffer overflow if the size of the buffer is not properly managed elsewhere in the code.
+
+However, the context provided does not show any direct manipulation of the buffer size or any checks to ensure that the offset added does not exceed the buffer size. Without additional context or information about how the buffer size is managed, it is difficult to determine if this is a real risk or if it is a false positive.
+
+Therefore, the warning is actionable because it indicates a potential vulnerability that should be investigated further. It is important to review the surrounding code to ensure that the buffer size is properly managed and that no buffer overflow can occur.
+
+@@ actionable @@
+
+## warning
+```json
+{
+  "Project": "sed",
+  "Tool": "Infer",
+  "category": "BUFFER_OVERRUN_L3",
+  "file": "sed/compile.c",
+  "message": "Offset: [1, +oo] Size: [0, +oo] by call to `ck_strdup`.",
+  "warning_function_name": "read_label",
+  "warning_line": "ret = ck_strdup(get_buffer(b));",
+  "warning_context": "static char *\nread_label()\n{\n  struct buffer *b;\n  int ch;\n  char *ret;\n\n  b = init_buffer();\n  ch = in_nonblank();\n\n  while (ch != EOF && ch != '\\n'\n\t && !ISBLANK(ch) && ch != ';' && ch != CLOSE_BRACE && ch != '#')\n    ch = add_then_next (b, ch);\n\n  savchar(ch);\n  add1_buffer(b, '\\0');\n  ret = ck_strdup(get_buffer(b));\n  free_buffer(b);\n  return ret;\n}\n"
+} 
+```
+
+## Your Answer
+The warning from Infer indicates a potential buffer overflow in the `read_label` function due to the use of `ck_strdup` with an unbounded buffer. The `ck_strdup` function is being called with the result of `get_buffer(b)`, which is not constrained by any known buffer size.
+
+The context provided shows that the buffer is being manipulated by `add_then_next` and `add1_buffer`, but there is no indication that these functions ensure that the buffer does not grow beyond its intended size. This could lead to a buffer overflow if the buffer is not properly managed elsewhere in the code.
+
+Given this information, the warning is actionable because it suggests a potential vulnerability that should be investigated. It is important to review the code that manages the buffer size and ensure that no buffer overflow can occur.
+
+@@ actionable @@

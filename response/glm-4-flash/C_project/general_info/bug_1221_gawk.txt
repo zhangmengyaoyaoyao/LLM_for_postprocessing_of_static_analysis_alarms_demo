@@ -1,0 +1,22 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `estrdup`. The warning is generated because the code is setting the null terminator at the end of the buffer, which is `len + 1` characters in size, but the buffer is allocated with size `len + 1` as well.
+
+The context of the warning is as follows:
+
+```c
+char *estrdup(const char *str, size_t len)
+{
+    char *s;
+    emalloc(s, char *, len + 1, "estrdup");
+    memcpy(s, str, len);
+    s[len] = '\\0';
+    return s;
+}
+```
+
+The `memcpy` function is used to copy `len` bytes from `str` to `s`, and then the null terminator is set at `s[len]`. This is a correct operation because the buffer `s` is allocated with `len + 1` bytes, which includes space for the null terminator.
+
+However, the warning suggests that there might be an issue with the `len` parameter, which could be incorrect or manipulated in a way that would lead to a buffer overflow. The warning does not provide enough context to determine if this is a real issue or if it's a false positive.
+
+Given that the code appears to be correct and the warning does not provide enough information to conclude that there is an actual buffer overflow vulnerability, the warning is likely a false positive.
+
+@@ unactionable @@

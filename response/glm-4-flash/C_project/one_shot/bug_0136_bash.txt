@@ -1,0 +1,58 @@
+## warning
+```json
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "binutils/bfdtest2.c",
+    "message": "Offset added: [16, +oo] (⇐ [0, +oo] + [16, +oo]) Size: [0, +oo] by call to `bfd_check_format_matches`.",
+    "warning_function_name": "check_format_any",
+    "warning_line": "if (bfd_check_format_matches (abfd, format, &targets))",
+    "warning_context": "static bfd_boolean
+check_format_any (struct bfd *abfd, bfd_format format)
+{
+  char** targets = NULL;
+
+  if (bfd_check_format_matches (abfd, format, &targets))
+    return TRUE;
+
+  if (targets)
+    {
+      bfd_find_target (targets[0], abfd);
+
+      return bfd_check_format (abfd, format);
+    }
+
+  return FALSE;
+}
+"
+}
+```
+
+## Your Answer
+The warning indicates a potential buffer overflow in the `check_format_any` function. The `bfd_check_format_matches` function is being called with an offset of `[16, +oo]` and a size of `[0, +oo]`, which suggests that the function may be writing beyond the bounds of the buffer. However, the context provided does not show any direct evidence of a buffer being overrun. The function appears to be using the `targets` array correctly, and the `bfd_find_target` and `bfd_check_format` calls do not show any obvious buffer overflow issues.
+
+Given the lack of a clear buffer that is being overrun and the absence of any direct evidence of a buffer overflow in the provided context, the warning is not actionable.
+
+@@ unactionable @@
+
+## warning
+```json
+{
+  "Project": "bash",
+  "Tool": "Infer",
+  "category": "BUFFER_OVERRUN_L2",
+  "file": "lib/termcap/termcap.c",
+  "message": "Offset: [-64, 63] Size: 33 by call to `tgetst1`.",
+  "warning_function_name": "tgetstr",
+  "warning_line": "return tgetst1 (ptr, area);",
+  "warning_context": "__private_extern__\nchar *\ntgetstr (cap, area)\n     char *cap;\n     char **area;\n{\n  register char *ptr = find_capability (term_entry, cap);\n  if (!ptr || (ptr[-1] != '=' && ptr[-1] != '~'))\n    return NULL;\n  return tgetst1 (ptr, area);\n}\n"
+}
+```
+
+## Your Answer
+The warning indicates a potential buffer overflow in the `tgetstr` function. The `tgetst1` function is being called with an offset of `[-64, 63]` and a size of `33`, which suggests that the function may be writing beyond the bounds of the buffer. The `ptr` variable is used to find a capability, and if the last character of `ptr` is not `=` or `~`, the function returns `NULL`. However, the context does not show how `ptr` is being used or if it is being properly validated against the buffer size.
+
+Given the potential for a buffer overflow and the lack of clear context showing proper bounds checking, this warning is actionable.
+
+@@ actionable @@

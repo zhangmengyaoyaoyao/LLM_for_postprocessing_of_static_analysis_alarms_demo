@@ -39,8 +39,8 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
     os.makedirs(output_dir, exist_ok=True)
 
     # temp
-    # if prompts_technique == "chain_of_thought":
-    json_files = json_files[1673:]
+    if prompts_technique == "chain_of_thought":
+        json_files = json_files[1407:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     #         process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, project_path)
 
 #C
-    prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
+    prompts_techniques = ["chain_of_thought", "critique", "self_heuristic"]
     tool = "unknown"
     project = "unknown"
     project_path = os.path.join("report", "c_json")

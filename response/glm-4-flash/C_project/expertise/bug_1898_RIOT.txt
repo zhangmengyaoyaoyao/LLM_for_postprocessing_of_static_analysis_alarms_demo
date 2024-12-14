@@ -1,0 +1,7 @@
+The warning from SpotBugs indicates a potential buffer overrun in the function `ha1_final_hmac` located in the file `sys/hashes/sha1.c`. The specific context of the warning is on the line `sha1_update_byte(ctx, ctx->inner_hash[i]);`, which suggests that the function is attempting to update the SHA1 context with an element from `ctx->inner_hash`.
+
+Given the context provided, the issue seems to be that the function is iterating over `SHA1_BLOCK_LENGTH` (which is typically 64) but is only updating `SHA1_DIGEST_LENGTH` (which is typically 20) elements of `ctx->inner_hash`. This could potentially lead to a buffer overrun if `ctx->inner_hash` is not properly allocated to hold at least `SHA1_DIGEST_LENGTH` elements.
+
+This is an actionable warning because it points to a potential security vulnerability in the code. If the allocation of `ctx->inner_hash` is not as expected, this could lead to a buffer overflow, which is a serious issue that needs to be addressed.
+
+@@ actionable @@

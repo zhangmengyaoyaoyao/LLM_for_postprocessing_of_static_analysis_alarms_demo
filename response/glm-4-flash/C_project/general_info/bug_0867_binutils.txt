@@ -1,0 +1,11 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `d_print_comp_inner` in the file `cp-demangle.c`. The specific line mentioned is `adpm[i] = adpm[i - 1];`, and the warning suggests that there is an offset of `-1` and a size of `4` that could lead to a buffer overflow.
+
+Upon analyzing the context, it appears that the `adpm` array is being used to store `d_print_mod` structures. The array is declared with a fixed size of `4`, and the warning suggests that the code might be writing beyond the bounds of this array.
+
+The code snippet provided shows that the `adpm` array is being used to store modifiers for a type name. The `adpm[i] = adpm[i - 1];` line is part of a loop that handles CV-qualifiers (const, volatile, restrict, etc.) on the right argument of a local name. If the `local_name` has CV-qualifiers, the code attempts to store these in the `adpm` array.
+
+The potential issue arises from the fact that the loop may continue to execute even after the `adpm` array is full, as there is no check to ensure that `i` is within the bounds of the array before the assignment `adpm[i] = adpm[i - 1];` is made.
+
+Given this analysis, the warning is actionable because it points to a clear potential buffer overflow condition. The code should include a check to ensure that `i` is within the bounds of the `adpm` array before performing the assignment.
+
+@@ actionable @@

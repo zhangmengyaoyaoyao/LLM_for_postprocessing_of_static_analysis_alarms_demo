@@ -1,0 +1,64 @@
+## example1
+### Bug Report
+```json
+{
+    "Project": "combine",
+    "Tool": "Cppcheck",
+    "category": "memleak",
+    "file": "src/dstring.c",
+    "message": "Memory leak: temp_string",
+    "warning_function_name": "dstrtonum",
+    "warning_line": "return return_val;",
+    "warning_context": "BIGNUMBER
+dstrtonum (string, remainder, base)
+     DStr_string_descriptor *string;
+     DStr_string_descriptor **remainder;
+     int base;
+{
+  BIGNUMBER return_val;
+  char *temp_string;
+  char *temp_remainder;
+
+  if (remainder != NULL)
+    *remainder = string;
+
+  temp_string = malloc (string->length + 1);
+  if (temp_string == NULL)
+    return 0;
+
+  memcpy (temp_string, string->string, string->length);
+  temp_string[string->length] = '\0';
+
+  return_val = STRTOBIGNUMBER (temp_string, &temp_remainder, base);
+  if (*temp_remainder == '\0') {
+    /* Either we used the wholde string, or there was an embedded null. */
+    if (temp_remainder - temp_string == string->length) {
+      if (remainder != NULL)
+	*remainder = NULL;
+      free (temp_string);
+      return return_val;
+      }
+    }
+
+  if (remainder != NULL) {
+    *remainder = dstrnew ();
+    if (*remainder == NULL) {
+      *remainder = string;
+      free (temp_string);
+      return return_val;
+      }
+    (*remainder)->length = string->length - (temp_remainder - temp_string);
+    (*remainder)->string = string->string + (temp_remainder - temp_string);
+    }
+
+  return return_val;
+
+  }
+"
+}
+```
+
+### Your Answer
+The warning indicates a potential memory leak due to the allocation of `temp_string` without a corresponding `free` call. This is a clear issue that can lead to memory leaks and should be addressed. The code should include a `free(temp_string)` call before returning `return_val` to prevent the memory leak.
+
+@@ actionable @@

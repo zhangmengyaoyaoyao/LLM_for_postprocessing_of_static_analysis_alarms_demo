@@ -1,0 +1,9 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `writeSelections` function of the `tiffcrop.c` file. The warning is about an offset and size that are being used in a call to `update_output_file`, which suggests that the buffer being accessed might be exceeded.
+
+Given the context, the issue seems to be related to the calculation of the offset and size for the buffer access. If the `out->tif_fieldinfo->field_bit` value is less than 65, the offset is set to 0, which is safe. However, if it is greater than or equal to 65, the offset is set to `max(65, `out->tif_fieldinfo->field_bit`)`, which could potentially lead to a buffer overflow if the size of the buffer is not properly checked.
+
+This is a classic case of a buffer overflow, which is a serious security vulnerability. It is important to address such warnings as they can lead to crashes, data corruption, or even arbitrary code execution.
+
+Therefore, the warning is actionable.
+
+@@ actionable @@

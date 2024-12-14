@@ -1,0 +1,54 @@
+## warning
+```json
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "binutils/bfdtest2.c",
+    "message": "Offset added: [16, +oo] (⇐ [0, +oo] + [16, +oo]) Size: [0, +oo] by call to `bfd_check_format_matches`.",
+    "warning_function_name": "check_format_any",
+    "warning_line": "if (bfd_check_format_matches (abfd, format, &targets))",
+    "warning_context": "static bfd_boolean
+check_format_any (struct bfd *abfd, bfd_format format)
+{
+  char** targets = NULL;
+
+  if (bfd_check_format_matches (abfd, format, &targets))
+    return TRUE;
+
+  if (targets)
+    {
+      bfd_find_target (targets[0], abfd);
+
+      return bfd_check_format (abfd, format);
+    }
+
+  return FALSE;
+}
+"
+}
+```
+
+## Your Answer
+The warning indicates a potential buffer overflow due to the addition of an offset to an already unbounded buffer size. The function `bfd_check_format_matches` is being called with an offset that is being added to an unbounded size, which could lead to a buffer overflow if not handled correctly. This is a potential security vulnerability that should be addressed.
+
+@@ actionable @@
+
+## warning
+```json
+{
+  "Project": "Zephyr",
+  "Tool": "Infer",
+  "category": "Uninitialized Value",
+  "file": "kernel/poll.c",
+  "message": "The value read from expr_copy was never initialized.",
+  "warning_function_name": "z_vrfy_k_poll_signal_check",
+  "warning_line": "Z_OOPS(Z_SYSCALL_OBJ(signal, K_OBJ_POLL_SIGNAL));",
+  "warning_context": "void z_vrfy_k_poll_signal_check(struct k_poll_signal *signal,\n\t\t\t       unsigned int *signaled, int *result)\n{\n\tZ_OOPS(Z_SYSCALL_OBJ(signal, K_OBJ_POLL_SIGNAL));\n\tZ_OOPS(Z_SYSCALL_MEMORY_WRITE(signaled, sizeof(unsigned int)));\n\tZ_OOPS(Z_SYSCALL_MEMORY_WRITE(result, sizeof(int)));\n\tz_impl_k_poll_signal_check(signal, signaled, result);\n}\n"
+}
+```
+
+## Your Answer
+The warning indicates that a value (`expr_copy`) is being read without being initialized. This could lead to undefined behavior, as the value of `expr_copy` is not known. This is a potential runtime error that should be addressed.
+
+@@ actionable @@

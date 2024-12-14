@@ -1,0 +1,58 @@
+## warning
+```json
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "binutils/bfdtest2.c",
+    "message": "Offset added: [16, +oo] (⇐ [0, +oo] + [16, +oo]) Size: [0, +oo] by call to `bfd_check_format_matches`.",
+    "warning_function_name": "check_format_any",
+    "warning_line": "if (bfd_check_format_matches (abfd, format, &targets))",
+    "warning_context": "static bfd_boolean
+check_format_any (struct bfd *abfd, bfd_format format)
+{
+  char** targets = NULL;
+
+  if (bfd_check_format_matches (abfd, format, &targets))
+    return TRUE;
+
+  if (targets)
+    {
+      bfd_find_target (targets[0], abfd);
+
+      return bfd_check_format (abfd, format);
+    }
+
+  return FALSE;
+}
+"
+}
+```
+
+## Your Answer
+The warning from Infer indicates a potential buffer overflow in the `check_format_any` function within the `binutils` project. The message suggests that an offset is being added to a buffer that could potentially grow indefinitely, which could lead to a buffer overflow. However, the context provided does not show any direct assignment of the result of `bfd_check_format_matches` to a buffer that could be overflowed. The warning seems to be related to the size of the buffer that could be affected by the call to `bfd_check_format_matches`, but without more information about the usage of the `targets` array and the actual buffer that is being manipulated, it is difficult to determine if this is a real risk.
+
+Given the lack of direct evidence of a buffer being overflowed and the complexity of the code, the warning is not actionable without further investigation.
+
+@@ unactionable @@
+
+## warning
+```json
+{
+  "Project": "gawk",
+  "Tool": "Infer",
+  "category": "BUFFER_OVERRUN_L3",
+  "file": "array.c",
+  "message": "Offset added: 72 Size: [0, 7200].",
+  "warning_function_name": "make_array",
+  "warning_line": "memset(array, '\\0', sizeof(NODE));",
+  "warning_context": "NODE *\nmake_array()\n{\n\tNODE *array;\n\tgetnode(array);\n\tmemset(array, '\\0', sizeof(NODE));\n\tarray->type = Node_var_array;\n\tarray->array_funcs = null_array_func;\n\t/* vname, flags, and parent_array not set here */\n\n\treturn array;\n}\t\t\n"
+}
+```
+
+## Your Answer
+The warning from Infer indicates a potential buffer overflow in the `make_array` function within the `gawk` project. The message suggests that an offset of 72 is being added to a buffer that could potentially grow to a size of 7200, which could lead to a buffer overflow. The warning is specifically related to the `memset` call, which is intended to initialize the buffer with null characters. However, if the buffer is used later in a way that does not account for the initial offset, it could lead to a buffer overflow.
+
+The context provided shows that the `memset` is used to initialize the `array` buffer, which is allocated by `getnode`. If the `array` is used later without considering the initial offset, this could indeed lead to a buffer overflow. Therefore, this warning is actionable and should be investigated to ensure that the buffer is used safely.
+
+@@ actionable @@

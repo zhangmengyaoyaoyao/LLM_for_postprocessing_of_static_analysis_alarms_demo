@@ -1,0 +1,22 @@
+The warning from SpotBugs indicates that there is a potential memory leak because the pointer `pages` is nulled out after a `realloc` call fails, but there is no corresponding `free` call to release the memory if `realloc` fails.
+
+Looking at the code, the `realloc` is called inside a `case 'p':` block, which is meant to add a page number to the `pages` array. If `realloc` fails, the pointer `pages` is set to `NULL`, but there is no `free` call to release the memory that was allocated before the `realloc`.
+
+Here is the relevant part of the code:
+
+```c
+case 'p':
+    pageNumber = (uint16)atoi(optarg);
+    if (pages)
+        pages = (uint16*) realloc(pages, (npages+1)*sizeof(uint16));
+    else
+        pages = (uint16*) malloc(sizeof(uint16));
+    pages[npages++] = pageNumber;
+    break;
+```
+
+If `realloc` fails, `pages` is set to `NULL`, but the original memory block is not freed. This is indeed a memory leak.
+
+Therefore, the warning is actionable, and the code should be modified to free the original memory block if `realloc` fails.
+
+@@ actionable @@

@@ -1,0 +1,18 @@
+The warning from SpotBugs indicates a potential buffer overflow due to an incorrect size being used when writing to the buffer. The warning is on line 3 of the function `_bfd_elf_write_section_eh_frame_hdr` in the file `bfd/elf-eh-frame.c`.
+
+The warning context shows that the code is setting the third and fourth bytes of the `contents` buffer to `DW_EH_PE_omit` when the `hdr_info->array` is not used. This is done by the lines:
+
+```c
+contents[2] = DW_EH_PE_omit;
+contents[3] = DW_EH_PE_omit;
+```
+
+However, the warning is generated because the size of the buffer is set to `[0, +oo]`, which is not a valid size range. This is likely due to the fact that the size calculation for the buffer does not account for the case when `hdr_info->array` is not used.
+
+The code snippet provided does not show the full size calculation, but it is mentioned that the size is determined by `EH_FRAME_HDR_SIZE` and potentially additional data if `hdr_info->array` is used. The buffer allocation is done with `bfd_malloc`, which should allocate memory based on the size provided.
+
+Given that the warning is about an invalid size range and the code snippet does not show the full size calculation, it is possible that there is an oversight in the size calculation logic. This could lead to a buffer overflow if the buffer is not properly sized.
+
+Therefore, the warning is actionable and should be investigated to ensure that the buffer size is correctly calculated and that the buffer is not being accessed out of bounds.
+
+@@ actionable @@

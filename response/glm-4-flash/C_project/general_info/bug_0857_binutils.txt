@@ -1,0 +1,18 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `ieee_write_number` in the file `binutils/ieee.c`. The warning is about an offset that is calculated as `[1+max(489, `info->curbuf->c`), +oo]` and a size of `490` bytes being written by the call to `ieee_real_write_byte`.
+
+The context of the warning suggests that the function is writing a number to a buffer, and the calculation of the offset and size seems to be based on the current buffer position (`info->curbuf->c`) and the number of bytes to write. The warning is raised because the offset plus the size exceeds the bounds of the buffer.
+
+Here is the relevant part of the code:
+
+```c
+if (! ieee_write_byte (info, *p))
+    return FALSE;
+```
+
+This line is inside a loop that writes bytes to the buffer. The loop continues until all bytes are written. The warning is actionable because it points to a potential buffer overflow, which is a serious security vulnerability.
+
+The code does not seem to have a check to ensure that the buffer is not overflowed before writing to it. The `if` condition checks if the write operation was successful, but it does not check if the buffer has enough space to accommodate the write operation.
+
+Therefore, the warning is actionable and should be addressed to prevent potential buffer overflow vulnerabilities.
+
+@@ actionable @@

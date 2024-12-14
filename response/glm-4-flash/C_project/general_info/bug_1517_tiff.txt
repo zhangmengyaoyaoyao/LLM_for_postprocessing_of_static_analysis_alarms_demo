@@ -1,0 +1,13 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `TIFFDestroyOvrCache` function call. The warning suggests that the offset and size are not properly checked before the call, which could lead to accessing memory out of bounds.
+
+Looking at the context, the `TIFFDestroyOvrCache` function is called within a loop that iterates over `nOverviews`. Each iteration creates an overview cache using `TIFFCreateOvrCache` and then later destroys it with `TIFFDestroyOvrCache`. The warning is generated on the last iteration of the loop.
+
+The code snippet provided does not show any explicit checks on the `papoRawBIs[i]` pointer before the call to `TIFFDestroyOvrCache`. However, the `TIFFCreateOvrCache` function is expected to return a non-NULL pointer if successful, and the loop is iterating over `nOverviews`, which should be a valid index for the array `papoRawBIs`.
+
+Given that the loop is iterating over `nOverviews` and the `TIFFCreateOvrCache` function is expected to return a valid pointer, it seems that the code is correctly handling the pointers. The warning might be a false positive if the `TIFFCreateOvrCache` function is always successful.
+
+However, without the full context of the `TIFFCreateOvrCache` function and how it handles errors, it's difficult to be certain. If `TIFFCreateOvrCache` could potentially return NULL and the code does not handle this case, then the warning would be actionable.
+
+Considering the information provided and assuming that `TIFFCreateOvrCache` always returns a valid pointer, the warning is likely a false positive.
+
+@@ unactionable @@

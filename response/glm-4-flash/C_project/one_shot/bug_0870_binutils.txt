@@ -1,0 +1,18 @@
+## warning
+```json
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "category": "UNINITIALIZED_VALUE",
+    "file": "libiberty/cp-demangle.c",
+    "message": "The value read from saved_templates was never initialized.",
+    "warning_function_name": "d_print_comp_inner",
+    "warning_line": "dpi->templates = saved_templates;",
+    "warning_context": "\t\t   If we are not beneath SUB or DC in the tree then we\n\t\t   need to restore SUB's template stack temporarily.  */\n\t\tfor (dcse = dpi->component_stack; dcse != NULL;\n\t\t     dcse = dcse->parent)\n\t\t  {\n\t\t    if (dcse->dc == sub\n\t\t\t|| (dcse->dc == dc\n\t\t\t    && dcse != dpi->component_stack))\n\t\t      {\n\t\t\tfound_self_or_parent = 1;\n\t\t\tbreak;\n\t\t      }\n\t\t  }\n\n\t\tif (!found_self_or_parent)\n\t\t  {\n\t\t    saved_templates = dpi->templates;\n\t\t    dpi->templates = scope->templates;\n\t\t    need_template_restore = 1;\n\t\t  }\n\t      }\n\n\t    a = d_lookup_template_argument (dpi, sub);\n\t    if (a && a->type == DEMANGLE_COMPONENT_TEMPLATE_ARGLIST)\n\t      a = d_index_template_argument (a, dpi->pack_index);\n\n\t    if (a == NULL)\n\t      {\n\t\tif (need_template_restore)\n\t\t  dpi->templates = saved_templates;\n\n\t\td_print_error (dpi);\n\t\treturn;\n\t      }\n\n\t    sub = a;\n\t  }\n\n\tif (sub->type == DEMANGLE_COMPONENT_REFERENCE\n\t    || sub->type == dc->type)\n\t  dc = sub;\n\telse if (sub->type == DEMANGLE_COMPONENT_RVALUE_REFERENCE)\n\t  mod_inner = d_left (sub);\n      }\n      /* Fall through.  */\n\n    case DEMANGLE_COMPONENT_RESTRICT_THIS:\n    case DEMANGLE_COMPONENT_VOLATILE_THIS:\n    case DEMANGLE_COMPONENT_CONST_THIS:\n    case DEMANGLE_COMPONENT_REFERENCE_THIS:\n    case DEMANGLE_COMPONENT_RVALUE_REFERENCE_THIS:\n    case DEMANGLE_COMPONENT_VENDOR_TYPE_QUAL:\n    case DEMANGLE_COMPONENT_POINTER:\n    case DEMANGLE_COMPONENT_COMPLEX:\n    case DEMANGLE_COMPONENT_IMAGINARY:\n    modifier:\n      {\n\t/* We keep a list of modifiers on the stack.  */\n\tstruct d_print_mod dpm;\n\n\tdpm.next = dpi->modifiers;\n\tdpi->modifiers = &dpm;\n\tdpm.mod = dc;\n\tdpm.printed = 0;\n\tdpm.templates = dpi->templates;\n\n\tif (!mod_inner)\n\t  mod_inner = d_left (dc);\n\n\td_print_comp (dpi, options, mod_inner);\n\n\t/* If the modifier didn't get printed by the type, print it\n   now.  */\n\tif (!dpm.printed)\n\t  d_print_mod (dpi, options, dc);\n\n\tdpi->modifiers = dpm.next;\n\n\tif (need_template_restore)\n\t  dpi->templates = saved_templates;\n\n\treturn;\n      }\n\n    case DEMANGLE_COMPONENT_BUILTIN_TYPE:\n      if ((options & DMGL_JAVA) == 0)\n\td_append_buffer (dpi, dc->u.s_builtin.type->name,\n\t\t\t dc->u.s_builtin.type->len);\n      else\n\td_append_buffer (dpi, dc->u.s_builtin.type->java_name,\n\t\t\t dc->u.s_builtin.type->java_len);\n      return;\n\n    case DEMANGLE_COMPONENT_VENDOR_TYPE:\n      d_print_comp (dpi, options, d_left (dc));\n      return;\n\n    case DEMANGLE_COMPONENT_FUNCTION_TYPE:\n      {\n\tif ((options & DMGL_RET_POSTFIX) != 0)\n\t  d_print_function_type (dpi,\n"
+}
+```
+
+## Your Answer
+The warning indicates that the variable `saved_templates` is being assigned a value without being initialized. This could lead to undefined behavior if `saved_templates` is used later in the code. Since this could potentially cause a crash or other issues, the warning is actionable.
+
+@@ actionable @@

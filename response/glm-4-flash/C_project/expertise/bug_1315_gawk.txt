@@ -1,0 +1,16 @@
+The warning from SpotBugs indicates that the value read from `nchar` was never initialized. The `nchar` variable is used in the `vsnprintf` function, which returns the number of characters that would have been written to the buffer if it were large enough. The warning suggests that `nchar` is being used without being assigned a value.
+
+Looking at the code context, `nchar` is indeed assigned a value by the `vsnprintf` function within the `while` loop:
+
+```c
+while (true) {
+    va_start(args, format);
+    nchar = vsnprintf(buf + bl, buflen - bl, format, args);
+    va_end(args);
+    // ...
+}
+```
+
+The `nchar` variable is initialized within the loop and used to determine the length of the string to be written to the buffer. Therefore, the warning is incorrect, as `nchar` is indeed initialized.
+
+@@ actionable @@

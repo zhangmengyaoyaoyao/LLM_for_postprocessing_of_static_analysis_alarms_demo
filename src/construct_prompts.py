@@ -27,7 +27,6 @@ class Constructor():
 
         user_message =  zero_shot.zero_shot_prompt_USER + warning
         messages.append({'role': 'user', 'content': user_message})
-        print("con gi")
 
         return messages
     
@@ -111,7 +110,7 @@ class C_Constructor(Constructor):
         user_message =  one_shot.one_shot_prompt_USER1+one_shot.one_shot_example_c+one_shot.one_shot_prompt_USER2 + warning
         messages.append({'role': 'user', 'content': user_message})
         #test
-        #print("input_one_shot:" + user_message)
+        # print("input_one_shot:" + user_message)
 
         return messages
 

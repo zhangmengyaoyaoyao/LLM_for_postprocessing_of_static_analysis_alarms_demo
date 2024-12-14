@@ -1,0 +1,19 @@
+The warning from SpotBugs indicates that there is either a redundant check for `echo == NULL` or pointer arithmetic with a NULL pointer. The code snippet provided shows that there is indeed a check for `echo == NULL` right before the pointer arithmetic operation:
+
+```c
+if ((echo == NULL) || (len < sizeof(icmpv6_echo_t))) {
+    DEBUG("icmpv6_echo: echo was NULL or len (%" PRIu16
+          ") was < sizeof(icmpv6_echo_t)\n", len);
+    return;
+}
+```
+
+The pointer arithmetic is then performed:
+
+```c
+uint8_t *payload = ((uint8_t *)echo) + sizeof(icmpv6_echo_t);
+```
+
+Given that the check for `echo == NULL` is present before the pointer arithmetic, the warning is actionable. The check should prevent the pointer arithmetic from being performed if `echo` is NULL, but if the check is redundant, it could be removed to simplify the code without changing its behavior.
+
+@@ actionable @@

@@ -1,0 +1,9 @@
+The warning from SpotBugs indicates a potential buffer overrun in the function `ha1_final_hmac` within the file `sys/hashes/sha1.c`. The warning specifies an offset range `[0, 19]` and a size of `5`, which suggests that the code is attempting to write `5` bytes starting from an offset of `0` within a buffer that is at least `20` bytes long (since the offset range is `[0, 19]` and the size is `5`).
+
+The context of the warning is within a loop that iterates over `SHA1_BLOCK_LENGTH` (which is typically `64` bytes for SHA-1) and writes `5` bytes at a time to the `ctx->inner_hash` buffer. The loop is intended to write the XORed `ctx->key_buffer[i]` with `HMAC_OPAD` to the `ctx->inner_hash` buffer.
+
+The code appears to be correct in terms of buffer size, as it is only writing `5` bytes out of a `64`-byte block. The warning seems to be a false positive because the buffer size is sufficient to accommodate the write operation without any risk of a buffer overflow.
+
+Therefore, the warning is not actionable.
+
+@@ unactionable @@

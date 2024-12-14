@@ -1,0 +1,25 @@
+The warning from SpotBugs indicates that the variable `*pun` is uninitialized. The variable `*pun` is a pointer dereference, and the pointer itself is initialized to point to the address of `state`:
+
+```c
+u64_t *pun = (u64_t *) &state;
+```
+
+However, the dereference `*pun` is used in a loop condition:
+
+```c
+} while (*pun != *pun2);
+```
+
+The pointer `pun2` is also initialized to point to `state2`:
+
+```c
+u64_t *pun2 = (u64_t *) &state2;
+```
+
+Given that `state` and `state2` are both initialized in the function, and `pun` and `pun2` are pointers to these initialized structures, the dereference `*pun` should not be uninitialized. The warning seems to be a false positive.
+
+The loop is intended to read the state until the same state is seen twice in a row. The dereference `*pun` is comparing the values of the structures pointed to by `pun` and `pun2`. Since `state` and `state2` are being updated within the loop, the comparison is valid and the variable `*pun` is not uninitialized.
+
+Therefore, the warning is not actionable.
+
+@@ actionable @@

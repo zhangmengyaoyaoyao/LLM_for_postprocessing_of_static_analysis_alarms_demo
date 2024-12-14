@@ -1,0 +1,9 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `TIFFFetchPerSampleAnys`. The warning is raised because the `TIFFFetchAnyArray` function is called with an offset of `[3, +oo]` and a size of `[0, +oo]`, which suggests that the function might be trying to read beyond the allocated buffer.
+
+Upon closer inspection of the code, we see that the buffer `buf` is allocated with a fixed size of 10 elements, and it is used to store the per-sample values. The variable `v` is initially set to `buf`, but it is reassigned to a dynamically allocated buffer if `dir->tdir_count` exceeds `NITEMS(buf)`. The `TIFFFetchAnyArray` function is then called with `v` as the destination buffer.
+
+The warning is actionable because the code does not properly check the size of the buffer before attempting to read into it. If `dir->tdir_count` is greater than the size of `buf`, the dynamically allocated buffer `v` is used, but there is no check to ensure that `v` is large enough to hold all the values fetched by `TIFFFetchAnyArray`. This could lead to a buffer overflow if the number of values exceeds the size of `v`.
+
+To mitigate this issue, the code should include a check to ensure that `v` is large enough to hold the values fetched by `TIFFFetchAnyArray`. If `dir->tdir_count` is greater than the size of `buf`, the dynamically allocated buffer should be allocated with a size that is at least as large as `dir->tdir_count`.
+
+@@ actionable @@

@@ -1,0 +1,22 @@
+To determine whether the warning is actionable, let's analyze the warning message and the context provided:
+
+**Warning Details:**
+- **Project**: gawk
+- **Tool**: Infer
+- **Category**: BUFFER_OVERRUN_L3
+- **File**: cint_array.c
+- **Message**: Offset added: 256 Size: [0, 256].
+- **Warning Function Name**: cint_lookup
+- **Warning Line**: memset(symbol->nodes, '\\0', INT32_BIT * sizeof(NODE *));
+- **Warning Context**: The function `cint_lookup` is provided.
+
+**Analysis:**
+- The warning is about a potential buffer overflow due to an offset of 256 being added to a size of 0.
+- The line in question is using `memset` to initialize an array of pointers to `NODE *` with a size of `INT32_BIT * sizeof(NODE *)`.
+- The size of the array is determined by `symbol->nodes`, which is being allocated dynamically.
+- The warning suggests that the array size is 0, but an offset of 256 is being added, which could lead to a buffer overflow.
+
+**Conclusion:**
+The warning indicates a potential buffer overflow, which is a critical issue. The code should be reviewed and fixed to prevent this vulnerability. Therefore, the warning is actionable.
+
+@@ actionable @@

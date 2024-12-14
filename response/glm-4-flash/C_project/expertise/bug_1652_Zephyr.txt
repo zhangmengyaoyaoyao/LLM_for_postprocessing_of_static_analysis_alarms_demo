@@ -1,0 +1,35 @@
+The warning from SpotBugs indicates a potential null pointer dereference in the `parse_channel_set` function. The specific line of code that triggers the warning is `chan = atoi(p);`, which attempts to convert a string to an integer using `atoi`, but does not check if `p` is a null pointer before dereferencing it.
+
+This is an actionable warning because it points to a potential runtime error that could cause the program to crash if `p` is null. The code should include a null pointer check before dereferencing `p` to prevent this issue.
+
+Here is an example of how the code could be modified to address this warning:
+
+```c
+static inline u32_t parse_channel_set(char *str_set)
+{
+    u32_t channel_set = 0U;
+    char *p, *n;
+
+    p = str_set;
+    do {
+        u32_t chan;
+        n = strchr(p, ':');
+        if (n) {
+            *n = '\0';
+        }
+        if (p) { // Check for null pointer before dereferencing
+            chan = atoi(p);
+            if (chan > 0 && chan < 32) {
+                channel_set |= BIT(chan - 1);
+            }
+        }
+        p = n ? n + 1 : n;
+    } while (n);
+
+    return channel_set;
+}
+```
+
+By adding the null pointer check, the code now safely handles the case where `p` might be null, thus addressing the issue raised by the warning.
+
+@@ actionable @@

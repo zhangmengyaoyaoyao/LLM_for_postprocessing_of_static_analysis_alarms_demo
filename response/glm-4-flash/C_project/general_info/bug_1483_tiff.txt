@@ -1,0 +1,14 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `TIFFReadDirectory` function call. The warning specifies an offset range of `[-1, +oo]` and a size range of `[0, +oo]`, which suggests that the function call could potentially read beyond the bounds of the buffer.
+
+The context of the warning is within the `main` function of the `tiffsplit.c` file. The `TIFFReadDirectory` function is called within a `do-while` loop, which continues until the end of the TIFF file is reached.
+
+The specific line of code that is flagged is:
+```c
+} while (TIFFReadDirectory(in));
+```
+
+The issue here is that `TIFFReadDirectory` is called repeatedly without any checks to ensure that it does not read beyond the end of the buffer. This could potentially lead to undefined behavior, including buffer overruns.
+
+Given that the warning is about a buffer overflow, which is a serious security vulnerability, this warning is actionable. It is important to investigate and fix the potential buffer overflow to prevent security issues.
+
+@@ actionable @@

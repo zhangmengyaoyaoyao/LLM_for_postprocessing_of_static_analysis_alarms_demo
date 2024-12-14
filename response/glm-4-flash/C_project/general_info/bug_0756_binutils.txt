@@ -1,0 +1,23 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `demangle_expression` function due to the use of `string_append` with an offset and size that may exceed the buffer's capacity. The warning context shows that `string_append` is called with an offset and size that are derived from the length of the string pointed to by `*mangled` and the length of the output string from the `optable`.
+
+Here is the relevant part of the code:
+
+```c
+if (l <= len && memcmp(optable[i].in, *mangled, l) == 0) {
+    string_append(s, optable[i].out);
+    string_appendn(s, " ", 1);
+    success = 1;
+    (*mangled) += l;
+    break;
+}
+```
+
+The `string_append` function is called with the current position of `*mangled` as the offset and the length of `optable[i].out` as the size. If the `optable[i].out` string is longer than the buffer `s` can handle, this could lead to a buffer overflow.
+
+However, the `string_append` function is typically designed to handle such cases by ensuring that the buffer is not overrun. It should check the buffer size before appending the string. If the `string_append` function is implemented correctly, it should not cause a buffer overflow.
+
+Given that the `string_append` function is part of the `libiberty` library, which is a standard library used in many projects, it is reasonable to assume that it has been thoroughly tested and is unlikely to contain a bug that would cause a buffer overflow.
+
+Therefore, the warning is likely to be a false positive, and the code is not necessarily vulnerable to a buffer overflow.
+
+@@ unactionable @@

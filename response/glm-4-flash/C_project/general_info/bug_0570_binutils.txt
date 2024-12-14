@@ -1,0 +1,25 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `stab_write_symbol` function of the `binutils` project. The specific issue is that the `memcpy` function is being called with a source offset of `info->symbols_size + 12` and a size of `STAB_SYMBOL_SIZE`, which could potentially write past the end of the `info->symbols` buffer if `info->symbols_size` is already equal to `info->symbols_alloc`.
+
+Here's the relevant part of the code:
+
+```c
+memcpy (info->symbols + info->symbols_size, sym, STAB_SYMBOL_SIZE);
+```
+
+The warning suggests that the offset added is `info->symbols_size + 12`, which is already at the end of the buffer, and the size is `STAB_SYMBOL_SIZE`. This could lead to a buffer overflow if `info->symbols_size` is equal to `info->symbols_alloc`.
+
+However, the code also includes a check before the `memcpy` call to ensure that there is enough space allocated for the `info->symbols` buffer:
+
+```c
+if (info->symbols_size + STAB_SYMBOL_SIZE > info->symbols_alloc)
+  {
+    info->symbols_alloc *= 2;
+    info->symbols = (bfd_byte *) xrealloc (info->symbols, info->symbols_alloc);
+  }
+```
+
+This check should prevent the buffer overflow by doubling the allocated size of `info->symbols` if the current size plus the size of the data to be copied exceeds the allocated size.
+
+Given this context, the warning seems to be a false positive. The code includes a check that should prevent the buffer overflow. However, without a deeper understanding of the `binutils` codebase and the specific circumstances under which this function is called, it's difficult to be certain.
+
+Conclusion: @@ actionable @@

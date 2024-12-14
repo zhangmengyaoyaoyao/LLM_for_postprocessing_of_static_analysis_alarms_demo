@@ -1,0 +1,21 @@
+The warning from SpotBugs indicates that the value `server_addr_len` is read from `server_addr_len` but was never initialized. This is a clear issue because a variable used to store the length of a socket address should be initialized before it is used to pass it as an argument to a function like `net_context_bind`.
+
+Given the context, it seems that the variable `server_addr_len` is intended to store the size of the `struct sockaddr` that is being passed to `net_context_bind`. The initialization of `server_addr_len` should correspond to the size of the `struct sockaddr` being used, which is determined by the family of the `server_addr`.
+
+Here is the relevant part of the code:
+
+```c
+if (IS_ENABLED(CONFIG_NET_IPV4) && server_addr.sa_family == AF_INET) {
+    local_addr = (struct sockaddr *)&local_addr4;
+    server_addr_len = sizeof(struct sockaddr_in);
+} else if (IS_ENABLED(CONFIG_NET_IPV6) && server_addr.sa_family == AF_INET6) {
+    local_addr = (struct sockaddr *)&local_addr6;
+    server_addr_len = sizeof(struct sockaddr_in6);
+}
+```
+
+The above code initializes `server_addr_len` based on the family of `server_addr`. However, the warning suggests that this initialization is not sufficient or is not being recognized by the compiler or static analysis tool.
+
+This is an actionable warning because the code should be modified to ensure that `server_addr_len` is initialized correctly before it is used. The fix would involve ensuring that the initialization is done in all cases where `server_addr_len` is used, and that the initialization is consistent with the actual size of the `struct sockaddr` being used.
+
+@@ actionable @@

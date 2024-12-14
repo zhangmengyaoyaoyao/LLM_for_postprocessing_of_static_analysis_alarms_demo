@@ -1,0 +1,15 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `ieee_pop_type_used`. The warning suggests that the offset and size used in a call to `ieee_real_write_byte` may exceed the bounds of the buffer, which could lead to undefined behavior.
+
+The context of the warning is within a conditional block that writes to a buffer based on certain conditions. The buffer being written to is either `info->types` or `info->global_types`, and the size of the data being written is 490 bytes.
+
+To determine if this warning is actionable, we need to consider the following:
+
+1. The conditions under which the buffer is written to.
+2. The size of the data being written.
+3. The size of the buffer (`info->types` or `info->global_types`).
+
+The warning message indicates that the offset is calculated as `[1+max(489, `info->types.tail->c`), `info->types.tail->c` + 1]`, which suggests that the buffer is being written to beyond its current tail position. This is a clear indication of a potential buffer overflow.
+
+Given that the buffer is being written to beyond its current tail position, and the size of the data being written is 490 bytes, it is likely that this is an actionable warning. The code should ensure that the buffer has enough space to accommodate the data being written to prevent a buffer overflow.
+
+@@ actionable @@

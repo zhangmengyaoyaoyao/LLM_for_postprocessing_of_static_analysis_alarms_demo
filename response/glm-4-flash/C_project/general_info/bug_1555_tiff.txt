@@ -1,0 +1,13 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `TIFFFetchPerSampleAnys`. The warning is triggered by the call to `TIFFFetchAnyArray` with an offset of 3 and a size that is potentially unbounded (from 0 to infinity).
+
+The context of the warning is as follows:
+- The function `TIFFFetchPerSampleAnys` is designed to fetch per-sample values from a TIFF file.
+- It checks if the number of items to fetch exceeds the size of a local buffer `buf`.
+- If it does, it allocates memory dynamically using `_TIFFCheckMalloc`.
+- The `TIFFFetchAnyArray` function is called with the dynamically allocated buffer `v` if it is not `NULL`.
+
+The warning suggests that if `dir->tdir_count` is greater than the size of the buffer, the `TIFFFetchAnyArray` function may read past the end of the buffer, which could lead to undefined behavior.
+
+Given this context, the warning is actionable because it points to a potential security vulnerability (buffer overflow) that could be exploited. It is important to ensure that the buffer is not accessed beyond its bounds.
+
+@@ actionable @@

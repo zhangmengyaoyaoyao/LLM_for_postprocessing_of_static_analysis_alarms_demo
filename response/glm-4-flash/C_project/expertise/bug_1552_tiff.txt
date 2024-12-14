@@ -1,0 +1,7 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `TIFFFetchPerSampleLongs`. The warning is about an offset and size that could lead to a buffer overflow when calling `TIFFFetchLongArray`. The context suggests that the buffer `buf` is allocated with a fixed size of 10 elements, and if the `dir->tdir_count` exceeds this size, a dynamic allocation is performed.
+
+The issue here is that the buffer size is not checked against the number of elements to be fetched, which could lead to a buffer overflow if `dir->tdir_count` is greater than the size of the buffer after dynamic allocation.
+
+This is an actionable warning because it points to a clear potential security vulnerability (buffer overflow) that could be exploited. The code should be reviewed and modified to ensure that the buffer is not accessed beyond its bounds.
+
+@@ actionable @@

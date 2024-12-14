@@ -1,0 +1,18 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `TIFFFetchPerSampleLongs`. The warning is generated because the `TIFFFetchLongArray` function is called with a buffer size that could potentially exceed the allocated size of the buffer `buf`.
+
+Here's the relevant part of the code:
+
+```c
+if (dir->tdir_count > NITEMS(buf))
+    v = (uint32*) _TIFFCheckMalloc(tif, dir->tdir_count, sizeof(uint32),
+                                  "to fetch per-sample values");
+if (v && TIFFFetchLongArray(tif, dir, v)) {
+    // ...
+}
+```
+
+The warning suggests that if `dir->tdir_count` is greater than `NITEMS(buf)`, which is the maximum number of items that can be stored in `buf`, the code attempts to allocate more memory using `_TIFFCheckMalloc`. If this allocation fails, the program will continue to use the potentially insufficient buffer `buf`, which could lead to a buffer overflow.
+
+This is a clear case of a potential buffer overflow, which is a serious security vulnerability. The warning is actionable because it points to a specific line of code where the buffer size is not properly checked before being used.
+
+@@ actionable @@

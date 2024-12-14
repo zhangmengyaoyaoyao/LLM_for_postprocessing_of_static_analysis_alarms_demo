@@ -1,0 +1,7 @@
+The warning from SpotBugs indicates a potential buffer overrun in the `sha1_final` function. The message "Offset added: 20 Size: [0, +oo]" suggests that the `memcpy` function is being called with an offset of 20 bytes, but the size of the destination buffer is not explicitly checked to ensure it can accommodate the data being copied.
+
+The context provided shows that the `memcpy` is copying 20 bytes from `ctx->state` to `digest`. Assuming `digest` is a buffer provided by the caller, it is crucial to ensure that the caller's buffer is large enough to hold these 20 bytes to prevent a buffer overflow.
+
+Given this information, the warning is actionable because it points to a potential security vulnerability that could be exploited if the buffer size is not properly managed.
+
+@@ actionable @@

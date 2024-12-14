@@ -1,0 +1,13 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `TIFFFlush` function call. The warning suggests that the offset and size used in the `TIFFFlush` call might exceed the bounds of the buffer, which could lead to undefined behavior.
+
+The context provided shows that the `TIFFFlush` function is called after writing encoded tiles or strips to the TIFF file. The offset and size are calculated based on the current state of the `psCache` structure, which includes information about the TIFF file's dimensions and the current block or strip being written.
+
+Given the following points:
+
+1. The calculation of the offset and size seems to be based on the current state of the `psCache` structure, which should be correct if the structure is properly managed.
+2. The warning does not provide enough information to determine if the calculation is incorrect or if there is a potential for the buffer to be overrun due to an error in the logic that updates the `psCache` structure.
+3. The TODO comments suggest that there are additional checks that should be added to handle error statuses, which implies that the current code may not be fully error-checked.
+
+Based on these points, the warning is actionable because it indicates a potential issue that could lead to a buffer overflow. It is important to review the logic that calculates the offset and size, as well as the management of the `psCache` structure, to ensure that the buffer is not overrun.
+
+@@ actionable @@

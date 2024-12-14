@@ -1,4 +1,4 @@
-from openai import OpenAI
+# from openai import OpenAI
 import json
 import os
 import sys
@@ -10,20 +10,17 @@ from . import openai_client
 # 获取项目根目录
 project_root = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 sys.path.append(project_root)
-import construct_prompts as constructor
+import construct_prompts as Constructor
 
 # your api key
 key = ""
 url = "https://integrate.api.nvidia.com/v1"
-# model_fullname="meta/llama-3.1-70b-instruct"
-# model = "llama3.1-70b-instruct"
-model_fullname="meta/llama-3.1-405b-instruct"
-model = "llama3.1-405b-instruct"
+model_fullname="meta/llama-3.1-70b-instruct"
+model = "llama3.1-70b-instruct"
+# model_fullname="meta/llama-3.1-405b-instruct"
+# model = "llama3.1-405b-instruct"
 
 def process_spotbugs_project_files(key, url, model, tool, prompts_technique, project_name, model_fullname=model):
-    # 构建项目路径
-    project_path = os.path.join("report", tool, project_name)
-
     # 获取该项目下的所有 JSON 文件路径
     json_files = sorted(glob.glob(os.path.join(project_path, "*.json")))
 
@@ -32,12 +29,17 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
         return
     
     # 存储输出的路径
-    output_dir = os.path.join("response", model, tool, prompts_technique, project_name)
+    if project_name == "unknown":
+        constructor = Constructor.C_Constructor()
+        output_dir = os.path.join("response", model, "C_project", prompts_technique)
+    else:
+        constructor = Constructor.Java_Constructor()
+        output_dir = os.path.join("response", model, tool, prompts_technique, project_name)
     os.makedirs(output_dir, exist_ok=True)
 
     #temp
-    if prompts_technique == "self_heuristic" and project_name == "dbcp":
-        json_files = json_files[46:]
+    # if prompts_technique == "self_heuristic" and project_name == "dbcp":
+    #     json_files = json_files[46:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -50,8 +52,8 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
         
         # 设置工具和项目名
         if(tool != 'spotbugs'):
-            tool = json_content["Tool"]
-            project_name = json_content["Project"]
+            tool = data["Tool"]
+            project_name = data["Project"]
         constructor.setGeneralInfo(tool, project_name)
         constructor.setWarning(json_content)
 
@@ -116,17 +118,27 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
 
 
 if __name__ == '__main__':
-    # 项目列表
-    #projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
-    projects = ["dbcp"]
-    # 提示词技术列表
+#java
+    # # 项目列表
+    # #projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
+    # projects = ["dbcp"]
+    # # 提示词技术列表
+    # prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
+    # # prompts_techniques = ["self_heuristic"]
+
+    # tool = "spotbugs"
+
+    # # 依次处理所有项目
+    # for project in projects:
+    #     for prompts_technique in prompts_techniques:
+    #         print(f"Processing project {project} with {prompts_technique}")
+    #         process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, model_fullname)
+
+
+#C
     prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
-    # prompts_techniques = ["self_heuristic"]
-
-    tool = "spotbugs"
-
-    # 依次处理所有项目
-    for project in projects:
-        for prompts_technique in prompts_techniques:
-            print(f"Processing project {project} with {prompts_technique}")
-            process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, model_fullname)
+    tool = "unknown"
+    project = "unknown"
+    project_path = os.path.join("report", "c_json")
+    for prompts_technique in prompts_techniques:
+        process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, project_path)

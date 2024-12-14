@@ -1,0 +1,9 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `bind_arrow_keys` function of the `readline` library in the `bash` project. The specific call to `rl_bind_keyseq_in_map` with an offset of [2, +oo] and size of 2 is flagged.
+
+The context of the warning suggests that the `rl_bind_keyseq_in_map` function is being used to unbind the escape key (`\\033`) in the `vi_movement_keymap` to allow users to repeatedly hit ESC in vi command mode while still allowing the arrow keys to work. The function is being called with a pointer to `NULL` for the command function, which is a common pattern for unbinding keys.
+
+Given that the `rl_bind_keyseq_in_map` function is designed to unbind keys and the context of the call seems to be correct for the intended functionality, the warning is likely a false positive. The buffer being accessed is not being overrun because the function is not intended to write to the buffer at the specified offset; it is intended to unbind a key.
+
+Therefore, the warning is not actionable.
+
+@@ unactionable @@

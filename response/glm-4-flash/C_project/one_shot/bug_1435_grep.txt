@@ -1,0 +1,22 @@
+## warning
+```json
+{
+    "Project": "grep",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "src/dfa.c",
+    "message": "Offset: [-128, 127] Size: 256.",
+    "warning_function_name": "dfambcache",
+    "warning_line": "d->mbrtowc_cache[uc] = mbrtowc (&wc, &c, 1, &s) <= 1 ? wc : WEOF;",
+    "warning_context": "static void\ndfambcache (struct dfa *d)\n{\n  int i;\n  for (i = CHAR_MIN; i <= CHAR_MAX; ++i)\n    {\n      char c = i;\n      unsigned char uc = i;\n      mbstate_t s = { 0 };\n      wchar_t wc;\n      d->mbrtowc_cache[uc] = mbrtowc (&wc, &c, 1, &s) <= 1 ? wc : WEOF;\n    }\n}\n"
+}
+```
+
+## Your Answer
+The warning indicates a potential buffer overflow in the function `dfambcache`. The function is iterating over all possible character values (`CHAR_MIN` to `CHAR_MAX`), and for each character, it is attempting to store the result of `mbrtowc` into an array indexed by the character itself. The array `d->mbrtowc_cache` is of size 256, which corresponds to the range of `unsigned char` values. However, the warning suggests that the offset is within the range `[-128, 127]`, which is outside the valid range of `unsigned char` values (0 to 255).
+
+This indicates that the code is attempting to write to an out-of-bounds index of the array, which is a clear buffer overflow condition. This could lead to undefined behavior, including crashes or security vulnerabilities.
+
+Given the severity of the potential issue, this warning is actionable.
+
+@@ actionable @@

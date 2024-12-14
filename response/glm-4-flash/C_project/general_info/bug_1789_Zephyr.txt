@@ -1,0 +1,21 @@
+The warning from SpotBugs indicates that the value `server_addr_len` is read from `server_addr_len` but was never initialized. This is a potential issue because if `server_addr_len` is not initialized, it could contain garbage data, which could lead to undefined behavior when it is used in the `net_context_bind` function.
+
+Looking at the code, `server_addr_len` is assigned a value based on the family of `server_addr`:
+
+```c
+if (IS_ENABLED(CONFIG_NET_IPV4) && server_addr.sa_family == AF_INET) {
+    local_addr = (struct sockaddr *)&local_addr4;
+    server_addr_len = sizeof(struct sockaddr_in);
+} else if (IS_ENABLED(CONFIG_NET_IPV6) && server_addr.sa_family == AF_INET6) {
+    local_addr = (struct sockaddr *)&local_addr6;
+    server_addr_len = sizeof(struct sockaddr_in6);
+}
+```
+
+This assignment is conditional on the family of `server_addr`, which means that `server_addr_len` should be initialized before it is used in the `net_context_bind` call. The warning is actionable because it suggests that there might be a mistake in the code where `server_addr_len` is not being initialized in all cases.
+
+However, the code snippet provided does not show the initialization of `server_addr`, which is necessary to ensure that `server_addr_len` is set correctly. If `server_addr` is not properly initialized, then `server_addr_len` will indeed not be initialized, and the warning would be valid.
+
+Therefore, the conclusion is:
+
+@@ actionable @@

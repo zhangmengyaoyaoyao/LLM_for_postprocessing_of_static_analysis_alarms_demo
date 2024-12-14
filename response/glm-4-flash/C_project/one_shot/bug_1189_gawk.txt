@@ -1,0 +1,20 @@
+## warning
+```json
+{
+  "Project": "gawk",
+  "Tool": "Infer",
+  "category": "BUFFER_OVERRUN_L3",
+  "file": "command.y",
+  "message": "Offset: [1, +oo] Size: [0, +oo] by call to `make_str_node`.",
+  "warning_function_name": "yylex",
+  "warning_line": "yylval->a_node = make_str_node(str, p - str, flags);",
+  "warning_context": "\t\tif (in_eval) {\n\t\t\tif (toklen == 3\n\t\t\t\t\t&& tokstart[3] == '\\0'\n\t\t\t\t\t&& tokstart[0] == 'e'\n\t\t\t\t\t&& tokstart[1] == 'n'\n\t\t\t\t\t&& tokstart[2] == 'd'\n\t\t\t) {\n\t\t\t\tcmd_idx = find_command(tokstart, toklen);\n\t\t\t\treturn D_END;\n\t\t\t}\n\t\t\tlexptr = lexend;\n\t\t\treturn D_STATEMENT;\n\t\t}\n\n\t\tcmd_idx = find_command(tokstart, toklen);\n\t\tif (cmd_idx >= 0) {\n\t\t\tif (in_commands && cmdtab[cmd_idx].type != D_eval) {\n\t\t\t\t/* add the actual command string (lexptr_begin) to\n\t\t\t\t * arg_list; command string for 'eval' prepended to the arg_list\n\t\t\t\t * in the grammer above (see eval_cmd non-terminal).\n\t\t\t\t */\n\t\t\t\tCMDARG *arg;\n\t\t\t\targ = mk_cmdarg(D_string);\n\t\t\t\targ->a_string = estrdup(lexptr_begin, lexend - lexptr_begin);\n\t\t\t\tappend_cmdarg(arg);\n\t\t\t}\n\t\t\treturn cmdtab[cmd_idx].class;\n\t\t} else {\n\t\t\tyyerror(_(\"unknown command - \\\"%.*s\\\", try help\"), toklen, tokstart);\n\t\t\treturn '\\n';\n\t\t}\n\t}\n\n\tc = *lexptr;\n\t\n\tif (cmdtab[cmd_idx].type == D_option) {\n\t\tif (c == '=')\n\t\t\treturn *lexptr++;\n\t} else if (c == '-' || c == '+' || c == ':' || c == '|')\n\t\treturn *lexptr++;\n\n\tif (c == '\"') {\n\t\tchar *str, *p;\n\t\tint flags = ALREADY_MALLOCED;\n\t\tbool esc_seen = false;\n\n\t\ttoklen = lexend - lexptr;\n\t\temalloc(str, char *, toklen + 2, \"yylex\");\n\t\tp = str;\n\n\t\twhile ((c = *++lexptr) != '\"') {\n\t\t\tif (lexptr == lexend) {\nerr:\n\t\t\t\tefree(str);\n\t\t\t\tyyerror(_(\"unterminated string\"));\n\t\t\t\treturn '\\n';\n\t\t\t}\n\t\t\tif (c == '\\\\') {\n\t\t\t\tc = *++lexptr;\n\t\t\t\tesc_seen = true;\n\t\t\t\tif (want_nodeval || c != '\"')\n\t\t\t\t\t*p++ = '\\\\';\n\t\t\t}\n\t\t\tif (lexptr == lexend)\n\t\t\t\tgoto err;\n\t\t\t*p++ = c;\n\t\t}\n\t\tlexptr++;\n\t\t*p = '\\0';\n\n\t\tif (! want_nodeval) {\n\t\t\tyylval = mk_cmdarg(D_string);\n\t\t\tyylval->a_string = str;\n\t\t\tappend_cmdarg(yylval);\n\t\t\treturn D_STRING;\n\t\t} else {\t/* awk string */\n\t\t\tif (esc_seen)\n\t\t\t\tflags |= SCAN;\n\t\t\tyylval = mk_cmdarg(D_node);\n\t\t\tyylval->a_node = make_str_node(str, p - str, flags);\n\t\t\tappend_cmdarg(yylval);\n\t\t\treturn D_NODE;\n\t\t}\n\t}\n\n\tif (! want_nodeval) {\n\t\twhile ((c = *++lexptr) != '\\0' && c != ':' && c == '-'\n\t\t\t\t\t&& c != ' ' && c != '\\t' && c != '=')\n\t\t\t;\n\n\t\t/* Is it an integer? */\n\t\tif (isdigit((unsigned char) tokstart[0]) && cmdtab[cmd_idx].type != D_option) {\n\t\t\tchar *end;\n\t\t\tlong l;\n\n\t\t\terrno = 0;\n\t\t\tl = strtol(tokstart, &end, 0);\n\t\t\tif (errno != 0) {\n\t\t\t\tyyerror(_(\"%s\"), strerror(errno));\n\t\t\t\terrno = 0;\n\t\t\t\treturn '\\n';\n\t\t\t}\n\t\t\tif (isdigit((unsigned char) end[0])) {\n\t\t\t\tyyerror(_(\"invalid number\"));\n\t\t\t\treturn '\\n';\n\t\t\t}\n\t\t\tif (l > INT_MAX) {\n\t\t\t\tyyerror(_(\"integer overflow\"));\n\t\t\t\treturn '\\n';\n\t\t\t}\n\t\t\tif (l < INT_MIN) {\n\t\t\t\tyyerror(_(\"integer underflow\"));\n\t\t\t\treturn '\\n';\n\t\t\t}\n\t\t\treturn cmdtab[cmd_idx].class;\n\t\t}\n\t}\n"
+}
+```
+
+## Your Answer
+The warning indicates a potential buffer overflow in the `make_str_node` function call within the `yylex` function. The context suggests that the function is attempting to create a string node with a size that could potentially be larger than the input buffer. This could lead to undefined behavior, including crashes or security vulnerabilities.
+
+Given the potential severity of the issue, this warning is actionable. It is important to investigate and fix the buffer size calculation to ensure that it does not exceed the allocated buffer size.
+
+@@ actionable @@

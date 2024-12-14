@@ -1,0 +1,18 @@
+## warning
+```json
+{
+  "Project": "trueprint",
+  "Tool": "Cppcheck",
+  "category": "memleak",
+  "file": "src/postscript.c",
+  "message": "Memory leak: s1",
+  "warning_function_name": NaN,
+  "warning_line": "}",
+  "warning_context": "\t\t   message_pointsize);\n      printf(\"-216 0 moveto (%s) show\\n\", message);\n      printf(\"grestore\\n\");\n    }\n\n  if (include_headers)\n    {\n      /*\n       * Set up the font and Ypos to print the header strings\n       */\n      printf(\"HF setfont /Ypos Tm Bh sub Ps 2 div add def\\n\");\n    \n      balance_strings(head1, head2, head3, page_no, index_page);\n    }\n\n  if (include_footers)\n    {\n      /*\n       * Set up the font and Ypos to print the footer strings\n       */\n      printf(\"HF setfont /Ypos Ps 2 div def\\n\");\n\n      balance_strings(foot1, foot2, foot3, page_no, index_page);\n    }\n\n  if (index_page)\n    {\n      printf(\"CF setfont \");\n    }\n\n  printf(\"/Vpos Tm Bh sub Ps sub def\\n\");\n}\n\n/*\n * Function:\n *\tPS_end_output()\n * \n */\nvoid\nPS_end_output(void)\n{\n  printf(\"%%%%Trailer\\n\");\n  printf(\"%%%%EOF\\n\");\n}\n\n/*\n * Function:\n *\tbalance_strings()\n */\nvoid\nbalance_strings(char *string1, char *string2, char *string3, long page_no, boolean index_page)\n{\n  char\t*s1, *s2, *s3;\n\n  if (right_page)\n    {\n      s1 = strdup(expand_string(string1, index_page));\n      s2 = strdup(expand_string(string2, index_page));\n      s3 = strdup(expand_string(string3, index_page));\n    }\n  else\n    {\n      s1 = strdup(expand_string(string3, index_page));\n      s2 = strdup(expand_string(string2, index_page));\n      s3 = strdup(expand_string(string1, index_page));\n    }\n  /* start  end1  start2  mid2  end2  start3  end3   */\n  /*      s1               s2               s3       */\n  printf(\"Ps Ypos moveto\\n\");\n  printf(\"(%s) show \",s1);\t\t/* print first string at extreme left hand edge */\n  printf(\"currentpoint pop dup \");\t\t/* . end1 end1 */\n  printf(\"Rm Ps sub \");\t\t\t\t/* . end1 end1 end3 */\n  printf(\"(%s) stringwidth pop \", s3);\t/* . end1 end1 end3 length3 */\n  printf(\"sub dup Ypos moveto\\n\");\t\t/* . end1 end1 start3 */\n  printf(\"(%s) show\\n\",s3);\n  printf(\"exch sub 2 div add \");\t\t\t/* . mid2 */\n  printf(\"(%s) stringwidth pop \",s2);\t/* . mid2 length2 */\n  printf(\"2 div sub Ypos moveto\\n\");\t\t/* . */\n  printf(\"(%s) show\\n\",s2);\n}\n\n/*\n * Function:\n * \tPS_pagesize()\n * sets up all variables corresponding to page size & related measurements, using\n * margins from printer_stats().\n * Specifically if length is unspecified then it is calculated from pointsize,\n * else pointsize is calculated from length.\n * Then width is calculated from pointsize.\n */\nvoid\nPS_pagesize(char *printer, int *width_ptr, int *length_ptr)\n\n{\n  float margin_height;\n  short tmp_sides;\n\n  printer_stats(printer, &tmp_sides, &left_margin, &right_margin, &top_margin, &bottom_margin);\n  if (no_of_sides == '0')\n    {\n      if (tmp_sides == 1)\n"
+}
+```
+
+## Your Answer
+The warning indicates a memory leak in the `balance_strings` function, specifically mentioning the variable `s1`. The context suggests that `s1` is allocated using `strdup`, but there is no corresponding `free` call to deallocate the memory. This is a clear memory leak, which can lead to increased memory usage over time and potentially cause the application to consume more memory than necessary.
+
+@@ actionable @@

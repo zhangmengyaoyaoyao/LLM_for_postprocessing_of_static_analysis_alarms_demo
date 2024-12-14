@@ -1,0 +1,15 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `fsdither` function of the `tiff` project. The warning is about an offset and size that are outside the bounds of the buffer when calling `TIFFWriteScanline`.
+
+The context of the warning is within a loop that iterates over the lines of an image. The loop writes to the `outline` buffer, which is allocated with `TIFFScanlineSize(out)`, and then attempts to write this buffer to the output TIFF file using `TIFFWriteScanline`. The warning suggests that the offset and size are not properly checked, which could lead to a buffer overflow if the buffer is not large enough to hold the data being written.
+
+The specific line of code that triggers the warning is:
+```c
+if (TIFFWriteScanline(out, outline, i-1, 0) < 0)
+    break;
+```
+
+This line writes the `outline` buffer to the output TIFF file at the position `i-1`. The warning suggests that this could potentially write past the end of the buffer if the buffer size is not correctly calculated or if there is an error in the loop that fills the `outline` buffer.
+
+Given the information provided, the warning is actionable because it points to a potential security vulnerability that could be exploited if the `outline` buffer is not large enough to hold the data being written. This could lead to a crash or other undefined behavior.
+
+@@ actionable @@

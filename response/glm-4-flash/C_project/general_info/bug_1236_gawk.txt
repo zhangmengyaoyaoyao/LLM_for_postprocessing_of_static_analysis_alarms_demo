@@ -1,0 +1,11 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `pp_group3`. The warning is generated because the `memcpy` function is used to copy strings into a buffer without checking if the destination buffer is large enough to hold the combined length of the strings being copied.
+
+The warning message specifies that the offset added is `[max(1, `s1->strlen`), `s1->strlen`]` and the size is `[0, `s3->strlen` + `s1->strlen` + `s2->strlen` + 2]`. This suggests that the buffer is being allocated with a size that is at least as large as the combined length of the strings plus two additional bytes, which is likely intended to account for the null terminator.
+
+However, the warning is generated because the `memcpy` function is called with a length that is equal to the length of `s1`, which could potentially be larger than the allocated buffer size if `s1` is not null-terminated. The `strlen` function does not check for null-termination, so if `s1` is not null-terminated, `strlen(s1)` would return a value that is too large for the buffer.
+
+The code snippet provided shows that the buffer is allocated with `emalloc`, which should ensure that the buffer is properly allocated with the correct size. The allocation size is `len1 + len2 + len3 + 2`, which includes space for the null terminator.
+
+Given this information, the warning seems to be a false positive. The allocation size includes space for the null terminator, and the `memcpy` function is called with a length that should not exceed the allocated buffer size. Therefore, the buffer should not be overrun.
+
+@@ actionable @@

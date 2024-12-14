@@ -1,0 +1,16 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `fmt_index`. The warning specifies an offset of 0 and a size range of [0, 32], which suggests that there might be an issue with the `fmt_list` array being accessed out of bounds.
+
+The context of the warning is the line `fmt_list[fmt_hiwater] = dupnode(n);`. This line is attempting to assign a new node to the `fmt_list` array at the index `fmt_hiwater`. The concern is that if `fmt_hiwater` exceeds the bounds of the `fmt_list` array, it could lead to a buffer overflow.
+
+However, the code also includes checks to ensure that `fmt_hiwater` does not exceed `fmt_num`, which is the size of the `fmt_list` array. The following lines of code show this check:
+
+```c
+if (fmt_hiwater >= fmt_num) {
+    fmt_num *= 2;
+    erealloc(fmt_list, NODE **, fmt_num * sizeof(*fmt_list), "fmt_index");
+}
+```
+
+This code snippet doubles the size of the `fmt_list` array when `fmt_hiwater` reaches `fmt_num`, which should prevent the buffer overflow. Therefore, the warning seems to be a false positive, as the code has a mechanism to prevent the overflow.
+
+@@ actionable @@

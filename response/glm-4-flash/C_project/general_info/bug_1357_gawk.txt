@@ -1,0 +1,24 @@
+The warning indicates that there is a potential null dereference in the function `load_old_ext`. The code snippet provided shows that the function pointer `func` is assigned the result of `dlsym(dl, init_func)`, which is used to load the initialization function from the dynamically loaded library. If `init_func` is `NULL` or the corresponding function is not found, `func` will be `NULL`.
+
+The warning is actionable because the code dereferences `func` without checking if it is `NULL`. If `func` is `NULL`, dereferencing it will lead to a null pointer dereference, which is a runtime error.
+
+Here is the relevant part of the code:
+```c
+func = (NODE *(*)(NODE *, void *)) dlsym(dl, init_func);
+if (func == NULL)
+    fatal(_("extension: library `%s': cannot call function `%s' (%s)"), lib_name, init_func, dlerror());
+tmp = (*func)(obj, dl);
+```
+
+The `if (func == NULL)` check is meant to handle the case where the function is not found, but it does not prevent dereferencing a `NULL` pointer if `init_func` is `NULL` or an empty string.
+
+To fix this issue, the code should check if `func` is `NULL` before dereferencing it:
+```c
+if (func == NULL) {
+    fatal(_("extension: library `%s': cannot call function `%s' (%s)"), lib_name, init_func, dlerror());
+} else {
+    tmp = (*func)(obj, dl);
+}
+```
+
+@@ actionable @@

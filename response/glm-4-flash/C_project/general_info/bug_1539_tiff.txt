@@ -1,0 +1,24 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `TIFFWriteByteArray` function call within the `TIFFWriteAnyArray` function. The warning is generated because the offset and size of the buffer being written are not properly checked against the buffer's size.
+
+The code checks if the size of the data to be written exceeds the size of the buffer `buf` before attempting to write it. If it does, it allocates a new buffer using `_TIFFmalloc`. However, the warning suggests that there might be an issue with the buffer size calculation or allocation.
+
+Here's the relevant part of the code:
+
+```c
+if (n * TIFFDataWidth(type) > sizeof buf) {
+    w = (char*) _TIFFmalloc(n * TIFFDataWidth(type));
+    if (w == NULL) {
+        TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+                     "No space to write array");
+        return (0);
+    }
+}
+```
+
+The check `n * TIFFDataWidth(type) > sizeof buf` is meant to ensure that the data to be written does not exceed the size of the buffer `buf`. If this check fails, a new buffer is allocated. However, the warning suggests that the buffer might still be overrun.
+
+Given that the code attempts to allocate a new buffer if the data size exceeds the buffer size, and the allocation is checked for `NULL` before proceeding, the warning seems to be a false positive. The code is already taking steps to prevent a buffer overflow by allocating a new buffer if necessary.
+
+Therefore, the warning is not actionable.
+
+@@ unactionable @@

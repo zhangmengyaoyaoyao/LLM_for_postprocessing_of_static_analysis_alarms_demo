@@ -1,0 +1,20 @@
+The warning indicates that the array index 'argv[1]' is being accessed with an index of 1, but the 'argv' buffer size is 0. This suggests that the 'argv' array is empty, and attempting to access 'argv[1]' is out of bounds.
+
+The code snippet provided shows that the function `cmd_net_stats_iface` is expecting an argument at index 1 of the `argv` array, which is used to determine the index of the network interface to print statistics for. If `argv` is empty, this will lead to undefined behavior when trying to access `argv[1]`.
+
+Given this context, the warning is actionable because it points to a potential runtime error that could cause the program to crash or behave unexpectedly. The code should check if `argc` (the number of arguments passed to the function) is greater than 1 before attempting to access `argv[1]`.
+
+Actionable fix:
+```c
+static int cmd_net_stats_iface(const struct shell *shell, size_t argc, char *argv[])
+{
+    // ...
+    if (argc < 2) {
+        PR_INFO("No index provided. Usage: net stats iface <index>\n");
+        return -EINVAL;
+    }
+    // ...
+}
+```
+
+@@ actionable @@

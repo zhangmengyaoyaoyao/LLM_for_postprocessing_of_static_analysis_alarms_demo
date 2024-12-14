@@ -1,0 +1,173 @@
+## example1
+### Bug Report
+```json
+{
+    "Project": "combine",
+    "Tool": "Cppcheck",
+    "category": "memleak",
+    "file": "src/dstring.c",
+    "message": "Memory leak: temp_string",
+    "warning_function_name": "dstrtonum",
+    "warning_line": "return return_val;",
+    "warning_context": "BIGNUMBER
+dstrtonum (string, remainder, base)
+     DStr_string_descriptor *string;
+     DStr_string_descriptor **remainder;
+     int base;
+{
+  BIGNUMBER return_val;
+  char *temp_string;
+  char *temp_remainder;
+
+  if (remainder != NULL)
+    *remainder = string;
+
+  temp_string = malloc (string->length + 1);
+  if (temp_string == NULL)
+    return 0;
+
+  memcpy (temp_string, string->string, string->length);
+  temp_string[string->length] = '\0';
+
+  return_val = STRTOBIGNUMBER (temp_string, &temp_remainder, base);
+  if (*temp_remainder == '\0') {
+    /* Either we used the wholde string, or there was an embedded null. */
+    if (temp_remainder - temp_string == string->length) {
+      if (remainder != NULL)
+	*remainder = NULL;
+      free (temp_string);
+      return return_val;
+      }
+    }
+
+  if (remainder != NULL) {
+    *remainder = dstrnew ();
+    if (*remainder == NULL) {
+      *remainder = string;
+      free (temp_string);
+      return return_val;
+      }
+    (*remainder)->length = string->length - (temp_remainder - temp_string);
+    (*remainder)->string = string->string + (temp_remainder - temp_string);
+    }
+
+  return return_val;
+
+  }
+"
+}
+```
+
+### Your Answer
+The warning indicates a memory leak in the function `dstrtonum`. The variable `temp_string` is allocated memory using `malloc`, but it is not freed before the function returns. This is a clear memory leak and should be addressed. The code should include a `free(temp_string)` before returning to prevent the memory leak.
+
+@@ actionable @@ 
+
+## example2
+### Bug Report
+```json
+{
+    "Project": "bash",
+    "Tool": "CSA",
+    "category": "core.NullDereference",
+    "file": "subst.c",
+    "message": "Access to field 'word' results in a dereference of a null pointer (loaded from field 'word')",
+    "warning_function_name": "quote_list",
+    "warning_line": "t = w->word->word;",
+    "warning_context": "static WORD_LIST *
+quote_list (list)
+     WORD_LIST *list;
+{
+  register WORD_LIST *w;
+  char *t;
+
+  for (w = list; w; w = w->next)
+    {
+      t = w->word->word;
+      w->word->word = quote_string (t);
+      if (*t == 0)
+	w->word->flags |= W_HASQUOTEDNULL;	/* XXX - turn on W_HASQUOTEDNULL here? */
+      w->word->flags |= W_QUOTED;
+      free (t);
+    }
+  return list;
+}
+"
+}
+```
+
+### Your Answer
+The warning indicates a potential null pointer dereference in the function `quote_list`. The variable `t` is assigned the value of `w->word->word`, which could be null if `w->word` is null. This is a potential bug that could lead to a crash or undefined behavior. The code should include a null check before dereferencing `w->word->word`.
+
+@@ actionable @@ 
+
+## example3
+### Bug Report
+```json
+{
+    "Project": "binutils",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "binutils/bfdtest2.c",
+    "message": "Offset added: [16, +oo] (⇐ [0, +oo] + [16, +oo]) Size: [0, +oo] by call to `bfd_check_format_matches`.",
+    "warning_function_name": "check_format_any",
+    "warning_line": "if (bfd_check_format_matches (abfd, format, &targets))",
+    "warning_context": "static bfd_boolean
+check_format_any (struct bfd *abfd, bfd_format format)
+{
+  char** targets = NULL;
+
+  if (bfd_check_format_matches (abfd, format, &targets))
+    return TRUE;
+
+  if (targets)
+    {
+      bfd_find_target (targets[0], abfd);
+
+      return bfd_check_format (abfd, format);
+    }
+
+  return FALSE;
+}
+"
+}
+```
+
+### Your Answer
+The warning indicates a potential buffer overflow in the function `check_format_any`. The variable `targets` is used as an output parameter for `bfd_check_format_matches`, but it is not checked for size before being used. This could lead to a buffer overflow if the size of the buffer is not sufficient to hold the data being written. The code should include a check for the size of `targets` before using it.
+
+@@ actionable @@ 
+
+## example4
+### Bug Report
+```json
+{
+    "Project": "gawk",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "src/expr.h",
+    "message": "Offset added: [16, +oo] (⇐ [0, +oo] + [16, +oo]) Size: [0, +oo] by call to `memcpy`.",
+    "warning_function_name": "memcpy",
+    "warning_line": "memcpy (buffer, string, len);",
+    "warning_context": "static void
+memcpy (buffer, string, len)
+     char *buffer;
+     const char *string;
+     size_t len;
+{
+  if (buffer == NULL || string == NULL)
+    return;
+
+  if (len > 0)
+    {
+      memcpy (buffer, string, len);
+    }
+}
+"
+}
+```
+
+### Your Answer
+The warning indicates a potential buffer overflow in the function `memcpy`. The function does not check if the `buffer` pointer is null before dereferencing it. This could lead to a crash or undefined behavior if `buffer` is null. The code should include a null check for `buffer` before dereferencing it.
+
+@@ actionable @@

@@ -1,0 +1,11 @@
+The warning from SpotBugs indicates a potential buffer overflow in the `get_token` function of the `binutils` project, specifically in the `sb_add_char` function call. The warning suggests that the buffer `name` may be overrun because the size of the buffer is not properly checked before adding characters.
+
+The context of the warning is as follows:
+- The `name->len` variable is used as an offset to add characters to the `name` buffer.
+- The `sb_add_char` function is called with `name` and `in->ptr[idx++]`, which increments `idx` after the call.
+
+The issue here is that the `name->len` is incremented by 1 in each iteration of the loop, but there is no check to ensure that `name->len` does not exceed the buffer size of `name`. This could lead to a buffer overflow if the loop runs more times than the buffer can handle.
+
+Given this information, the warning is actionable because it points to a potential security vulnerability that could be exploited to corrupt memory or execute arbitrary code.
+
+@@ actionable @@

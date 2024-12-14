@@ -1,0 +1,14 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `ieee_output_pending_parms` in the file `binutils/ieee.c`. The warning is about an offset calculation that could potentially exceed the bounds of the buffer being written to by the `ieee_real_write_byte` function.
+
+The warning message states:
+- Offset: `[max(490, `info->vars.tail->c`), `info->vars.tail->c`]`
+- Size: `490`
+- By call to `ieee_real_write_byte`.
+
+The offset calculation is using the maximum of `490` and the value of `info->vars.tail->c`, which suggests that the buffer being written to is being accessed with an offset that is either `490` or the value of `info->vars.tail->c`, whichever is greater. The size of the write is `490` bytes.
+
+Given that the size of the write is fixed and the offset is potentially larger than the buffer size, this could lead to a buffer overflow if the buffer is not properly sized to accommodate the maximum possible offset.
+
+This is a classic case of a buffer overflow, which is a serious security vulnerability. It is important to investigate and fix such issues to prevent potential exploits.
+
+@@ actionable @@

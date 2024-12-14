@@ -1,0 +1,9 @@
+The warning from SpotBugs indicates a potential buffer overrun in the function `_ccnl_interest` when calling `ccnl_send_interest`. The warning specifies that the offset is `[0, 6]` and the size is `[0, 7]`, which suggests that the buffer `_int_buf` is being accessed beyond its allocated size.
+
+The context provided shows that `_int_buf` is initialized with `memset(_int_buf, '\\0', BUF_SIZE);` before the call to `ccnl_send_interest`, which should prevent a buffer overflow if `ccnl_send_interest` is used correctly.
+
+However, the warning is actionable because it is possible that the `ccnl_send_interest` function does not adhere to the same buffer size expectations as `memset`. If `ccnl_send_interest` expects a smaller buffer size or does not null-terminate the buffer, this could lead to a buffer overflow.
+
+To conclude, the warning is actionable because it points to a potential vulnerability that could be exploited if the underlying function (`ccnl_send_interest`) behaves differently than expected.
+
+@@ actionable @@

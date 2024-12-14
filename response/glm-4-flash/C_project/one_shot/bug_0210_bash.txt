@@ -1,0 +1,22 @@
+## warning
+```json
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L3",
+    "file": "lib/readline/display.c",
+    "message": "Offset: [1, +oo] Size: [0, +oo].",
+    "warning_function_name": NaN,
+    "warning_line": "inv_lbreaks[++newlines] = out + temp;",
+    "warning_context": "#endif\n\tlpos -= _rl_screenwidth;\n    }\n\n  prompt_last_screen_line = newlines;\n\n  /* Draw the rest of the line (after the prompt) into invisible_line, keeping\n     track of where the cursor is (cpos_buffer_position), the number of the line containing\n     the cursor (lb_linenum), the last line number (lb_botlin and inv_botlin).\n     It maintains an array of line breaks for display (inv_lbreaks).\n     This handles expanding tabs for display and displaying meta characters. */\n  lb_linenum = 0;\n#if defined (HANDLE_MULTIBYTE)\n  in = 0;\n  if (MB_CUR_MAX > 1 && rl_byte_oriented == 0)\n    {\n      memset (&ps, 0, sizeof (mbstate_t));\n      /* XXX - what if wc_bytes ends up <= 0? check for MB_INVALIDCH */\n      wc_bytes = mbrtowc (&wc, rl_line_buffer, rl_end, &ps);\n    }\n  else\n    wc_bytes = 1;\n  while (in < rl_end)\n#else\n  for (in = 0; in < rl_end; in++)\n#endif\n    {\n      c = (unsigned char)rl_line_buffer[in];\n\n#if defined (HANDLE_MULTIBYTE)\n      if (MB_CUR_MAX > 1 && rl_byte_oriented == 0)\n\t{\n\t  if (MB_INVALIDCH (wc_bytes))\n\t    {\n\t      /* Byte sequence is invalid or shortened.  Assume that the\n\t         first byte represents a character. */\n\t      wc_bytes = 1;\n\t      /* Assume that a character occupies a single column. */\n\t      wc_width = 1;\n\t      memset (&ps, 0, sizeof (mbstate_t));\n\t    }\n\t  else if (MB_NULLWCH (wc_bytes))\n\t    break;\t\t\t/* Found '\\0' */\n\t  else\n\t    {\n\t      temp = WCWIDTH (wc);\n\t      wc_width = (temp >= 0) ? temp : 1;\n\t    }\n\t}\n#endif\n\n      if (out + 8 >= line_size)\t\t/* XXX - 8 for \\t */\n\t{\n\t  line_size *= 2;\n\t  visible_line = (char *)xrealloc (visible_line, line_size);\n\t  invisible_line = (char *)xrealloc (invisible_line, line_size);\n\t  line = invisible_line;\n\t}\n\n      if (in == rl_point)\n\t{\n\t  cpos_buffer_position = out;\n\t  lb_linenum = newlines;\n\t}\n\n#if defined (HANDLE_MULTIBYTE)\n      if (META_CHAR (c) && _rl_output_meta_chars == 0)\t/* XXX - clean up */\n#else\n      if (META_CHAR (c))\n#endif\n\t{\n\t  if (_rl_output_meta_chars == 0)\n\t    {\n\t      sprintf (line + out, \"\\\\%o\", c);\n\n\t      if (lpos + 4 >= _rl_screenwidth)\n\t\t{\n\t\t  temp = _rl_screenwidth - lpos;\n\t\t  CHECK_INV_LBREAKS ();\n\t\t  inv_lbreaks[++newlines] = out + temp;\n\t\t  lpos = 4 - temp;\n\t\t}\n\t      else\n\t\tlpos += 4;\n\n\t      out += 4;\n\t    }\n\t  else\n\t    {\n\t      line[out++] = c;\n\t      CHECK_LPOS();\n\t    }\n\t}\n#if defined (DISPLAY_TABS)\n      else if (c == '\\t')\n\t{\n\t  register int newout;\n\n#if 0\n\t  newout = (out | (int)7) + 1;\n#else\n"
+}
+```
+
+## Your Answer
+The warning indicates a potential buffer overflow in the `display.c` file of the `bash` project. The specific line of code in question is `inv_lbreaks[++newlines] = out + temp;`, which suggests that the `out` variable may be used to calculate an offset that is then assigned to an element in the `inv_lbreaks` array. If the `out` variable is not properly bounded, this could lead to a buffer overflow.
+
+Given the context, it appears that the `out` variable is intended to track the current position in the `line` buffer. However, without a clear upper bound on `out`, there is a risk that the assignment to `inv_lbreaks` could write past the end of the buffer.
+
+This is a potential security vulnerability that should be addressed. The code should include bounds checking to ensure that `out + temp` does not exceed the size of the `inv_lbreaks` array.
+
+@@ actionable @@

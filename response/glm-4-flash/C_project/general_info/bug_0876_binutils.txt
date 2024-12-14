@@ -1,0 +1,28 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `ieee_define_named_type` in the file `binutils/ieee.c`. The warning suggests that the offset and size used in the call to `ieee_real_write_byte` may exceed the bounds of the buffer.
+
+The context of the warning is within a conditional block that handles the case where a buffer is not provided. The code attempts to write bytes to the buffer, starting from an offset that is calculated based on the current tail of the buffer (`info->types.tail->c`) and the maximum of 489 and the current tail value. The size of the write operation is 490 bytes.
+
+Here is the relevant part of the code:
+
+```c
+if (! ieee_buffer_emptyp (&info->types))
+{
+  if (! ieee_change_buffer (info, &info->types))
+    return FALSE;
+}
+else
+{
+  if (! ieee_change_buffer (info, &info->types)
+      || ! ieee_write_byte (info, (int) ieee_bb_record_enum)
+      || ! ieee_write_byte (info, 1)
+      || ! ieee_write_number (info, 0)
+      || ! ieee_write_id (info, info->modname))
+    return FALSE;
+}
+```
+
+The warning is actionable because it points to a specific line of code (`|| ! ieee_write_byte (info, 1)`) where a buffer overflow could occur if the buffer is not properly managed. The offset calculation and the size of the write operation suggest that the code is attempting to write beyond the end of the buffer if `info->types.tail->c` is large enough.
+
+To mitigate this issue, the code should ensure that the buffer has enough space to accommodate the write operation. This could involve checking the buffer size before writing or using a different mechanism to ensure that the write operation does not exceed the buffer bounds.
+
+@@ actionable @@

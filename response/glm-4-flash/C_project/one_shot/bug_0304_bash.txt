@@ -1,0 +1,20 @@
+## warning
+```json
+{
+    "Project": "bash",
+    "Tool": "Infer",
+    "category": "BUFFER_OVERRUN_L1",
+    "file": "bashline.c",
+    "message": "Offset: 2 Size: 2.",
+    "warning_function_name": "command_word_completion_function",
+    "warning_line": "igncase = RL_BOOLEAN_VARIABLE_VALUE (temp);",
+    "warning_context": "char *\ncommand_word_completion_function (hint_text, state)\n     const char *hint_text;\n     int state;\n{\n  static char *hint = (char *)NULL;\n  static char *path = (char *)NULL;\n  static char *val = (char *)NULL;\n  static char *filename_hint = (char *)NULL;\n  static char *fnhint = (char *)NULL;\n  static char *dequoted_hint = (char *)NULL;\n  static char *directory_part = (char *)NULL;\n  static char **glob_matches = (char **)NULL;\n  static int path_index, hint_len, dequoted_len, istate, igncase;\n  static int mapping_over, local_index, searching_path, hint_is_dir;\n  static int old_glob_ignore_case, globpat;\n  static SHELL_VAR **varlist = (SHELL_VAR **)NULL;\n#if defined (ALIAS)\n  static alias_t **alias_list = (alias_t **)NULL;\n#endif /* ALIAS */\n  char *temp, *cval;\n\n  /* We have to map over the possibilities for command words.  If we have\n     no state, then make one just for that purpose. */\n  if (state == 0)\n    {\n      rl_filename_stat_hook = bash_command_name_stat_hook;\n\n      if (dequoted_hint && dequoted_hint != hint)\n\tfree (dequoted_hint);\n      if (hint)\n\tfree (hint);\n\n      mapping_over = searching_path = 0;\n      hint_is_dir = CMD_IS_DIR (hint_text);\n      val = (char *)NULL;\n\n      temp = rl_variable_value (\"completion-ignore-case\");\n      igncase = RL_BOOLEAN_VARIABLE_VALUE (temp);\n\n      if (glob_matches)\n\t{\n\t  free (glob_matches);\n\t  glob_matches = (char **)NULL;\n\t}\n\n      globpat = glob_pattern_p (hint_text);\n\n      /* If this is an absolute program name, do not check it against\n\t aliases, reserved words, functions or builtins.  We must check\n\t whether or not it is unique, and, if so, whether that filename\n\t is executable. */\n      if (globpat || absolute_program (hint_text))\n\t{\n\t  /* Perform tilde expansion on what's passed, so we don't end up\n\t     passing filenames with tildes directly to stat(). */\n\t  if (*hint_text == '~')\n\t    {\n\t      hint = bash_tilde_expand (hint_text, 0);\n\t      directory_part = savestring (hint_text);\n\t      temp = strchr (directory_part, '/');\n\t      if (temp)\n\t\t*temp = 0;\n\t      else\n\t\t{\n\t\t  free (directory_part);\n\t\t  directory_part = (char *)NULL;\n\t\t}\n\t    }\n\t  else\n\t    hint = savestring (hint_text);\n\n\t  dequoted_hint = hint;\n\t  /* If readline's completer found a quote character somewhere, but\n\t     didn't set the quote character, there must have been a quote\n\t     character embedded in the filename.  It can't be at the start of\n\t     the filename, so we need to dequote the filename before we look\n\t     in the file system for it. */\n\t  if (rl_completion_found_quote && rl_completion_quote_character == 0)\n\t    {\n\t      dequoted_hint = bash_dequote_filename (hint, 0);\n\t      free (hint);\n\t      hint = dequoted_hint;\n\t    }\n\t  dequoted_len = hint_len = strlen (hint);\n\n\t  if (filename_hint)\n\t    free (filename_hint);\n\n\t  fnhint = filename_hint = savestring (hint);\n\n\t  istate = 0;\n\n\t  if (globpat)\n\t    {\n\t      mapping_over = 5;\n\t      goto globword;\n\t    }\n\t  else\n\t    {\n\t     if (dircomplete_expand && path_dot_or_dotdot (filename_hint))\n"
+}
+```
+
+## Your Answer
+The warning indicates a potential buffer overflow in the `command_word_completion_function` function of the bash project. The specific context of the warning is that the variable `igncase` is being assigned a value from `RL_BOOLEAN_VARIABLE_VALUE(temp)`, which could potentially lead to a buffer overflow if `temp` is not properly null-terminated or if the size of the buffer is not correctly managed.
+
+Given the potential for a buffer overflow, this warning is actionable. It suggests that there may be a vulnerability in the code that should be investigated and fixed to prevent potential security issues.
+
+@@ actionable @@

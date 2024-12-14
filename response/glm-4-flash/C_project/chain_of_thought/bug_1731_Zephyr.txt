@@ -1,0 +1,20 @@
+To determine whether the warning is actionable, let's analyze the warning message and the context provided:
+
+1. **Warning Message**: "The value read from rc was never initialized."
+2. **Context**: The warning is from the function `mcuboot_swap_type` in the file `subsys/dfu/boot/mcuboot.c`. The variable `rc` is used to store the return value from the function `boot_read_swap_state_by_id`. If `rc` is never initialized, it could lead to undefined behavior when it is returned.
+
+Step-by-step analysis:
+
+- The function `mcuboot_swap_type` reads swap states from flash using `boot_read_swap_state_by_id`.
+- If `boot_read_swap_state_by_id` returns an error (non-zero value), it is immediately returned from the function.
+- If `boot_read_swap_state_by_id` returns zero (indicating success), the function continues to perform checks and possibly returns a value.
+- The warning suggests that `rc` is never initialized, which means that if `boot_read_swap_state_by_id` fails, the function would return an uninitialized value of `rc`.
+
+Given this context, the warning is actionable because:
+
+- It points out a potential bug in the code where a variable is used without being initialized.
+- This could lead to undefined behavior, especially if the function is called in a way that relies on the value of `rc`.
+
+Conclusion: "@@ actionable @@"
+
+The warning is actionable because it indicates a potential bug that could lead to undefined behavior.

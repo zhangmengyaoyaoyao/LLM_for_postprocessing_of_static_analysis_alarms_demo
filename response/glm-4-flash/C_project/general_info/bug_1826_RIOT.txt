@@ -1,0 +1,15 @@
+The warning from SpotBugs indicates that there is an array access at index 4 for the array `config[2]`, which is out of bounds. The array `config` is indexed by `int_num`, which is assigned the value of `_int_num(pin)`.
+
+Looking at the code, `int_num` is assigned the value of `_int_num(pin)` which is meant to be the interrupt number for the given pin. The array `config` is presumably meant to store configuration information for each interrupt number.
+
+The warning suggests two possibilities:
+1. The condition `int_num < 4` is redundant, meaning that the array access is always within bounds.
+2. The array `config` is accessed at an index that is out of bounds.
+
+Given the context, the first possibility seems unlikely because the condition `int_num < 4` is used to determine which register to modify for setting the flank of the interrupt. If `int_num` is less than 4, it uses `EICRA`; otherwise, it uses `EICRB`. This suggests that the array `config` is meant to have at least 4 elements, corresponding to the 4 interrupt numbers that can be configured using `EICRA`.
+
+The second possibility is that the array `config` is accessed at an index that is out of bounds. However, the code seems to be correctly checking `int_num < 4` before accessing `config[int_num]`. This would imply that the array access is within bounds for the given condition.
+
+Therefore, the warning seems to be a false positive. The code is accessing the array within the bounds that are intended by the condition `int_num < 4`.
+
+@@ actionable @@

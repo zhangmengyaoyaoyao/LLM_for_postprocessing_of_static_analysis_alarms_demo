@@ -1,0 +1,15 @@
+The warning from SpotBugs indicates a potential buffer overflow in the function `higher_prime_number`. The warning is about an offset of 28 and a size of 28, which suggests that there might be an attempt to access memory beyond the bounds of the `primes` array.
+
+Looking at the code, the warning is generated from the line:
+```c
+const unsigned long *high = &primes[sizeof (primes) / sizeof (primes[0])];
+```
+This line is setting the `high` pointer to the end of the `primes` array. The array `primes` is statically allocated and contains prime numbers. The warning is suggesting that this might lead to a buffer overflow if the pointer is used incorrectly.
+
+However, the rest of the function does not show any direct use of the `high` pointer that would lead to a buffer overflow. The function is using binary search to find the highest prime number less than or equal to `n`. The pointers `low` and `high` are used to keep track of the current search range, and the `mid` pointer is calculated as the average of `low` and `high`. The pointers are then adjusted based on the comparison with `n`.
+
+The function does not access the `high` pointer beyond the bounds of the array, and the binary search logic is correct. The `high` pointer is never dereferenced outside of the bounds of the array, so there is no actual buffer overflow in this function.
+
+Therefore, the warning is not actionable because the code is correct and there is no risk of a buffer overflow.
+
+@@ unactionable @@

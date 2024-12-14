@@ -1,0 +1,11 @@
+The warning provided by SpotBugs indicates a potential buffer overflow in the function `get_page_geometry` in the file `tools/tiffcrop.c`. The specific line of code that triggers the warning is `page->name[15] = '\\0';`, which sets the 16th character of the `page->name` buffer to the null terminator.
+
+The context of the code suggests that `strncpy` is used to copy up to 15 characters from `PaperTable[n].name` to `page->name`. The null terminator is then explicitly set at the 16th position. This is a common pattern to ensure that the string is null-terminated, which is generally a good practice.
+
+However, the warning is generated because the `BUFFER_OVERRUN_L1` category is triggered, which typically indicates that the buffer is being written beyond its allocated size. In this case, the buffer `page->name` is declared with a size that can hold up to 16 characters (including the null terminator), so the code appears to be correctly handling the buffer size.
+
+Given the context and the fact that the code is explicitly setting the null terminator at the 16th position, it seems that the warning is a false positive. The buffer is not being overrun because the `strncpy` function is copying up to 15 characters, and the null terminator is set at the 16th position, which is within the bounds of the buffer.
+
+Therefore, the warning is not actionable.
+
+@@ unactionable @@
