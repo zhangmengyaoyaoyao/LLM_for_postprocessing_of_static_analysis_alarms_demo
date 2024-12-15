@@ -17,11 +17,11 @@ sys.path.append(project_root)
 import construct_prompts as Constructor
 
 # your api key
-key = ""
+key = "18f2c750fd94cf998cd783992f97c819.5LiF231eFl2uYNQs"
 url = "https://open.bigmodel.cn/api/paas/v4/"
 model = "glm-4-flash"
 
-def process_spotbugs_project_files(key, url, model, tool, prompts_technique, project_name, project_path):
+def process_spotbugs_project_files(key, url, model, tool, prompts_technique, project_name, project_path, model_fullname=model):
     # 获取该项目下的所有 JSON 文件路径
     json_files = sorted(glob.glob(os.path.join(project_path, "*.json")))
 
@@ -39,8 +39,8 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
     os.makedirs(output_dir, exist_ok=True)
 
     # temp
-    if prompts_technique == "chain_of_thought":
-        json_files = json_files[1407:]
+    if prompts_technique == "self_heuristic":
+        json_files = json_files[843:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -131,7 +131,7 @@ if __name__ == '__main__':
     #         process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, project_path)
 
 #C
-    prompts_techniques = ["chain_of_thought", "critique", "self_heuristic"]
+    prompts_techniques = ["self_heuristic"]
     tool = "unknown"
     project = "unknown"
     project_path = os.path.join("report", "c_json")

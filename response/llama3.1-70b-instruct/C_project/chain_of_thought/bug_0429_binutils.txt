@@ -1,0 +1,17 @@
+To determine whether this warning is actionable or not, let's break down the information provided and analyze it step by step.
+
+1. **Warning Category and Message**: The warning category is "uninitvar," which stands for uninitialized variable. The message specifically points out that the variable "*pp" is uninitialized.
+
+2. **Code Context**: The warning is located in the "dec_dynrel_count" function within the "bfd/elf64-ppc.c" file of the "binutils" project. The code snippet provided shows the handling of dynamic relocations for ELF64 objects on PPC64 architecture.
+
+3. **Variable Initialization**: The variable "*pp" is a pointer to a pointer, which is used to traverse a linked list of dynamic relocations. The warning suggests that "*pp" might be used before it is initialized.
+
+4. **Initialization of *pp**: Looking at the code, "*pp" is initialized in two different blocks:
+   - For the case when "h" (a hash entry) is not NULL, "*pp" is initialized as "&((struct ppc_link_hash_entry *) h)->dyn_relocs;". This line clearly assigns a valid memory address to "*pp".
+   - For the case when "h" is NULL, "*pp" is initialized as "(struct ppc_dyn_relocs **) &elf_section_data (sym_sec)->local_dynrel;". Again, this line assigns a valid memory address to "*pp".
+
+5. **Usage of *pp**: The variable "*pp" is used in a while loop condition as "while ((p = *pp) != NULL)". This usage is safe if "*pp" is properly initialized before the loop, which seems to be the case based on the code provided.
+
+6. **Conclusion**: Given that "*pp" is initialized before its use in both possible code paths, the warning about "*pp" being an uninitialized variable seems to be a false positive. The code appears to handle the initialization of "*pp" correctly, making the warning unactionable.
+
+@@ unactionable @@

@@ -1,0 +1,15 @@
+To determine whether this warning is actionable or not, let's break down the information provided and analyze it step by step.
+
+1. **Warning Category**: The warning is categorized as "UNINITIALIZED_VALUE". This means the tool (Infer) has detected that a value is being used without being initialized.
+
+2. **Message**: The message specifically states, "The value read from correct_words[_] was never initialized." This indicates that the array `correct_words` is being accessed and its values are being used in computations, but the tool believes these values have not been initialized.
+
+3. **Code Context**: The code snippet provided is part of an MD5 hash algorithm implementation. It involves a series of operations on variables `A`, `B`, `C`, and `D`, using predefined constants and values from an array `correct_words`. The operations are defined within macros (`OP`, `CYCLIC`, `FX`, `FG`, `FH`), which can make the code harder to follow but are essentially performing bitwise operations and additions.
+
+4. **Initialization of `correct_words`**: The warning suggests that `correct_words` is not initialized. However, looking at the code, there is a line `md5_uint32 *cwp = correct_words;` followed by an assignment `a += FX (b, c, d) + (*cwp++ = SWAP (*words)) + T;` within the `OP` macro. This line actually initializes the `correct_words` array by assigning swapped values from the `words` array to it.
+
+5. **Conclusion**: Given the information above, it seems the warning about `correct_words` not being initialized might be a false positive. The array is indeed initialized within the loop where its values are used. The complexity of the code, involving multiple macros and pointer operations, might have led the tool to incorrectly identify the array as uninitialized.
+
+Therefore, based on the analysis, this warning appears to be unactionable because the code does initialize the `correct_words` array before using its values.
+
+@@ unactionable @@

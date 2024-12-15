@@ -1,0 +1,17 @@
+To determine whether this warning is actionable or not, let's analyze the code and the warning step by step.
+
+1. **Warning Category**: The warning is categorized as "Uninitialized Variable". This suggests that the tool (Cppcheck) has identified a variable that is being used before it has been initialized.
+
+2. **Variable in Question**: The variable mentioned in the warning is `*pun`. This is a pointer to a `u64_t` type, which is initialized as `u64_t *pun = (u64_t *) &state;`. Here, `state` is a struct of type `struct state`.
+
+3. **Initialization of `state`**: Looking at the code, `state` is declared as `struct state state;`. However, there is no explicit initialization of `state` before it is used to initialize `pun`. 
+
+4. **Use of `pun`**: The warning points to the line `} while (*pun != *pun2);`, indicating that the comparison `*pun != *pun2` is where the uninitialized variable is being used.
+
+5. **Implicit Initialization**: Although `state` is not explicitly initialized, it is assigned the value of `state2` before the loop where `pun` is used. The line `state = state2;` suggests that `state` (and by extension, `*pun`) is being initialized indirectly through the assignment from `state2`.
+
+6. **Initialization of `state2`**: Before the loop, `state2` is passed to the function `read_state(&state2);`, which presumably initializes `state2`. This implies that by the time `*pun` is used in the comparison, it has been indirectly initialized through the assignment from `state2`.
+
+Given these steps, it appears that the variable `*pun` is indeed initialized before it is used, albeit indirectly. The warning about an uninitialized variable seems to be a false positive in this context, as the code does ensure that `state` (and thus `*pun`) is initialized before the comparison.
+
+@@ unactionable @@

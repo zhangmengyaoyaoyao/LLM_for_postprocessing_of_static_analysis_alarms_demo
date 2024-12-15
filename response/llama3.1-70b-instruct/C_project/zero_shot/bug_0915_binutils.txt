@@ -1,0 +1,9 @@
+This warning is reporting a potential buffer overrun in the `_bfd_elf_get_synthetic_symtab` function. The warning message "Offset added: 5 Size: [0, +oo]." suggests that the `memcpy` function is being used to copy data into a buffer, but the size of the buffer is not properly bounded.
+
+Upon examining the code, it appears that the `memcpy` function is being used to copy a string into a buffer, but the size of the buffer is not explicitly checked. The buffer is allocated using `bfd_malloc`, but the size of the buffer is calculated based on the number of relocation entries and the length of the symbol names, which could potentially overflow.
+
+However, upon closer inspection, it appears that the buffer size is actually calculated correctly, taking into account the length of the symbol names and the additional characters added to the buffer. The `memcpy` function is also used with a bounded size, which is the length of the string being copied.
+
+Therefore, this warning is likely a false positive, and the code is actually safe.
+
+@@ unactionable @@

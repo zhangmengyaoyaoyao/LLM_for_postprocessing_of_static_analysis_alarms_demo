@@ -1,0 +1,8 @@
+@@ actionable @@
+The warning indicates that the value read from `eps[_]` was never initialized. However, looking at the code, we can see that `eps` is initialized with a value of 2.0 in the loop `for (i = NANGLES; i--; ) eps[i] = 2.;`. 
+
+Moreover, the warning is triggered at the line `if (eps[i] > 1.5) {`, which is inside the loop that initializes `eps`. This suggests that the warning is likely a false positive, as `eps` is indeed initialized before it is used.
+
+However, there is another issue in the code. The variable `eps` is declared as `static double eps[NANGLES]`, which means it is only initialized once, when the program starts. But the code has a loop that initializes `eps` only when `initialized` is 0. If the function `oog_encode` is called multiple times, `eps` will not be reinitialized, and the values from the previous call will be used. This could potentially lead to incorrect results.
+
+Therefore, the warning is actionable, as it points to a potential issue in the code, even though the specific warning message is incorrect. The code should be modified to ensure that `eps` is properly initialized before it is used.

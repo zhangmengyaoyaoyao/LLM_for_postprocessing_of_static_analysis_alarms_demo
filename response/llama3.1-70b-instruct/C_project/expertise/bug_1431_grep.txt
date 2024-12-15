@@ -1,0 +1,21 @@
+ warning
+{
+  "Project": "grep",
+  "Tool": "Infer",
+  "category": "BUFFER_OVERRUN_L1",
+  "file": "lib/localcharset.c",
+  "message": "Offset: [1, +oo] (\u21d0 [0, +oo] + 1) Size: 1.",
+  "warning_function_name": "locale_charset",
+  "warning_line": "|| (aliases[0] == '*' && aliases[1] == '\\0'))",
+  "warning_context": "  if (pdot)\n    sprintf (buf, \"CP%s\", pdot + 1);\n  else\n    {\n      /* The Windows API has a function returning the locale's codepage as a\n        number: GetACP().\n        When the output goes to a console window, it needs to be provided in\n        GetOEMCP() encoding if the console is using a raster font, or in\n        GetConsoleOutputCP() encoding if it is using a TrueType font.\n        But in GUI programs and for output sent to files and pipes, GetACP()\n        encoding is the best bet.  */\n      sprintf (buf, \"CP%u\", GetACP ());\n    }\n  codeset = buf;\n\n#elif defined OS2\n\n  const char *locale;\n  static char buf[2 + 10 + 1];\n  ULONG cp[3];\n  ULONG cplen;\n\n  /* Allow user to override the codeset, as set in the operating system,\n     with standard language environment variables.  */\n  locale = getenv (\"LC_ALL\");\n  if (locale == NULL || locale[0] == '\\0')\n    {\n      locale = getenv (\"LC_CTYPE\");\n      if (locale == NULL || locale[0] == '\\0')\n        locale = getenv (\"LANG\");\n    }\n  if (locale != NULL && locale[0] != '\\0')\n    {\n      /* If the locale name contains an encoding after the dot, return it.  */\n      const char *dot = strchr (locale, '.');\n\n      if (dot != NULL)\n        {\n          const char *modifier;\n\n          dot++;\n          /* Look for the possible @... trailer and remove it, if any.  */\n          modifier = strchr (dot, '@');\n          if (modifier == NULL)\n            return dot;\n          if (modifier - dot < sizeof (buf))\n            {\n              memcpy (buf, dot, modifier - dot);\n              buf [modifier - dot] = '\\0';\n              return buf;\n            }\n        }\n\n      /* Resolve through the charset.alias file.  */\n      codeset = locale;\n    }\n  else\n    {\n      /* OS/2 has a function returning the locale's codepage as a number.  */\n      if (DosQueryCp (sizeof (cp), cp, &cplen))\n        codeset = \"\";\n      else\n        {\n          sprintf (buf, \"CP%u\", cp[0]);\n          codeset = buf;\n        }\n    }\n\n#endif\n\n  if (codeset == NULL)\n    /* The canonical name cannot be determined.  */\n    codeset = \"\";\n\n  /* Resolve alias. */\n  for (aliases = get_charset_aliases ();\n       *aliases != '\\0';\n       aliases += strlen (aliases) + 1, aliases += strlen (aliases) + 1)\n    if (strcmp (codeset, aliases) == 0\n        || (aliases[0] == '*' && aliases[1] == '\\0'))\n      {\n        codeset = aliases + strlen (aliases) + 1;\n        break;\n      }\n\n  /* Don't return an empty string.  GNU libc and GNU libiconv interpret\n     the empty string as denoting \"the locale's character encoding\",\n     thus GNU libiconv would call this function a second time.  */\n  if (codeset[0] == '\\0')\n    codeset = \"ASCII\";\n\n#ifdef DARWIN7\n  /* Mac OS X sets MB_CUR_MAX to 1 when LC_ALL=C, and \"UTF-8\"\n     (the default codeset) does not work when MB_CUR_MAX is 1.  */\n  if (strcmp (codeset, \"UTF-8\") == 0 && MB_CUR_MAX_L (uselocale (NULL)) <= 1)\n    codeset = \"ASCII\";\n#endif\n\n  return codeset;\n}\n"
+}
+
+The warning is a BUFFER_OVERRUN_L1 warning, which indicates a potential buffer overflow vulnerability. The warning message suggests that the offset [1, +oo] is out of bounds for the buffer of size 1.
+
+After analyzing the code, I found that the warning is triggered by the line `if (strcmp (codeset, aliases) == 0 || (aliases[0] == '*' && aliases[1] == '\0'))`. The warning is likely caused by the fact that the `aliases` array is not null-terminated, and the `strcmp` function is accessing memory beyond the bounds of the array.
+
+However, upon closer inspection, I noticed that the `aliases` array is actually a pointer to a string, and the `strcmp` function is correctly checking for the null-termination of the string. The warning is likely a false positive.
+
+Therefore, I conclude that this warning is unactionable.
+
+@@ unactionable @@

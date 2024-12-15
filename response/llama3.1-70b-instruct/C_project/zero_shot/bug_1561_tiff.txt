@@ -1,0 +1,18 @@
+This warning is actionable.
+
+The warning is indicating a potential buffer overrun in the `PS_FlipBytes` function, which is called with a buffer `buf_data` and a byte count `byte_count`. The warning suggests that the offset and size of the buffer are not properly validated, which could lead to a buffer overrun.
+
+The code snippet provided shows that the `buf_data` buffer is allocated with a size of `chunk_size`, which is calculated based on the image dimensions and the number of chunks. However, the `byte_count` variable is not validated to ensure that it does not exceed the size of the buffer.
+
+To fix this warning, the code should add a check to ensure that `byte_count` does not exceed the size of the `buf_data` buffer before calling `PS_FlipBytes`. This can be done by adding a simple bounds check, such as:
+
+```c
+if (byte_count > chunk_size) {
+    TIFFError(filename, "Buffer overrun detected in PS_FlipBytes");
+    return FALSE;
+}
+```
+
+By adding this check, the code can prevent a potential buffer overrun and ensure that the `PS_FlipBytes` function is called with a valid buffer size.
+
+@@ actionable @@

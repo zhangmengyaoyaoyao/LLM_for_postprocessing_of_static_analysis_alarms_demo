@@ -1,0 +1,17 @@
+To determine whether this warning is actionable or not, let's break down the information provided and analyze it step by step.
+
+1. **Warning Category**: The warning is categorized as "Uninitialized Variable." This suggests that the tool (Cppcheck) has identified a variable that is being used before it has been initialized.
+
+2. **Variable in Question**: The variable mentioned is `count`, and it is being used in the line `sprintf(buffer, "test data %n test data", &count);`. The `%n` format specifier in `sprintf` stores the number of characters written so far into the variable pointed to by the corresponding argument (`&count` in this case).
+
+3. **Initialization of `count`**: Looking at the provided code snippet, `count` is declared as `int count;` but there is no explicit initialization before it is used in the `sprintf` function.
+
+4. **Usage of `count`**: After the `sprintf` call, the value of `count` is asserted to be 10 with `zassert_false((count != 10), ...)`. This implies that the code expects `count` to be modified by the `sprintf` call and then checked against a specific value.
+
+5. **Behavior of `%n` in `sprintf`**: The `%n` format specifier in `sprintf` writes the number of characters written so far to the variable pointed to by the argument. This means that after the `sprintf` call, `count` should indeed hold the number of characters written up to that point in the string.
+
+Given these points, the warning about an uninitialized variable seems to be a false positive in this specific context. The variable `count` is intentionally not initialized before the `sprintf` call because its value is supposed to be set by the `sprintf` function itself through the `%n` format specifier. The code's logic depends on this behavior, as evidenced by the assertion that follows.
+
+Therefore, considering the specific usage and the expected behavior of the `%n` format specifier in `sprintf`, this warning can be considered unactionable for the given code snippet.
+
+@@ unactionable @@

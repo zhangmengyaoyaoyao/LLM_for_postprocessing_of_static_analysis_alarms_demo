@@ -1,0 +1,13 @@
+@@ unactionable @@
+
+The warning is about a potential buffer overrun in the `elf_i386_check_tls_transition` function. However, upon closer inspection, it appears that the warning is likely a false positive.
+
+The warning is triggered by the line `if (bfd_get_8 (abfd, contents + offset + 9) != 0x90)`, which is checking the value of a byte at a specific offset in the `contents` buffer. The warning suggests that the offset calculation may overflow, leading to a buffer overrun.
+
+However, the code has several checks in place to ensure that the offset is valid:
+
+* `if (offset < 2 || (rel + 1) >= relend) return FALSE;` checks that the offset is at least 2 and that there is at least one more relocation entry after the current one.
+* `if ((offset + 10) > sec->size) return FALSE;` checks that the offset plus 10 does not exceed the size of the section.
+* `if ((val & 0xf8) != 0x80 || (val & 7) == 4) return FALSE;` checks that the value at the offset is a valid opcode.
+
+Given these checks, it is unlikely that the offset calculation will overflow and cause a buffer overrun. Therefore, the warning is likely a false positive and can be considered unactionable.

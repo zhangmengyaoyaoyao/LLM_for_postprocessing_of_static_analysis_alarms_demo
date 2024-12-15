@@ -1,0 +1,14 @@
+@@ unactionable @@
+
+The warning is about an uninitialized value being read from `evt.status`. However, looking at the code, `evt.status` is initialized in several places before it is read. The warning is likely a false positive, and the code is correct. 
+
+The `evt.status` is initialized in the following places:
+
+- `evt.status = osErrorISR;` when `k_is_in_isr()` is true
+- `evt.status = osErrorValue;` when `signals` is out of range
+- `evt.status = osEventSignal;` when `retval` is 0
+- `evt.status = osOK;` when `millisec` is 0 and `retval` is -EAGAIN
+- `evt.status = osEventTimeout;` when `millisec` is not 0 and `retval` is -EAGAIN
+- `evt.status = osErrorValue;` when `retval` is default
+
+Therefore, the warning is not actionable.

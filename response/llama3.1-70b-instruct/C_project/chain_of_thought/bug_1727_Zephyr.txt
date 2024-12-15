@@ -1,0 +1,13 @@
+To determine whether this warning is actionable or not, let's break down the information provided and analyze it step by step.
+
+1. **Warning Category and Message**: The warning is categorized as "Uninitialized Value" with the message "The value read from primary_slot.copy_done was never initialized." This suggests that the tool (Infer) has detected a potential issue where a variable (`primary_slot.copy_done`) is being used without being initialized.
+
+2. **Code Context**: The warning is related to the function `mcuboot_swap_type` in the file `subsys/dfu/boot/mcuboot.c`. The code snippet provided shows the function's implementation, including how it reads swap state by ID into `primary_slot` and `secondary_slot` variables.
+
+3. **Initialization of `primary_slot`**: The code initializes `primary_slot` by calling `boot_read_swap_state_by_id(FLASH_AREA_IMAGE_PRIMARY, &primary_slot);`. This function is expected to read the swap state from the primary image area into `primary_slot`. If this function fails (i.e., returns a non-zero value), the function returns the error code without using `primary_slot`.
+
+4. **Potential Issue**: The warning suggests that `primary_slot.copy_done` might not be initialized properly. However, based on the provided code, `primary_slot` is initialized through the `boot_read_swap_state_by_id` function. If this function succeeds, it should initialize all members of `primary_slot`, including `copy_done`.
+
+5. **Conclusion**: Given that `primary_slot` is initialized through a function call before its use, and assuming that `boot_read_swap_state_by_id` correctly initializes the structure when it succeeds, the warning might be a false positive. However, without knowing the implementation details of `boot_read_swap_state_by_id` and how it handles initialization of the `struct boot_swap_state`, there's a possibility that the warning could be valid if there's an edge case where `primary_slot.copy_done` isn't initialized.
+
+Given the information and analysis, the best conclusion would be "@@ unactionable @@", assuming that `boot_read_swap_state_by_id` correctly initializes `primary_slot`. However, further investigation into the `boot_read_swap_state_by_id` function would be necessary to confirm this conclusion with certainty.

@@ -1,0 +1,22 @@
+After analyzing the warning, I conclude that it is unactionable.
+
+The warning is a BUFFER_OVERRUN_L3 warning, which indicates that the `TIFFWriteByteArray` function may write beyond the bounds of the buffer `bp`. However, upon closer inspection, it appears that the buffer `bp` is properly allocated and its size is checked before writing to it.
+
+The code checks if the size of the buffer is sufficient to hold the data before writing to it:
+```c
+if (n * TIFFDataWidth(type) > sizeof buf) {
+    w = (char*) _TIFFmalloc(n * TIFFDataWidth(type));
+    if (w == NULL) {
+        TIFFErrorExt(tif->tif_clientdata, tif->tif_name,
+            "No space to write array");
+        return (0);
+    }
+}
+```
+This check ensures that the buffer is large enough to hold the data, and if not, it allocates a new buffer of sufficient size using `_TIFFmalloc`.
+
+Additionally, the `TIFFWriteByteArray` function is called with the correct buffer size, which is `n * TIFFDataWidth(type)`.
+
+Therefore, I believe that the warning is a false positive, and the code is not vulnerable to a buffer overrun.
+
+@@ unactionable @@

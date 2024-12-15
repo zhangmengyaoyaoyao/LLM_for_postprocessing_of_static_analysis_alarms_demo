@@ -1,0 +1,13 @@
+To determine whether this warning is actionable or not, let's break down the information provided and analyze it step by step.
+
+1. **Understanding the Warning**: The warning is categorized as "BUFFER_OVERRUN_L1" by the tool Infer, indicating a potential buffer overrun issue. The message specifically points to an offset and size issue related to a call to `rl_bind_keyseq_if_unbound_in_map` within the `rl_bind_key_if_unbound` function.
+
+2. **Context of the Warning**: The function `rl_bind_key_if_unbound` takes a key and a default function as parameters. It constructs a key sequence (`keyseq`) by assigning the key to the first element of the `keyseq` array and null-terminating it. The warning is triggered by the return statement that calls `rl_bind_keyseq_if_unbound_in_map` with this constructed `keyseq`.
+
+3. **Potential Issue**: The warning suggests that there might be a buffer overrun because the size of the data being written to `keyseq` (2 bytes, considering the null-termination) might exceed the buffer's capacity. However, the buffer `keyseq` is declared as `char keyseq[2];`, which can hold exactly 2 characters (including the null terminator).
+
+4. **Analysis**: Given the declaration of `keyseq` as `char keyseq[2];`, it seems that the buffer is correctly sized for the operation being performed. The assignment of `key` to `keyseq[0]` and the null-termination at `keyseq[1]` fit within the bounds of the array. There doesn't appear to be an overrun based on the provided code snippet.
+
+5. **Conclusion**: Based on the information provided and the analysis, the warning appears to be a false positive or not indicative of an actual issue. The buffer size matches the operation being performed, and there's no apparent buffer overrun.
+
+@@ unactionable @@

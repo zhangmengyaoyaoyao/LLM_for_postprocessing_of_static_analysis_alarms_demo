@@ -1,0 +1,21 @@
+To determine whether this warning is actionable or not, let's break down the information provided and analyze it step by step.
+
+1. **Warning Category**: The warning is categorized as "UNINITIALIZED_VALUE". This means the tool (Infer) has detected a situation where a value is being used without being initialized.
+
+2. **Message**: The message specifically states, "The value read from x[_] was never initialized." This indicates that the array `x` is being accessed and its values are being used in the function `sha1_process_block`, but the tool believes that these values have not been initialized before use.
+
+3. **Code Context**: Looking at the provided code snippet, we see that `x` is an array of `sha1_uint32` declared within the `sha1_process_block` function. Before the loop where the warning is triggered, there is a loop that initializes the `x` array:
+   ```c
+   for (t = 0; t < 16; t++)
+   {
+     x[t] = SWAP (*words);
+     words++;
+   }
+   ```
+   This loop initializes the first 16 elements of `x` with values from the `words` array, which is derived from the function's input `buffer`.
+
+4. **Analysis**: The warning suggests that the value of `x[12]` (and potentially other indices) is used without being initialized. However, from the code, it's clear that all elements of `x` up to index 15 are initialized before they are used in the subsequent loops. The loop that initializes `x` ensures that all elements up to `x[15]` are set before the function proceeds to use them.
+
+5. **Conclusion**: Given the initialization loop for `x`, it appears that the warning might be a false positive. The code does initialize the values of `x` before using them, which contradicts the warning's claim. Therefore, this warning seems to be unactionable, as it does not accurately reflect an issue in the code.
+
+@@ unactionable @@

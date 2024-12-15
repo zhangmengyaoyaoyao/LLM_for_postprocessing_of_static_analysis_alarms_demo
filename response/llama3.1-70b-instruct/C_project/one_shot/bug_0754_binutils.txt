@@ -1,0 +1,6 @@
+@@ unactionable @@
+The warning is about a potential buffer overrun in the `_bfd_elf_write_section_eh_frame_hdr` function, but the code is using `bfd_malloc` to allocate memory for the `contents` array, and the size of the allocation is calculated based on the `EH_FRAME_HDR_SIZE` constant and the `hdr_info->fde_count` variable. The code also checks for memory allocation failure and returns an error if it occurs. Additionally, the code uses `bfd_put_32` to write data to the `contents` array, which is a safe function that does not perform any bounds checking.
+
+The warning message "Offset: 3 Size: [0, +oo]" suggests that the Infer tool is reporting a potential buffer overrun because the `contents` array is being accessed at index 3, but the size of the array is not fixed and could potentially be larger than the allocated size. However, the code is using a safe allocation size calculation and is not performing any out-of-bounds accesses.
+
+Therefore, this warning is likely a false positive and is not actionable.

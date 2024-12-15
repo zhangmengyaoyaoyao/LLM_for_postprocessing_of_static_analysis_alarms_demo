@@ -1,0 +1,7 @@
+This warning is reporting a potential buffer overrun in the `sha1_final` function, specifically in the `memcpy` call where 20 bytes are being copied from `ctx->state` to `digest`. However, the warning message "Offset added: 20 Size: [0, +oo]" suggests that the tool is unsure about the size of the buffer being copied to.
+
+Upon examining the code, it appears that the `digest` buffer is expected to be at least 20 bytes in size, as indicated by the comment "Copy the content of the hash (20 characters)". However, there is no explicit check for the size of the `digest` buffer before the `memcpy` call.
+
+Given this information, it is possible that the warning is actionable, as the code may be vulnerable to a buffer overrun if the `digest` buffer is not properly sized. However, without more context about the expected size of the `digest` buffer, it is difficult to say for certain.
+
+@@ actionable @@

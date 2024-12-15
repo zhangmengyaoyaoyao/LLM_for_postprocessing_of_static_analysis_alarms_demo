@@ -1,0 +1,7 @@
+This warning is reporting a potential buffer overrun in the `locale_charset` function. The warning message indicates that the offset is `[1, +oo]` and the size is `1`, which suggests that the buffer `buf` may be accessed out of bounds.
+
+Upon examining the code, it appears that the buffer `buf` is declared with a size of `2 + 10 + 1`, which is 13 characters. However, the `sprintf` function is used to write a string to `buf` without checking the length of the string. If the string is longer than 12 characters (leaving room for the null terminator), it will overflow the buffer.
+
+The warning is actionable because it highlights a potential security vulnerability. The code should be modified to ensure that the buffer is not overflowed, for example by using `snprintf` instead of `sprintf` to limit the length of the string written to the buffer.
+
+@@ actionable @@

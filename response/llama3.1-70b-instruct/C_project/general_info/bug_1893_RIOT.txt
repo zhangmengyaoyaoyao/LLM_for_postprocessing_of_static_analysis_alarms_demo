@@ -1,0 +1,20 @@
+After analyzing the warning, I conclude that it is unactionable.
+
+The warning is complaining about the value read from `x[_]` being never initialized. However, upon closer inspection, we can see that `x` is an array of `uint32_t` that is initialized earlier in the code with values from the `block` array.
+
+The warning is likely being triggered because the static analysis tool is not able to follow the complex logic of the `permute` function and is mistakenly assuming that `x` is not initialized.
+
+In particular, the code initializes `x` with values from `block` using the following loop:
+```c
+for (int i = 0, j = 0; i < 16; i++) {
+    x[i]  =  (uint32_t)block[j++];
+    x[i] |= ((uint32_t)block[j++] << 8);
+    x[i] |= ((uint32_t)block[j++] << 16);
+    x[i] |= ((uint32_t)block[j++] << 24);
+}
+```
+This loop initializes each element of `x` with a value from `block`, so it is clear that `x` is indeed initialized before it is used.
+
+Therefore, I conclude that this warning is unactionable.
+
+@@ unactionable @@

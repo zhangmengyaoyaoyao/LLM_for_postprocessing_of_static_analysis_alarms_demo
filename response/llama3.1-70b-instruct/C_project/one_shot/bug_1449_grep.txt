@@ -1,0 +1,8 @@
+@@ actionable @@
+The warning indicates a potential buffer overrun in the `get_nondigit_option` function. The message "Offset: [-1, +oo] Size: 25" suggests that the buffer `buf` has a size of 25, but the offset is unbounded, which could lead to a buffer overflow.
+
+Upon examining the code, we can see that the buffer `buf` is defined with a size of `INT_BUFSIZE_BOUND (intmax_t) + 4`, which is likely a large enough size to hold the expected input. However, the code does not perform any bounds checking on the `p` pointer, which is incremented without checking if it exceeds the buffer size.
+
+The line `*p++ = opt;` is the potential source of the buffer overrun, as it increments the `p` pointer without checking if it has reached the end of the buffer. If the input is large enough, this could cause the `p` pointer to exceed the buffer size, leading to a buffer overrun.
+
+Therefore, this warning is actionable, and the code should be modified to include bounds checking on the `p` pointer to prevent a potential buffer overrun.

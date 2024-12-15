@@ -13,14 +13,14 @@ sys.path.append(project_root)
 import construct_prompts as Constructor
 
 # your api key
-key = ""
+key = "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"
 url = "https://integrate.api.nvidia.com/v1"
 model_fullname="meta/llama-3.1-70b-instruct"
 model = "llama3.1-70b-instruct"
 # model_fullname="meta/llama-3.1-405b-instruct"
 # model = "llama3.1-405b-instruct"
 
-def process_spotbugs_project_files(key, url, model, tool, prompts_technique, project_name, model_fullname=model):
+def process_spotbugs_project_files(key, url, model, tool, prompts_technique, project_name, project_path, model_fullname=model):
     # 获取该项目下的所有 JSON 文件路径
     json_files = sorted(glob.glob(os.path.join(project_path, "*.json")))
 
@@ -38,8 +38,8 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
     os.makedirs(output_dir, exist_ok=True)
 
     #temp
-    # if prompts_technique == "self_heuristic" and project_name == "dbcp":
-    #     json_files = json_files[46:]
+    if prompts_technique == "critique":
+        json_files = json_files[264:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -136,9 +136,9 @@ if __name__ == '__main__':
 
 
 #C
-    prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
+    prompts_techniques = ["critique", "self_heuristic"]
     tool = "unknown"
     project = "unknown"
     project_path = os.path.join("report", "c_json")
     for prompts_technique in prompts_techniques:
-        process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, project_path)
+        process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, project_path, model_fullname)

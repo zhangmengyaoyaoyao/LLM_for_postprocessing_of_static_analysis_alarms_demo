@@ -1,0 +1,15 @@
+To determine whether this warning is actionable or not, let's break down the information provided and analyze it step by step.
+
+1. **Warning Category**: The warning is categorized as "BUFFER_OVERRUN_L3" by the tool Infer. This suggests that the tool has detected a potential buffer overrun issue, which typically involves accessing an array or buffer with an index that exceeds its bounds, potentially leading to undefined behavior or security vulnerabilities.
+
+2. **Warning Message**: The message "Offset added: 9 Size: [0, 11] by call to `assoc_list`." indicates that the tool has identified a specific line of code where the potential buffer overrun could occur. The message suggests that there is an offset being added (9) and a size range ([0, 11]) that might be problematic in the context of the `assoc_list` function call.
+
+3. **Code Context**: The code snippet provided shows the function `check_param_names`, which appears to be checking for conflicts between function parameter names and function names in an array. The line highlighted by the warning is `list = assoc_list(func_table, "@unsorted", ASORTI);`, which calls `assoc_list` to obtain a list of elements from `func_table`.
+
+4. **Analysis**: The warning suggests a potential buffer overrun, but to assess its actionability, we need to consider whether the code properly handles the bounds of the `list` array returned by `assoc_list`. The loop that iterates over `list` uses `max = func_table->table_size * 2;` as its upper bound, incrementing by 2 each time (`i += 2`), which seems to be based on the assumption that `assoc_list` returns an array with two elements per awk array element. However, the warning implies that there might be an issue with how the offset or size is calculated or used.
+
+5. **Conclusion**: Without more information about how `assoc_list` allocates and returns its array, and how the sizes and offsets are calculated and used in the context of this specific code, it's challenging to definitively classify this warning as actionable or not. However, given the nature of the warning and the potential for a buffer overrun, it would be prudent to investigate this further to ensure that the code does not have a vulnerability.
+
+Given the uncertainty and the potential severity of a buffer overrun, I would classify this warning as requiring further investigation, but leaning towards being actionable due to the potential risk.
+
+@@ actionable @@

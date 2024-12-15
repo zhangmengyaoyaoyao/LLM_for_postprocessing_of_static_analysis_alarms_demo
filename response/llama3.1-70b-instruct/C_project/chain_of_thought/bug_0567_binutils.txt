@@ -1,0 +1,13 @@
+To determine whether this warning is actionable or not, let's break down the information provided and analyze it step by step.
+
+1. **Warning Category**: The warning is categorized as "BUFFER_OVERRUN_L1". This suggests that the tool (Infer) has detected a potential buffer overrun issue, which typically involves accessing memory outside the bounds of a buffer, leading to undefined behavior.
+
+2. **Warning Message**: The message "Offset: 28 Size: 28." indicates that the issue is related to accessing memory at an offset of 28 with a size of 28. This could imply an attempt to access an array or buffer with an index that might be out of bounds.
+
+3. **Warning Function Name and Line**: The warning points to the function `higher_prime_number` at the line where `high` is defined: `const unsigned long *high = &primes[sizeof (primes) / sizeof (primes[0])];`. This line calculates the address of the last element of the `primes` array.
+
+4. **Analysis**: The calculation `sizeof (primes) / sizeof (primes[0])` gives the number of elements in the `primes` array. By taking the address of the element at this index (`&primes[...]`), the code is essentially pointing to the memory location immediately after the last valid element of the array. This is a common technique in C to get a pointer to the end of an array, which is then used in the binary search algorithm implemented in the function.
+
+5. **Conclusion**: Given the context and the typical use of such a pointer in algorithms like binary search, it seems that the warning might be a false positive. The code does not appear to be accessing memory out of bounds but rather uses a common idiom to establish the end of the array for the search. Therefore, without further evidence of actual buffer overrun or out-of-bounds access, this warning can be considered not actionable.
+
+@@ unactionable @@

@@ -1,0 +1,17 @@
+After analyzing the warning, I conclude that it is likely unactionable.
+
+The warning is about an uninitialized variable `stackAdjSize` in the `arch_new_thread` function. However, upon closer inspection, it appears that `stackAdjSize` is actually initialized in the lines preceding the warning:
+
+```c
+#if CONFIG_ARC_MPU_VER == 2
+    stackAdjSize = Z_ARC_MPUV2_SIZE_ALIGN(stackSize);
+#elif CONFIG_ARC_MPU_VER == 3
+    stackAdjSize = STACK_SIZE_ALIGN(stackSize);
+#endif
+```
+
+The warning is likely a false positive, as the variable is indeed initialized before it is used. The static analysis tool may have missed the initialization due to the conditional compilation directives (`#if` and `#elif`) or the complexity of the code.
+
+Therefore, I conclude that this warning is likely unactionable.
+
+@@ unactionable @@
