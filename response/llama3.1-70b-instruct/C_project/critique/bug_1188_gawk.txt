@@ -1,0 +1,23 @@
+This warning is actionable because it points to a specific line of code where a potential null pointer dereference could occur. The warning message clearly states that the pointer `arg` could be null and is dereferenced by the call to `memset()`.
+
+However, to provide a correct fix, more information about the `emalloc()` function is needed. Specifically, it is necessary to know how `emalloc()` handles memory allocation failures. If `emalloc()` returns a null pointer on failure, then a check for null should be added after the call to `emalloc()`. On the other hand, if `emalloc()` aborts the program or throws an exception on failure, then no additional check is needed.
+
+Assuming that `emalloc()` returns a null pointer on failure, a possible fix could be:
+
+```c
+static CMDARG *
+mk_cmdarg(enum argtype type)
+{
+    CMDARG *arg;
+    if (emalloc(arg, CMDARG *, sizeof(CMDARG), "mk_cmdarg") == NULL) {
+        // handle memory allocation error
+    }
+    memset(arg, 0, sizeof(CMDARG));
+    arg->type = type;
+    return arg;
+}
+```
+
+Alternatively, if `emalloc()` is guaranteed to never return a null pointer (e.g., because it aborts the program on failure), then the warning can be safely ignored, and no additional check is needed.
+
+@@ actionable @@

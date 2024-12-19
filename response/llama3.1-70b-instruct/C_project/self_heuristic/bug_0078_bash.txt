@@ -1,0 +1,20 @@
+@@ actionable @@
+
+The warning message indicates a memory leak in the `read_history_range` function, specifically with the `buffer` variable. The warning context provides sufficient information to understand the issue, including the allocation of memory for the `buffer` variable using `malloc` or `mmap`. The warning also provides a clear fix, which is to free the `buffer` variable before returning from the function.
+
+The code snippet shows that the `buffer` variable is allocated memory, but it is not freed in all cases. Specifically, if the `HISTORY_USE_MMAP` macro is defined, the `buffer` variable is mapped using `mmap`, but it is not unmapped before returning from the function. If the `HISTORY_USE_MMAP` macro is not defined, the `buffer` variable is allocated using `malloc`, but it is not freed before returning from the function.
+
+To fix the memory leak, the `buffer` variable should be freed or unmapped before returning from the function, regardless of whether an error occurs or not. This can be done by adding a call to `free` or `munmap` before the `return` statement, like this:
+```c
+FREE (buffer);
+return (chars_read);
+```
+Alternatively, the `buffer` variable can be freed or unmapped in the `error_and_exit` block, like this:
+```c
+error_and_exit:
+    ...
+#ifndef HISTORY_USE_MMAP
+    FREE (buffer);
+#endif
+    return (chars_read);
+```

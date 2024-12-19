@@ -1,0 +1,28 @@
+Upon reviewing the code, I notice that the variable "check" is actually initialized inside the while loop, but it is not initialized before the loop. If the loop is not executed (i.e., len is 0), the variable "check" will not be initialized before it is returned.
+
+To fix this issue, the variable "check" should be initialized before the loop, for example, to a default value that makes sense for the function's requirements. This ensures that the variable is always initialized before it is returned, regardless of whether the loop is executed or not.
+
+Here is an example of how the code could be fixed:
+
+```c
+static int _set(const at24cxxx_t *dev, uint32_t pos, uint8_t val, size_t len)
+{
+    int check = 0;  // Initialize check to a default value
+    uint8_t set_buffer[AT24CXXX_SET_BUF_SIZE];
+
+    memset(set_buffer, val, sizeof(set_buffer));
+    while (len) {
+        size_t clen = MIN(sizeof(set_buffer), len);
+        check = _write(dev, pos, set_buffer, clen);
+        if (!check) {
+            len -= clen;
+            pos += clen;
+        } else {
+            break;
+        }
+    }
+    return check;
+}
+```
+
+@@ actionable @@

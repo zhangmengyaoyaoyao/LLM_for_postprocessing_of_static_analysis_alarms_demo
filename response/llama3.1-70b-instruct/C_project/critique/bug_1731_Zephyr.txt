@@ -1,0 +1,5 @@
+This warning is actionable. The warning claims that the value read from `rc` was never initialized, and upon closer inspection, it appears that the warning is correct. The variable `rc` is assigned a value in the lines `rc = boot_read_swap_state_by_id(FLASH_AREA_IMAGE_PRIMARY, &primary_slot);` and `rc = boot_read_swap_state_by_id(FLASH_AREA_IMAGE_SECONDARY, &secondary_slot);`, but it is not initialized in the case where the `for` loop completes without finding a matching table. In this case, the function returns `rc` without assigning a value to it, which can lead to undefined behavior.
+
+To fix this issue, the variable `rc` should be initialized with a default value, such as `BOOT_SWAP_TYPE_NONE`, before the `for` loop. This ensures that `rc` has a valid value in all possible paths, and the warning can be resolved.
+
+@@ actionable @@

@@ -1,0 +1,11 @@
+Upon reviewing the warning, I notice that it is indicating a potential buffer overrun in the `careadlinkat` function, specifically in the line `memcpy (b, buf, link_size);`. The warning message suggests that the offset added to the buffer is out of bounds, which could lead to a buffer overrun.
+
+However, upon closer examination of the code, I notice that the `memcpy` operation is actually copying data from `buf` to `b`, where `b` is a newly allocated buffer with a size of `link_size`. This suggests that the buffer size is being dynamically allocated to match the size of the data being copied, which reduces the likelihood of a buffer overrun.
+
+Furthermore, the code has various checks and error handling mechanisms in place to prevent buffer overruns, such as checking the return value of `preadlinkat` and handling errors accordingly. For example, the code checks if `link_size` is less than `buf_size` before copying the data, and it also checks if the buffer size exceeds the maximum allowed size (`buf_size_max`) before attempting to allocate a new buffer.
+
+Given the presence of these safeguards, it appears that the warning is likely a false positive, and the code is not actually vulnerable to a buffer overrun.
+
+Therefore, I conclude that the warning is unactionable.
+
+@@ unactionable @@

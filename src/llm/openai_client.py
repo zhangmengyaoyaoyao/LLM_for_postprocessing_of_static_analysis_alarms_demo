@@ -22,6 +22,10 @@ def get_response(key, url, model, message, top_p=0.1, temperature=0.1, max_retri
             print(f"Rate limit exceeded: {e}. Retrying in 3 seconds...")
             retries += 1
             time.sleep(3)  # wait for 3 seconds before retrying
+        except openai.BadRequestError as e:
+            print(f"openai.BadRequestError: {e}. Retrying in 3 seconds...")
+            retries += 1
+            time.sleep(3)  # wait for 3 seconds before retrying
     raise Exception("Max retries exceeded. Could not get response.")
 
 

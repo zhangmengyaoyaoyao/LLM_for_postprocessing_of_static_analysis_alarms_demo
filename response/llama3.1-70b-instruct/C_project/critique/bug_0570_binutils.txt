@@ -1,0 +1,20 @@
+Upon reviewing the warning, I notice that the warning message indicates a potential buffer overrun in the `stab_write_symbol` function, specifically in the `memcpy` call. The warning suggests that the offset added to `info->symbols_size` may exceed the allocated size of the `info->symbols` buffer, leading to a buffer overrun.
+
+However, upon examining the code, I notice that the code checks if the buffer needs to be reallocated before performing the `memcpy` operation:
+```c
+if (info->symbols_size + STAB_SYMBOL_SIZE > info->symbols_alloc)
+{
+    info->symbols_alloc *= 2;
+    info->symbols = (bfd_byte *) xrealloc (info->symbols,
+        info->symbols_alloc);
+}
+```
+This check ensures that the buffer is large enough to hold the additional data before performing the `memcpy` operation. This suggests that the buffer overrun warning may be a false positive.
+
+Furthermore, the code also updates the `info->symbols_size` variable after the `memcpy` operation, which ensures that the buffer size is correctly tracked:
+```c
+info->symbols_size += STAB_SYMBOL_SIZE;
+```
+Given this analysis, I conclude that this warning is likely unactionable, as the code appears to have sufficient checks in place to prevent a buffer overrun.
+
+@@ unactionable @@

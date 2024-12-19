@@ -1,0 +1,7 @@
+After re-examining the code, I conclude that the warning is likely unactionable. The variable `server_addr_len` is initialized in the `if` statements that check the `server_addr.sa_family` value, and it is assigned a value of either `sizeof(struct sockaddr_in)` or `sizeof(struct sockaddr_in6)` depending on the family.
+
+Although there is a possibility that `server_addr_len` might not be initialized if none of the `if` conditions are met, the code returns an error before using `server_addr_len` in this case. Specifically, if `local_addr` remains `NULL`, the code returns `-EINVAL` before calling `net_context_connect`, which uses `server_addr_len`.
+
+Given this analysis, it appears that the warning is a false positive, and the code is actually handling the initialization of `server_addr_len` correctly.
+
+@@ unactionable @@

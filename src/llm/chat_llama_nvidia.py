@@ -13,7 +13,7 @@ sys.path.append(project_root)
 import construct_prompts as Constructor
 
 # your api key
-key = "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"
+key = ""
 url = "https://integrate.api.nvidia.com/v1"
 model_fullname="meta/llama-3.1-70b-instruct"
 model = "llama3.1-70b-instruct"
@@ -38,8 +38,8 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
     os.makedirs(output_dir, exist_ok=True)
 
     #temp
-    if prompts_technique == "critique":
-        json_files = json_files[264:]
+    if prompts_technique == "self_heuristic":
+        json_files = json_files[188:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -136,7 +136,7 @@ if __name__ == '__main__':
 
 
 #C
-    prompts_techniques = ["critique", "self_heuristic"]
+    prompts_techniques = ["self_heuristic"]
     tool = "unknown"
     project = "unknown"
     project_path = os.path.join("report", "c_json")
