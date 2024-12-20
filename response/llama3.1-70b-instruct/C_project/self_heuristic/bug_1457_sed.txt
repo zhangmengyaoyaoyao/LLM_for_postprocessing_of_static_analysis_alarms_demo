@@ -1,0 +1,15 @@
+@@ actionable @@
+
+This warning is actionable because it provides a clear fix to the issue. The warning message indicates that the `pattern` variable is nulled but not freed upon failure, which is a common realloc mistake. The warning context shows that the `pattern` variable is allocated using `realloc`, and if the allocation fails, the `pattern` variable is set to `NULL` but not freed.
+
+To fix this issue, the code should free the `pattern` variable before setting it to `NULL` in case of allocation failure. The corrected code would be:
+```c
+pattern = realloc (pattern, p - line);
+if (pattern == NULL) {
+    free(pattern); // Add this line to free the pattern variable
+    printf ("%lu: Cannot record pattern: %m\n", linenum);
+    ret = 1;
+    break;
+}
+```
+By adding the `free(pattern)` statement, the code ensures that the `pattern` variable is properly freed in case of allocation failure, preventing a memory leak.
