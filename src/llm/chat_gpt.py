@@ -49,8 +49,8 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
         
         # 设置工具和项目名
         if(tool != 'spotbugs'):
-            tool = json_content["Tool"]
-            project_name = json_content["Project"]
+            tool = data["Tool"]
+            project_name = data["Project"]
         constructor.setGeneralInfo(tool, project_name)
         constructor.setWarning(json_content)
 
@@ -139,4 +139,4 @@ if __name__ == '__main__':
     project = "unknown"
     project_path = os.path.join("report", "c_json")
     for prompts_technique in prompts_techniques:
-        process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, project_path, model_fullname)
+        process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, project_path)
