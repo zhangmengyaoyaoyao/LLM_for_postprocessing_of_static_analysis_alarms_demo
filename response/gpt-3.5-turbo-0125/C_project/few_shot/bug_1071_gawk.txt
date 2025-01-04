@@ -1,0 +1,19 @@
+## Task Description
+Please decide whether this warning is actionable or not. In the last line of your answer, you should conclude with "@@ actionable @@", "@@ unactionable @@" or "@@ unknown @@"(if you are uncertain).
+
+# warning
+{
+  "Project": "gawk",
+  "Tool": "Infer",
+  "category": "BUFFER_OVERRUN_L3",
+  "file": "cint_array.c",
+  "message": "Offset added: 256 Size: [0, 256].",
+  "warning_function_name": "cint_lookup",
+  "warning_line": "memset(symbol->nodes, '\\0', INT32_BIT * sizeof(NODE *));",
+  "warning_context": "static NODE **\ncint_lookup(NODE *symbol, NODE *subs)\n{\n\tNODE **lhs;\n\tlong k;\n\tint h1 = -1, m, li;\n\tNODE *tn, *xn;\n\tlong cint_size, capacity;\n\n\tk = -1;\n\tif (ISUINT(symbol, subs)) {\n\t\tk = subs->numbr;\t/* k >= 0 */\n\t\th1 = cint_hash(k);\t/* h1 >= NHAT */\n\t\tif ((lhs = cint_find(symbol, k, h1)) != NULL)\n\t\t\treturn lhs;\n\t}\n\txn = symbol->xarray;\n\tif (xn != NULL && (lhs = xn->aexists(xn, subs)) != NULL)\n\t\treturn lhs;\n\n\t/* It's not there, install it */\n\n\tif (k < 0)\n\t\tgoto xinstall;\n\n\tm = h1 - 1;\t/* m >= (NHAT- 1) */\n\n\t/* Estimate capacity upper bound.\n\t * capacity upper bound = current capacity + leaf array size.\n\t */\n\tli = m > NHAT ? m : NHAT;\n\twhile (li >= NHAT) {\n\t\t/* leaf-array of a HAT */\n\t\tli = (li + 1) / 2;\n\t}\n\tcapacity = symbol->array_capacity + power_two_table[li];\n\n\tcint_size = (xn == NULL) ? symbol->table_size\n\t\t\t: (symbol->table_size - xn->table_size);\n\tassert(cint_size >= 0);\n\tif ((capacity - cint_size) > THRESHOLD)\n\t\tgoto xinstall;\n\n\tif (symbol->nodes == NULL) {\n\t\tsymbol->array_capacity = 0;\n\t\tassert(symbol->table_size == 0);\n\n\t\t/* nodes[0] .. nodes[NHAT- 1] not used */\n\t\temalloc(symbol->nodes, NODE **, INT32_BIT * sizeof(NODE *), \"cint_lookup\");\n \t\tmemset(symbol->nodes, '\\0', INT32_BIT * sizeof(NODE *));\n\t}\n\n\tsymbol->table_size++;\t/* one more element in array */\n\n\ttn = symbol->nodes[h1];\n\tif (tn == NULL) {\n\t\ttn = make_node(Node_array_tree);\n\t\tsymbol->nodes[h1] = tn;\n\t}\n\n\tif (m < NHAT)\n\t\treturn tree_lookup(symbol, tn, k, NHAT, 0);\n\treturn tree_lookup(symbol, tn, k, m, power_two_table[m]);\n\nxinstall:\n\n\tsymbol->table_size++;\n\tif (xn == NULL) {\n\t\txn = symbol->xarray = make_array();\n\t\txn->vname = symbol->vname;\t/* shallow copy */\n\n\t\t/*\n\t\t * Avoid using assoc_lookup(xn, subs) which may lead\n\t\t * to infinite recursion.\n\t\t */\n\n\t\tif (is_integer(xn, subs))\n\t\t\txn->array_funcs = int_array_func;\n\t\telse\n\t\t\txn->array_funcs = str_array_func;\n\t\txn->flags |= XARRAY;\n\t}\n\treturn xn->alookup(xn, subs);\n}\n"
+}
+
+## Your Answer
+The warning indicates a potential buffer overrun issue due to an offset added of 256 with a size of [0, 256]. This warning is actionable as it points to a specific vulnerability that needs to be addressed to prevent buffer overflows. 
+
+@@ actionable @@

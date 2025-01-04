@@ -1,0 +1,28 @@
+The warning provided seems to be related to a memory leak in the `balance_strings` function in the `postscript.c` file. The function allocates memory using `strdup` but does not free it before the function exits, which can lead to a memory leak.
+
+To address this warning, the allocated memory for `s1`, `s2`, and `s3` should be freed using `free()` before the function `balance_strings` returns.
+
+```c
+void balance_strings(char *string1, char *string2, char *string3, long page_no, boolean index_page) {
+    char *s1, *s2, *s3;
+
+    if (right_page) {
+        s1 = strdup(expand_string(string1, index_page));
+        s2 = strdup(expand_string(string2, index_page));
+        s3 = strdup(expand_string(string3, index_page));
+    } else {
+        s1 = strdup(expand_string(string3, index_page));
+        s2 = strdup(expand_string(string2, index_page));
+        s3 = strdup(expand_string(string1, index_page));
+    }
+
+    // Other code
+
+    // Free allocated memory before returning
+    free(s1);
+    free(s2);
+    free(s3);
+}
+```
+
+@@ actionable @@

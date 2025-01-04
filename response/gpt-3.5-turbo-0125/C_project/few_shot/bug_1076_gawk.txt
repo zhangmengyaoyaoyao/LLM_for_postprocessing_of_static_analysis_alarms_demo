@@ -1,0 +1,13 @@
+## Task Description
+Please decide whether this warning is actionable or not. In the last line of your answer, you should conclude with "@@ actionable @@", "@@ unactionable @@" or "@@ unknown @@"(if you are uncertain).
+
+# warning
+{
+  "Project": "gawk",
+  "Tool": "Infer",
+  "category": "BUFFER_OVERRUN_L3",
+  "file": "profile.c",
+  "message": "Offset: [0, 10] Size: [0, 12] by call to `pp_group3`.",
+  "warning_function_name": "pprint",
+  "warning_line": "tmp = pp_group3(\" \", op2str(Op_field_spec), \"0\");",
+  "warning_context": "\t\t\tarray = t1->pp_str;\n\t\t\tif (pc->expr_count > 1) {\n\t\t\t\tsub = pp_list(pc->expr_count, \"()\", \", \");\n\t\t\t\tstr = pp_group3(sub, op2str(Op_in_array), array);\n\t\t\t\tefree(sub);\n\t\t\t} else {\n\t\t\t\tt2 = pp_pop();\n\t\t\t\tif (prec_level(t2->type) < prec_level(Op_in_array)) {\n\t\t\t\t\t\tpp_parenthesize(t2);\n\t\t\t\t}\n\t\t\t\tsub = t2->pp_str;\n\t\t\t\tstr = pp_group3(sub, op2str(Op_in_array), array);\n\t\t\t\tpp_free(t2);\n\t\t\t}\n\t\t\tpp_free(t1);\n\t\t\tpp_push(Op_in_array, str, CAN_FREE);\n\t\t}\n\t\t\tbreak;\n\n\t\tcase Op_var_update:\n\t\tcase Op_var_assign:\n\t\tcase Op_field_assign:\n\t\tcase Op_subscript_assign:\n\t\tcase Op_arrayfor_init:\n\t\tcase Op_arrayfor_incr: \n\t\tcase Op_arrayfor_final:\n\t\tcase Op_newfile:\n\t\tcase Op_get_record:\n\t\tcase Op_lint:\n\t\tcase Op_jmp:\n\t\tcase Op_jmp_false:\n\t\tcase Op_jmp_true:\n\t\tcase Op_no_op:\n\t\tcase Op_and_final:\n\t\tcase Op_or_final:\n\t\tcase Op_cond_pair:\n\t\tcase Op_after_beginfile:\n\t\tcase Op_after_endfile:\n\t\t\tbreak;\n\n\t\tcase Op_sub_builtin:\n\t\t{\n\t\t\tconst char *fname = \"sub\";\n\t\t\tif ((pc->sub_flags & GSUB) != 0)\n\t\t\t\tfname = \"gsub\";\n\t\t\telse if ((pc->sub_flags & GENSUB) != 0)\n\t\t\t\tfname = \"gensub\";\n\t\t\ttmp = pp_list(pc->expr_count, \"()\", \", \");\n\t\t\tstr = pp_group3(fname, tmp, \"\");\n\t\t\tefree(tmp);\n\t\t\tpp_push(Op_sub_builtin, str, CAN_FREE);\n\t\t}\n\t\t\tbreak;\n\n\t\tcase Op_builtin:\n\t\tcase Op_ext_builtin:\n\t\t{\n\t\t\tconst char *fname;\n\t\t\tif (pc->opcode == Op_builtin)\n\t\t\t
