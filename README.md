@@ -3,7 +3,7 @@
 文件夹       | 说明
 ----------- | -----
 prompts  | 存放提示词
-report  | 原始数据。spotbugs_linked是完整的警告（包含手工标记结果），spotbugs/是最终的json格式Java项目警告；c_json预计存放json格式C/C++项目警告。
+report  | 原始数据。spotbugs_linked是完整的警告（包含手工标记结果），spotbugs/是最终的json格式Java项目警告；c_json/是json格式C/C++项目警告。
 response  | LLMs返回的回答，子文件夹名称代表“LLM/prompt_technique/project_name”
 src  | 核心代码
 src/llm  | 从不同平台调用不同LLMs
