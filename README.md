@@ -116,10 +116,18 @@ bug
 模型/项目 | bcel  |  collections  |  dbcp  |  mavendp
 Llama3.1-70B-Instruct | √ | √ | √ | √ 
 GLM-4-flash | √ | √ | √ | √ 
+gpt-3.5-turbo-0125 | √ | √ | √ | √
 
 **C项目**
 
 所有（10个项目）
+
+Llama3.1-70B-Instruct
+
+GLM-4-flash
+
+gpt-3.5-turbo-0125
+
 
 # TODO
 已解决 1、提示词的example以md形式改写
