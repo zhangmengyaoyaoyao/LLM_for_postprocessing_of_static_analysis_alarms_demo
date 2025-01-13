@@ -39,8 +39,8 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
     os.makedirs(output_dir, exist_ok=True)
 
     # temp
-    if prompts_technique == "self_heuristic":
-        json_files = json_files[843:]
+    # if prompts_technique == "critique" and project_name == "net":
+        # json_files = json_files[281:]
 
     # 依次处理每个 JSON 文件
     for i, json_file in enumerate(json_files):
@@ -115,25 +115,28 @@ def process_spotbugs_project_files(key, url, model, tool, prompts_technique, pro
 
 if __name__ == '__main__':
 #java
-    # # 项目列表
-    # projects = ["bcel", "codec", "collections", "configuration", "dbcp", "digester", "fileupload", "mavendp", "net", "pool"]
+    # 项目列表
+    # projects = ["pool", "configuration"]
+    projects = ["pool"]
 
     # prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
+    prompts_techniques = ["zero_shot", "one_shot", "few_shot", "general_info", "expertise", "chain_of_thought", "critique", "self_heuristic"]
 
-    # tool = "spotbugs"
+
+    tool = "spotbugs"
     
-    # # 依次处理所有项目
-    # for project in projects:
-    #     # 构建项目路径
-    #     project_path = os.path.join("report", tool, project)
-    #     for prompts_technique in prompts_techniques:
-    #         print(f"Processing project {project} with {prompts_technique}")
-    #         process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, project_path)
+    # 依次处理所有项目
+    for project in projects:
+        # 构建项目路径
+        project_path = os.path.join("report", tool, project)
+        for prompts_technique in prompts_techniques:
+            print(f"Processing project {project} with {prompts_technique}")
+            process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, project_path)
 
 #C
-    prompts_techniques = ["self_heuristic"]
-    tool = "unknown"
-    project = "unknown"
-    project_path = os.path.join("report", "c_json")
-    for prompts_technique in prompts_techniques:
-        process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, project_path)
+    # prompts_techniques = ["self_heuristic"]
+    # tool = "unknown"
+    # project = "unknown"
+    # project_path = os.path.join("report", "c_json")
+    # for prompts_technique in prompts_techniques:
+    #     process_spotbugs_project_files( key, url, model, tool, prompts_technique, project, project_path)

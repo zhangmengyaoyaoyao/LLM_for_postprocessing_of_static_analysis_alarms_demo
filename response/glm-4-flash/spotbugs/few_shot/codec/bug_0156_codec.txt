@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "PZLA_PREFER_ZERO_LENGTH_ARRAYS",
+  "priority": "3",
+  "rank": "20",
+  "project": "codec",
+  "warning_line": "return null;\n",
+  "warning_method": "public static final byte[] encodeQuotedPrintable(BitSet printable, final byte[] bytes, final boolean strict) {\nif (bytes == null) {\nreturn null;\n}\nif (printable == null) {\nprintable = PRINTABLE_CHARS;\n}\nfinal ByteArrayOutputStream buffer = new ByteArrayOutputStream();\nif (strict) {\nint pos = 1;\nfor (int i = 0; i < bytes.length - 3; i++) {\nfinal int b = getUnsignedOctet(i, bytes);\nif (pos < SAFE_LENGTH) {\npos += encodeByte(b, !printable.get(b), buffer);\n} else {\nencodeByte(b, !printable.get(b) || isWhitespace(b), buffer);\nbuffer.write(ESCAPE_CHAR);\nbuffer.write(CR);\nbuffer.write(LF);\npos = 1;\n}\n}\nint b = getUnsignedOctet(bytes.length - 3, bytes);\nboolean encode = !printable.get(b) || (isWhitespace(b) && pos > SAFE_LENGTH - 5);\npos += encodeByte(b, encode, buffer);\n// simplification: if < 6 bytes left, do a soft line break as we may need\nif (pos > SAFE_LENGTH - 2) {\nbuffer.write(ESCAPE_CHAR);\nbuffer.write(CR);\nbuffer.write(LF);\n}\nfor (int i = bytes.length - 2; i < bytes.length; i++) {\nb = getUnsignedOctet(i, bytes);\nencode = !printable.get(b) || (i > bytes.length - 2 && isWhitespace(b));\nencodeByte(b, encode, buffer);\n}\n} else {\nfor (final byte c : bytes) {\nint b = c;\nif (b < 0) {\nb = 256 + b;\n}\nif (printable.get(b)) {\nbuffer.write(b);\n} else {\nencodeQuotedPrintable(b, buffer);\n}\n}\n}\nreturn buffer.toByteArray();\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning is actionable because it suggests that the method `encodeQuotedPrintable` should prefer zero-length arrays over returning `null`. This is a best practice in Java to avoid unnecessary null checks and to make the code more robust. The method should be modified to handle cases where `bytes` is a zero-length array appropriately, possibly by returning an empty array or handling the case explicitly.
+
+@@ actionable @@

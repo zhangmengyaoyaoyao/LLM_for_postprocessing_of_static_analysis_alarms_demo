@@ -1,0 +1,31 @@
+The warning from SpotBugs indicates a "DB_DUPLICATE_SWITCH_CLAUSES" issue, which suggests that there are duplicate switch clauses in the code. This can happen when the same case label is used in multiple switch clauses, which is generally a sign of redundant code.
+
+In the provided code snippet, the warning is on the last line of the `switch` statement:
+
+```java
+case _STATE_DATA:
+    if (ch == TelnetCommand.IAC) {
+        __receiveState = _STATE_IAC;
+        continue;
+    }
+    if (ch == '\\r') {
+        synchronized (__client) {
+            if (__client._requestedDont(TelnetOption.BINARY)) {
+                __receiveState = _STATE_CR;
+            } else {
+                __receiveState = _STATE_DATA;
+            }
+        }
+    } else {
+        __receiveState = _STATE_DATA;
+    }
+    break;
+```
+
+The warning is about the `break;` statement at the end of the `switch` statement. The `break;` statement is used to exit the switch block, and it is not inherently a problem. However, if the `break;` statement is followed by another `case` that has the same label, it would be redundant.
+
+In this specific case, the `break;` statement is followed by another `case _STATE_DATA:` which is not a duplicate because it is a separate case with different conditions. The `break;` statement is necessary to prevent the execution from falling through to the next case.
+
+Therefore, the warning is not actionable because the `break;` statement is not causing any logical redundancy or error in the code.
+
+@@ unactionable @@

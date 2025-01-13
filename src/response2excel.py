@@ -179,11 +179,34 @@ def link_excel(file1, file2):
     """
     将 file1 中的所有列粘贴到 file2 中的最后，并保存为新的 Excel 文件。
     """
-    df1 = pd.read_csv(file1)
-    df2 = pd.read_excel(file2)
+    # 根据文件扩展名判断读取方式
+    if file1.endswith('.csv'):
+        df1 = pd.read_csv(file1)
+    elif file1.endswith('.xlsx'):
+        df1 = pd.read_excel(file1)
+    else:
+        raise ValueError("file1 必须是 CSV 或 Excel 文件")
+    if file2.endswith('.csv'):
+        df2 = pd.read_csv(file2)
+    elif file2.endswith('.xlsx'):
+        df2 = pd.read_excel(file2)
+    else:
+        raise ValueError("file2 必须是 CSV 或 Excel 文件")
 
-    # 将 file1 中的所有列粘贴到 file2 的后面
-    df2 = pd.concat([df2, df1], axis=1)
+    # 按照 'no' 列升序排序 file1
+    df1_sorted = df1.sort_values(by='no', ascending=True)
 
-    # 将修改后的 DataFrame 保存回 file2
-    df2.to_excel(file2, index=False)
+    # 按照 'File Name' 列升序排序 file2
+    df2_sorted = df2.sort_values(by='File Name', ascending=True)
+
+    # 将 file1 中的所有列添加到 file2 中的最后
+    # merged_df = pd.concat([df2_sorted, df1_sorted], axis=1)
+
+
+    # 一行一行地粘贴 file1 的数据到 file2
+    for index, row in df1_sorted.iterrows():
+        # 将每一行添加到 file2 的最后
+        df2_sorted.loc[index, df1_sorted.columns] = row
+
+    # 保存到 file2 中
+    df2_sorted.to_excel(file2, index=False)

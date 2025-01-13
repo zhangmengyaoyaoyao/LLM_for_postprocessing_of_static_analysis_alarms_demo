@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "PZLA_PREFER_ZERO_LENGTH_ARRAYS",
+  "priority": "3",
+  "rank": "20",
+  "project": "codec",
+  "warning_line": "return null;\n",
+  "warning_method": "public static final byte[] encodeUrl(BitSet urlsafe, final byte[] bytes) {\nif (bytes == null) {\nreturn null;\n}\nif (urlsafe == null) {\nurlsafe = WWW_FORM_URL_SAFE;\n}\nfinal ByteArrayOutputStream buffer = new ByteArrayOutputStream();\nfor (final byte c : bytes) {\nint b = c;\nif (b < 0) {\nb = 256 + b;\n}\nif (urlsafe.get(b)) {\nif (b == ' ') {\nb = '+';\n}\nbuffer.write(b);\n} else {\nbuffer.write(ESCAPE_CHAR);\nfinal char hex1 = Utils.hexDigit(b >> 4);\nfinal char hex2 = Utils.hexDigit(b);\nbuffer.write(hex1);\nbuffer.write(hex2);\n}\n}\nreturn buffer.toByteArray();\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning suggests that the method `encodeUrl` returns `null` when the input `bytes` is `null`, which is a common practice. However, the warning is about the "prefer zero-length arrays" which is not applicable in this context since `ByteArrayOutputStream` will return an empty array when the buffer is empty, not `null`. This warning does not indicate a problem that needs to be addressed in the code as it is written. Therefore, it is not actionable.
+
+@@ unactionable @@

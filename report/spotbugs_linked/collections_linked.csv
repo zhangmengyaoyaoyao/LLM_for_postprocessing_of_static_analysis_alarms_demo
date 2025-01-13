@@ -1,0 +1,4881 @@
+category,vtype,final_label,priority,rank,project,no,warning_line,warning_method
+PERFORMANCE,DM_NUMBER_CTOR,TP,2,18,collections,4,"this.collectionFactory = new InstantiateFactory<C>(collectionClazz, new Class[] { Integer.TYPE },
+","@SuppressWarnings(""unchecked"")
+protected <C extends Collection<V>> AbstractMultiValuedMap(final Map<K, ? super C> map, final Class<C> collectionClazz, final int initialCollectionCapacity) {
+if (map == null) {
+throw new IllegalArgumentException(""Map must not be null"");
+}
+if (initialCollectionCapacity < 0) {
+throw new IllegalArgumentException(""Illegal Capacity: "" + initialCollectionCapacity);
+}
+this.map = (Map<K, Collection<V>>) map;
+this.collectionFactory = new InstantiateFactory<C>(collectionClazz, new Class[] { Integer.TYPE }, new Object[] { new Integer(initialCollectionCapacity) });
+}"
+DODGY_CODE,UC_USELESS_CONDITION,TP,1,14,collections,5,"left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+","private AVLNode<E> removeSelf() {
+if (getRightSubTree() == null && getLeftSubTree() == null) {
+return null;
+}
+if (getRightSubTree() == null) {
+if (relativePosition > 0) {
+left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+}
+left.max().setRight(null, right);
+return left;
+}
+if (getLeftSubTree() == null) {
+right.relativePosition += relativePosition - (relativePosition < 0 ? 0 : 1);
+right.min().setLeft(null, left);
+return right;
+}
+if (heightRightMinusLeft() > 0) {
+final AVLNode<E> rightMin = right.min();
+value = rightMin.value;
+if (leftIsPrevious) {
+left = rightMin.left;
+}
+right = right.removeMin();
+if (relativePosition < 0) {
+relativePosition++;
+}
+} else {
+final AVLNode<E> leftMax = left.max();
+value = leftMax.value;
+if (rightIsNext) {
+right = leftMax.right;
+}
+final AVLNode<E> leftPrevious = left.left;
+left = left.removeMax();
+if (left == null) {
+left = leftPrevious;
+leftIsPrevious = true;
+}
+if (relativePosition > 0) {
+relativePosition--;
+}
+}
+recalcHeight();
+return this;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,18,"this.keys = keys;
+","public MultiKey(final K[] keys, final boolean makeClone) {
+super();
+Objects.requireNonNull(keys, ""keys"");
+if (makeClone) {
+this.keys = keys.clone();
+} else {
+this.keys = keys;
+}
+calculateHashCode(keys);
+}"
+DODGY_CODE,RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT,TP,2,17,collections,19,"map.size();  
+","@SuppressWarnings(""unchecked"")
+public static <K, V> Map<K, V> putAll(final Map<K, V> map, final Object[] array) {
+map.size();
+if (array == null || array.length == 0) {
+return map;
+}
+final Object obj = array[0];
+if (obj instanceof Map.Entry) {
+for (final Object element : array) {
+final Map.Entry<K, V> entry = (Map.Entry<K, V>) element;
+map.put(entry.getKey(), entry.getValue());
+}
+} else if (obj instanceof KeyValue) {
+for (final Object element : array) {
+final KeyValue<K, V> keyval = (KeyValue<K, V>) element;
+map.put(keyval.getKey(), keyval.getValue());
+}
+} else if (obj instanceof Object[]) {
+for (int i = 0; i < array.length; i++) {
+final Object[] sub = (Object[]) array[i];
+if (sub == null || sub.length < 2) {
+throw new IllegalArgumentException(""Invalid array element: "" + i);
+}
+map.put((K) sub[0], (V) sub[1]);
+}
+} else {
+for (int i = 0; i < array.length - 1; ) {
+map.put((K) array[i++], (V) array[i++]);
+}
+}
+return map;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,24,"buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+","@Override
+public String toString() {
+if (delegateMap != null) {
+return delegateMap.toString();
+}
+if (size == 0) {
+return ""{}"";
+}
+final StringBuilder buf = new StringBuilder(128);
+buf.append('{');
+switch(size) {
+case 3:
+buf.append(key3 == this ? ""(this Map)"" : key3);
+buf.append('=');
+buf.append(value3 == this ? ""(this Map)"" : value3);
+buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+buf.append('=');
+buf.append(value2 == this ? ""(this Map)"" : value2);
+buf.append(',');
+case 1:
+buf.append(key1 == this ? ""(this Map)"" : key1);
+buf.append('=');
+buf.append(value1 == this ? ""(this Map)"" : value1);
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+buf.append('}');
+return buf.toString();
+}"
+CORRECTNESS,INT_BAD_COMPARISON_WITH_NONNEGATIVE_VALUE,FP,2,7,collections,32,"if (listSize < 0) {
+","@Override
+public List<T> get(final int index) {
+final int listSize = size();
+if (listSize < 0) {
+throw new IllegalArgumentException(""negative size: "" + listSize);
+}
+if (index < 0) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must not be negative"");
+}
+if (index >= listSize) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must be less than size "" + listSize);
+}
+final int start = index * size;
+final int end = Math.min(start + size, list.size());
+return list.subList(start, end);
+}"
+BAD_PRACTICE,NP_BOOLEAN_RETURN_NULL,FP,2,14,collections,33,"return null;
+","public static <K> Boolean getBoolean(final Map<? super K, ?> map, final K key) {
+if (map != null) {
+final Object answer = map.get(key);
+if (answer != null) {
+if (answer instanceof Boolean) {
+return (Boolean) answer;
+}
+if (answer instanceof String) {
+return Boolean.valueOf((String) answer);
+}
+if (answer instanceof Number) {
+final Number n = (Number) answer;
+return n.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE;
+}
+}
+}
+return null;
+}"
+BAD_PRACTICE,SE_INNER_CLASS,FP,3,19,collections,34,"SynchronizedBagSet(final Set<E> set, final Object lock) {
+super(set, lock);
+}
+","@Override
+public boolean equals(final Object object) {
+if (object == this) {
+return true;
+}
+synchronized (lock) {
+return getBag().equals(object);
+}
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,35,"return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+","@Override
+public boolean equals(final Object obj) {
+return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,36,"return this.doEquals(obj, KEY);
+","@Override
+public boolean equals(final Object obj) {
+return this.doEquals(obj, KEY);
+}"
+Multithreaded correctness,IS2_INCONSISTENT_SYNC,FP,2,17,collections,37,"private UnmodifiableBidiMap<V, K> inverse;","private UnmodifiableBidiMap<V, K> inverse;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,38,"private final Transformer<C, K> keyTransformer;","private final Transformer<C, K> keyTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,39,private final Predicate<? super E> predicate;,private final Predicate<? super E> predicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,40,"protected final Transformer<? super E, ? extends E> transformer;","protected final Transformer<? super E, ? extends E> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,41,"private final Transformer<? super I, ? extends O> transformer;","private final Transformer<? super I, ? extends O> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,42,private final Predicate<? super T> iPredicate1;,private final Predicate<? super T> iPredicate1;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,43,private final Closure<? super E>[] iClosures;,private final Closure<? super E>[] iClosures;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,44,"private final Transformer<? super T, ? extends T>[] iTransformers;","private final Transformer<? super T, ? extends T>[] iTransformers;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,45,private final Closure<? super T> iClosure;,private final Closure<? super T> iClosure;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,46,private final Factory<? extends O> iFactory;,private final Factory<? extends O> iFactory;
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,47,"return null;
+","@SuppressWarnings(""unchecked"")
+static <I, O> Transformer<I, O>[] copy(final Transformer<? super I, ? extends O>... transformers) {
+if (transformers == null) {
+return null;
+}
+return (Transformer<I, O>[]) transformers.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,48,"return null;
+","@SuppressWarnings(""unchecked"")
+static <E> Closure<E>[] copy(final Closure<? super E>... closures) {
+if (closures == null) {
+return null;
+}
+return (Closure<E>[]) closures.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,49,"return null;
+","@SuppressWarnings(""unchecked"")
+static <T> Predicate<T>[] copy(final Predicate<? super T>... predicates) {
+if (predicates == null) {
+return null;
+}
+return (Predicate<T>[]) predicates.clone();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,50,private final Predicate<? super E> iPredicate;,private final Predicate<? super E> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,51,"private final Transformer<? super I, ? extends O> iFalseTransformer;","private final Transformer<? super I, ? extends O> iFalseTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,52,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,53,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,54,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,55,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,56,private final Predicate<? super T> iPredicate2;,private final Predicate<? super T> iPredicate2;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,57,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,58,private final Closure<? super E> iDefault;,private final Closure<? super E> iDefault;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,59,private final Predicate<? super I>[] iPredicates;,private final Predicate<? super I>[] iPredicates;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,60,"private final Transformer<? super T, ? extends T> iTransformer;","private final Transformer<? super T, ? extends T> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,61,"private final Transformer<? super E, ?> iTransformer;","private final Transformer<? super E, ?> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,62,"private final Transformer<? super T, Boolean> iTransformer;","private final Transformer<? super T, Boolean> iTransformer;"
+MALICIOUS_CODE,EI_EXPOSE_REP,FP,2,18,collections,63,"return this.array;
+","public E[] getArray() {
+return this.array;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,64,"this.array = array;
+","public ObjectArrayIterator(final E[] array, final int start, final int end) {
+super();
+if (start < 0) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be less than zero"");
+}
+if (end > array.length) {
+throw new ArrayIndexOutOfBoundsException(""End index must not be greater than the array length"");
+}
+if (start > array.length) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be greater than the array length"");
+}
+if (end < start) {
+throw new IllegalArgumentException(""End index must not be less than start index"");
+}
+this.array = array;
+this.startIndex = start;
+this.endIndex = end;
+this.index = start;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,65,"this.keys = keys;
+","public MultiKey(final K[] keys, final boolean makeClone) {
+super();
+if (keys == null) {
+throw new IllegalArgumentException(""The array of keys must not be null"");
+}
+if (makeClone) {
+this.keys = keys.clone();
+} else {
+this.keys = keys;
+}
+calculateHashCode(keys);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,66,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,67,private final Factory<? extends E> factory;,private final Factory<? extends E> factory;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,68,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,69,"return (List<E>) decorated();
+","protected List<E> getList() {
+return (List<E>) decorated();
+}"
+DODGY_CODE,UC_USELESS_CONDITION,FP,1,14,collections,70,"left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+","private AVLNode<E> removeSelf() {
+if (getRightSubTree() == null && getLeftSubTree() == null) {
+return null;
+}
+if (getRightSubTree() == null) {
+if (relativePosition > 0) {
+left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+}
+left.max().setRight(null, right);
+return left;
+}
+if (getLeftSubTree() == null) {
+right.relativePosition += relativePosition - (relativePosition < 0 ? 0 : 1);
+right.min().setLeft(null, left);
+return right;
+}
+if (heightRightMinusLeft() > 0) {
+final AVLNode<E> rightMin = right.min();
+value = rightMin.value;
+if (leftIsPrevious) {
+left = rightMin.left;
+}
+right = right.removeMin();
+if (relativePosition < 0) {
+relativePosition++;
+}
+} else {
+final AVLNode<E> leftMax = left.max();
+value = leftMax.value;
+if (rightIsNext) {
+right = leftMax.right;
+}
+final AVLNode<E> leftPrevious = left.left;
+left = left.removeMax();
+if (left == null) {
+left = leftPrevious;
+leftIsPrevious = true;
+}
+if (relativePosition > 0) {
+relativePosition--;
+}
+}
+recalcHeight();
+return this;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,73,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void removeEntry(final HashEntry<K, V> entry, final int hashIndex, final HashEntry<K, V> previous) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.before.after = link.after;
+link.after.before = link.before;
+link.after = null;
+link.before = null;
+super.removeEntry(entry, hashIndex, previous);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,74,"return (LinkEntry<K, V>) super.getEntry(key);
+","@Override
+protected LinkEntry<K, V> getEntry(final Object key) {
+return (LinkEntry<K, V>) super.getEntry(key);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,75,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void addEntry(final HashEntry<K, V> entry, final int hashIndex) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.after = header;
+link.before = header.before;
+header.before.after = link;
+header.before = link;
+data[hashIndex] = link;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,76,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,77,"if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+","protected void purge(final Reference<?> ref) {
+final int hash = ref.hashCode();
+final int index = hashIndex(hash, data.length);
+HashEntry<K, V> previous = null;
+HashEntry<K, V> entry = data[index];
+while (entry != null) {
+if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+if (previous == null) {
+data[index] = entry.next;
+} else {
+previous.next = entry.next;
+}
+this.size--;
+return;
+}
+previous = entry;
+entry = entry.next;
+}
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,78,"entry = entry.next();
+","protected ReferenceEntry<K, V> nextEntry() {
+checkMod();
+if (nextNull() && !hasNext()) {
+throw new NoSuchElementException();
+}
+previous = entry;
+entry = entry.next();
+currentKey = nextKey;
+currentValue = nextValue;
+nextKey = null;
+nextValue = null;
+return previous;
+}"
+PERFORMANCE,URF_UNREAD_FIELD,FP,2,18,collections,79,"V currentValue, nextValue;","V currentValue, nextValue;"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,80,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,81,"total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+","@Override
+public int hashCode() {
+if (delegateMap != null) {
+return delegateMap.hashCode();
+}
+int total = 0;
+switch(size) {
+case 3:
+total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+case 1:
+total += hash1 ^ (value1 == null ? 0 : value1.hashCode());
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+return total;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,82,"buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+","@Override
+public String toString() {
+if (delegateMap != null) {
+return delegateMap.toString();
+}
+if (size == 0) {
+return ""{}"";
+}
+final StringBuilder buf = new StringBuilder(128);
+buf.append('{');
+switch(size) {
+case 3:
+buf.append(key3 == this ? ""(this Map)"" : key3);
+buf.append('=');
+buf.append(value3 == this ? ""(this Map)"" : value3);
+buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+buf.append('=');
+buf.append(value2 == this ? ""(this Map)"" : value2);
+buf.append(',');
+case 1:
+buf.append(key1 == this ? ""(this Map)"" : key1);
+buf.append('=');
+buf.append(value1 == this ? ""(this Map)"" : value1);
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+buf.append('}');
+return buf.toString();
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,83,"delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+","private void convertToMap() {
+delegateMap = createDelegateMap();
+switch(size) {
+case 3:
+delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+case 1:
+delegateMap.put(key1, value1);
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+size = 0;
+hash1 = hash2 = hash3 = 0;
+key1 = key2 = key3 = null;
+value1 = value2 = value3 = null;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,84,"moveToMRU((LinkEntry<K, V>) entry);  
+","@Override
+protected void updateEntry(final HashEntry<K, V> entry, final V newValue) {
+moveToMRU((LinkEntry<K, V>) entry);
+entry.setValue(newValue);
+}"
+DODGY_CODE,CI_CONFUSED_INHERITANCE,FP,3,20,collections,85,"protected Node<K, V> next;","protected Node<K, V> next;"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,86,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public int hashCode() {
+final Set<V> set = (Set<V>) getMapping();
+return SetUtils.hashCodeForSet(set);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,87,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public boolean equals(Object other) {
+final Set<V> set = (Set<V>) getMapping();
+if (set == null) {
+return Collections.emptySet().equals(other);
+}
+if (!(other instanceof Set)) {
+return false;
+}
+Set<?> otherSet = (Set<?>) other;
+return SetUtils.isEqualSet(set, otherSet);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,88,"final ArrayList<V> list = (ArrayList<V>) coll;
+","public void trimToSize() {
+for (Collection<V> coll : getMap().values()) {
+final ArrayList<V> list = (ArrayList<V>) coll;
+list.trimToSize();
+}
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,89,"private final Transformer<? super K, ? extends K> keyTransformer;","private final Transformer<? super K, ? extends K> keyTransformer;"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,90,"return (UnmodifiableMultiValuedMap<K, V>) map;
+","@SuppressWarnings(""unchecked"")
+public static <K, V> UnmodifiableMultiValuedMap<K, V> unmodifiableMultiValuedMap(MultiValuedMap<? extends K, ? extends V> map) {
+if (map instanceof Unmodifiable) {
+return (UnmodifiableMultiValuedMap<K, V>) map;
+}
+return new UnmodifiableMultiValuedMap<K, V>(map);
+}"
+DODGY_CODE,URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD,FP,3,20,collections,91,protected final AbstractMapMultiSet<E> parent;,protected final AbstractMapMultiSet<E> parent;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,92,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,93,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,94,"return (SortedSet<E>) decorated();
+","protected SortedSet<E> getSortedSet() {
+return (SortedSet<E>) decorated();
+}"
+DODGY_CODE,IA_AMBIGUOUS_INVOCATION_OF_INHERITED_OR_OUTER_METHOD,FP,1,18,collections,95,"Set<K> currentKeys = keySet();
+","@Override
+public void clear() {
+Iterator<Map.Entry<K, V>> it = AbstractPatriciaTrie.this.entrySet().iterator();
+Set<K> currentKeys = keySet();
+while (it.hasNext()) {
+if (currentKeys.contains(it.next().getKey())) {
+it.remove();
+}
+}
+}"
+BAD_PRACTICE,NP_BOOLEAN_RETURN_NULL,FP,2,14,collections,166,"return null;
+","public static <K> Boolean getBoolean(final Map<? super K, ?> map, final K key) {
+if (map != null) {
+final Object answer = map.get(key);
+if (answer != null) {
+if (answer instanceof Boolean) {
+return (Boolean) answer;
+}
+if (answer instanceof String) {
+return Boolean.valueOf((String) answer);
+}
+if (answer instanceof Number) {
+final Number n = (Number) answer;
+return n.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE;
+}
+}
+}
+return null;
+}"
+BAD_PRACTICE,SE_INNER_CLASS,FP,3,19,collections,167,"SynchronizedBagSet(final Set<E> set, final Object lock) {
+super(set, lock);
+}
+","@Override
+public Set<E> uniqueSet() {
+synchronized (lock) {
+final Set<E> set = getBag().uniqueSet();
+return new SynchronizedBagSet(set, lock);
+}
+}"
+DODGY_CODE,DMI_NONSERIALIZABLE_OBJECT_WRITTEN,FP,3,20,collections,168,"out.writeObject(comparator());
+","private void writeObject(final ObjectOutputStream out) throws IOException {
+out.defaultWriteObject();
+out.writeObject(comparator());
+super.doWriteObject(out);
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,169,"final Object value = last.getValue();
+","@Override
+public void remove() {
+if (!canRemove) {
+throw new IllegalStateException(""Iterator remove() can only be called once after next()"");
+}
+final Object value = last.getValue();
+super.remove();
+parent.reverseMap.remove(value);
+last = null;
+canRemove = false;
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,170,"final V value = last.getValue();
+","@Override
+public void remove() {
+if (!canRemove) {
+throw new IllegalStateException(""Iterator remove() can only be called once after next()"");
+}
+final V value = last.getValue();
+iterator.remove();
+parent.reverseMap.remove(value);
+last = null;
+canRemove = false;
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,171,"parent.remove(last.getKey());
+","@Override
+public void remove() {
+iterator.remove();
+parent.remove(last.getKey());
+last = null;
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,172,"return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+","@Override
+public boolean equals(final Object obj) {
+return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,173,"return this.doEquals(obj, KEY);
+","@Override
+public boolean equals(final Object obj) {
+return this.doEquals(obj, KEY);
+}"
+Multithreaded correctness,IS2_INCONSISTENT_SYNC,FP,2,17,collections,174,"private UnmodifiableBidiMap<V, K> inverse;","private UnmodifiableBidiMap<V, K> inverse;"
+PERFORMANCE,SIC_INNER_SHOULD_BE_STATIC_ANON,FP,3,20,collections,175,"class Bits {
+private long[] data = new long[16];
+private int size;
+boolean add(long bits) {
+if (size == data.length) {
+data = Arrays.copyOf(data, size * 2);
+}
+data[size++] = bits;
+return true;
+}
+long[] toArray() {
+return size == data.length ? data : Arrays.copyOf(data, size);
+","boolean add(long bits) {
+if (size == data.length) {
+data = Arrays.copyOf(data, size * 2);
+}
+data[size++] = bits;
+return true;
+}"
+CORRECTNESS,UMAC_UNCALLABLE_METHOD_OF_ANONYMOUS_CLASS,FP,2,7,collections,176,"if (size == data.length) {
+data = Arrays.copyOf(data, size * 2);
+}
+data[size++] = bits;
+return true;
+","boolean add(long bits) {
+if (size == data.length) {
+data = Arrays.copyOf(data, size * 2);
+}
+data[size++] = bits;
+return true;
+}"
+DODGY_CODE,ICAST_INTEGER_MULTIPLY_CAST_TO_LONG,FP,3,20,collections,177,"if (BitMap.numberOfBitMaps(shape.getNumberOfBits()) * Long.BYTES < (long) shape.getNumberOfHashFunctions()
+","private IndexFilter(Shape shape, IntPredicate consumer) {
+this.size = shape.getNumberOfBits();
+this.consumer = consumer;
+if (BitMap.numberOfBitMaps(shape.getNumberOfBits()) * Long.BYTES < (long) shape.getNumberOfHashFunctions() * Integer.BYTES) {
+this.tracker = new BitMapTracker(shape);
+} else {
+this.tracker = new ArrayTracker(shape);
+}
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,178,"private final Transformer<C, K> keyTransformer;","private final Transformer<C, K> keyTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,179,private final Predicate<? super E> predicate;,private final Predicate<? super E> predicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,180,"protected final Transformer<? super E, ? extends E> transformer;","protected final Transformer<? super E, ? extends E> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,181,private final List<Comparator<E>> comparatorChain;,private final List<Comparator<E>> comparatorChain;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,182,private final Comparator<? super E> nonNullComparator;,private final Comparator<? super E> nonNullComparator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,183,private final Comparator<? super E> comparator;,private final Comparator<? super E> comparator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,184,private final Comparator<O> decorated;,private final Comparator<O> decorated;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,185,private final Predicate<? super T> iPredicate2;,private final Predicate<? super T> iPredicate2;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,186,private final Closure<? super E>[] iClosures;,private final Closure<? super E>[] iClosures;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,187,"private final Transformer<? super T, ? extends T>[] iTransformers;","private final Transformer<? super T, ? extends T>[] iTransformers;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,188,private final Closure<? super T> iClosure;,private final Closure<? super T> iClosure;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,189,private final Comparator<T> comparator;,private final Comparator<T> comparator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,190,private final Equator<T> equator;,private final Equator<T> equator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,191,private final Factory<? extends O> iFactory;,private final Factory<? extends O> iFactory;
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,192,"return null;
+","@SuppressWarnings(""unchecked"")
+static <T> Predicate<T>[] copy(final Predicate<? super T>... predicates) {
+if (predicates == null) {
+return null;
+}
+return (Predicate<T>[]) predicates.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,193,"return null;
+","@SuppressWarnings(""unchecked"")
+static <E> Closure<E>[] copy(final Closure<? super E>... closures) {
+if (closures == null) {
+return null;
+}
+return (Closure<E>[]) closures.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,194,"return null;
+","@SuppressWarnings(""unchecked"")
+static <I, O> Transformer<I, O>[] copy(final Transformer<? super I, ? extends O>... transformers) {
+if (transformers == null) {
+return null;
+}
+return (Transformer<I, O>[]) transformers.clone();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,195,private final Closure<? super E> iFalseClosure;,private final Closure<? super E> iFalseClosure;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,196,"private final Transformer<? super I, ? extends O> iFalseTransformer;","private final Transformer<? super I, ? extends O> iFalseTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,197,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,198,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,199,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,200,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,201,private final Predicate<? super T> iPredicate2;,private final Predicate<? super T> iPredicate2;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,202,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,203,private final Predicate<? super E>[] iPredicates;,private final Predicate<? super E>[] iPredicates;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,204,private final Predicate<? super I>[] iPredicates;,private final Predicate<? super I>[] iPredicates;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,205,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,206,"private final Transformer<? super E, ?> iTransformer;","private final Transformer<? super E, ?> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,207,"private final Transformer<? super T, Boolean> iTransformer;","private final Transformer<? super T, Boolean> iTransformer;"
+MALICIOUS_CODE,EI_EXPOSE_REP,FP,2,18,collections,208,"return this.array;
+","public E[] getArray() {
+return this.array;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,209,"this.array = array;
+","public ObjectArrayIterator(final E[] array, final int start, final int end) {
+if (start < 0) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be less than zero"");
+}
+if (end > array.length) {
+throw new ArrayIndexOutOfBoundsException(""End index must not be greater than the array length"");
+}
+if (start > array.length) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be greater than the array length"");
+}
+if (end < start) {
+throw new IllegalArgumentException(""End index must not be less than start index"");
+}
+this.array = array;
+this.startIndex = start;
+this.endIndex = end;
+this.index = start;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,210,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,211,private final Factory<? extends E> factory;,private final Factory<? extends E> factory;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,212,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,213,"return (List<E>) decorated();
+","protected List<E> getList() {
+return (List<E>) decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,215,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void addEntry(final HashEntry<K, V> entry, final int hashIndex) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.after = header;
+link.before = header.before;
+header.before.after = link;
+header.before = link;
+data[hashIndex] = link;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,216,"return (LinkEntry<K, V>) super.getEntry(key);
+","@Override
+protected LinkEntry<K, V> getEntry(final Object key) {
+return (LinkEntry<K, V>) super.getEntry(key);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,218,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void removeEntry(final HashEntry<K, V> entry, final int hashIndex, final HashEntry<K, V> previous) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.before.after = link.after;
+link.after.before = link.before;
+link.after = null;
+link.before = null;
+super.removeEntry(entry, hashIndex, previous);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,219,"final ReferenceEntry<K, V> refEntry = (ReferenceEntry<K, V>) entry;
+","protected void purge(final Reference<?> ref) {
+final int hash = ref.hashCode();
+final int index = hashIndex(hash, data.length);
+HashEntry<K, V> previous = null;
+HashEntry<K, V> entry = data[index];
+while (entry != null) {
+final ReferenceEntry<K, V> refEntry = (ReferenceEntry<K, V>) entry;
+if (refEntry.purge(ref)) {
+if (previous == null) {
+data[index] = entry.next;
+} else {
+previous.next = entry.next;
+}
+this.size--;
+refEntry.onPurge();
+return;
+}
+previous = entry;
+entry = entry.next;
+}
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,220,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,221,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,222,"next = next.next();
+","protected ReferenceEntry<K, V> nextEntry() {
+checkMod();
+if (nextNull() && !hasNext()) {
+throw new NoSuchElementException();
+}
+current = next;
+next = next.next();
+currentKey = nextKey;
+currentValue = nextValue;
+nextKey = null;
+nextValue = null;
+return current;
+}"
+PERFORMANCE,URF_UNREAD_FIELD,FP,2,18,collections,223,"V currentValue, nextValue;","V currentValue, nextValue;"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,224,"delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+","private void convertToMap() {
+delegateMap = createDelegateMap();
+switch(size) {
+case 3:
+delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+case 1:
+delegateMap.put(key1, value1);
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+size = 0;
+hash1 = hash2 = hash3 = 0;
+key1 = key2 = key3 = null;
+value1 = value2 = value3 = null;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,225,"buf.append(CollectionUtils.COMMA);
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+","@Override
+public String toString() {
+if (delegateMap != null) {
+return delegateMap.toString();
+}
+if (size == 0) {
+return ""{}"";
+}
+final StringBuilder buf = new StringBuilder(128);
+buf.append('{');
+switch(size) {
+case 3:
+buf.append(key3 == this ? ""(this Map)"" : key3);
+buf.append('=');
+buf.append(value3 == this ? ""(this Map)"" : value3);
+buf.append(CollectionUtils.COMMA);
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+buf.append('=');
+buf.append(value2 == this ? ""(this Map)"" : value2);
+buf.append(CollectionUtils.COMMA);
+case 1:
+buf.append(key1 == this ? ""(this Map)"" : key1);
+buf.append('=');
+buf.append(value1 == this ? ""(this Map)"" : value1);
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+buf.append('}');
+return buf.toString();
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,226,"total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+","@Override
+public int hashCode() {
+if (delegateMap != null) {
+return delegateMap.hashCode();
+}
+int total = 0;
+switch(size) {
+case 3:
+total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+case 1:
+total += hash1 ^ (value1 == null ? 0 : value1.hashCode());
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+return total;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,227,"moveToMRU((LinkEntry<K, V>) entry);  
+","@Override
+protected void updateEntry(final HashEntry<K, V> entry, final V newValue) {
+moveToMRU((LinkEntry<K, V>) entry);
+entry.setValue(newValue);
+}"
+DODGY_CODE,CI_CONFUSED_INHERITANCE,FP,3,20,collections,228,"protected Node<K, V> next;","protected Node<K, V> next;"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,229,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public boolean equals(final Object other) {
+final Set<V> set = (Set<V>) getMapping();
+if (set == null) {
+return Collections.emptySet().equals(other);
+}
+if (!(other instanceof Set)) {
+return false;
+}
+final Set<?> otherSet = (Set<?>) other;
+return SetUtils.isEqualSet(set, otherSet);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,230,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public int hashCode() {
+final Set<V> set = (Set<V>) getMapping();
+return SetUtils.hashCodeForSet(set);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,231,"final ArrayList<V> list = (ArrayList<V>) coll;
+","public void trimToSize() {
+for (final Collection<V> coll : getMap().values()) {
+final ArrayList<V> list = (ArrayList<V>) coll;
+list.trimToSize();
+}
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,232,"private final Transformer<? super K, ? extends K> keyTransformer;","private final Transformer<? super K, ? extends K> keyTransformer;"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,233,"return (UnmodifiableMultiValuedMap<K, V>) map;
+","@SuppressWarnings(""unchecked"")
+public static <K, V> UnmodifiableMultiValuedMap<K, V> unmodifiableMultiValuedMap(final MultiValuedMap<? extends K, ? extends V> map) {
+if (map instanceof Unmodifiable) {
+return (UnmodifiableMultiValuedMap<K, V>) map;
+}
+return new UnmodifiableMultiValuedMap<>(map);
+}"
+DODGY_CODE,URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD,FP,3,20,collections,234,protected final AbstractMapMultiSet<E> parent;,protected final AbstractMapMultiSet<E> parent;
+Multithreaded correctness,UG_SYNC_SET_UNSYNC_GET,FP,2,14,collections,235,"return defaultValue;
+","@Override
+public String getProperty(final String key, final String defaultValue) {
+return defaultValue;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,236,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,237,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,238,"return (SortedSet<E>) decorated();
+","protected SortedSet<E> getSortedSet() {
+return (SortedSet<E>) decorated();
+}"
+DODGY_CODE,IA_AMBIGUOUS_INVOCATION_OF_INHERITED_OR_OUTER_METHOD,FP,1,18,collections,239,"final Set<K> currentKeys = keySet();
+","@Override
+public void clear() {
+final Iterator<Map.Entry<K, V>> it = AbstractPatriciaTrie.this.entrySet().iterator();
+final Set<K> currentKeys = keySet();
+while (it.hasNext()) {
+if (currentKeys.contains(it.next().getKey())) {
+it.remove();
+}
+}
+}"
+CORRECTNESS,INT_BAD_COMPARISON_WITH_NONNEGATIVE_VALUE,FP,2,7,collections,240,"if (listSize < 0) {
+","@Override
+public List<T> get(final int index) {
+final int listSize = size();
+if (listSize < 0) {
+throw new IllegalArgumentException(""negative size: "" + listSize);
+}
+if (index < 0) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must not be negative"");
+}
+if (index >= listSize) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must be less than size "" + listSize);
+}
+final int start = index * size;
+final int end = Math.min(start + size, list.size());
+return list.subList(start, end);
+}"
+DODGY_CODE,RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT,FP,2,17,collections,241,"map.size();  
+","@SuppressWarnings(""unchecked"")
+public static <K, V> Map<K, V> putAll(final Map<K, V> map, final Object[] array) {
+map.size();
+if (array == null || array.length == 0) {
+return map;
+}
+final Object obj = array[0];
+if (obj instanceof Map.Entry) {
+for (final Object element : array) {
+final Map.Entry<K, V> entry = (Map.Entry<K, V>) element;
+map.put(entry.getKey(), entry.getValue());
+}
+} else if (obj instanceof KeyValue) {
+for (final Object element : array) {
+final KeyValue<K, V> keyval = (KeyValue<K, V>) element;
+map.put(keyval.getKey(), keyval.getValue());
+}
+} else if (obj instanceof Object[]) {
+for (int i = 0; i < array.length; i++) {
+final Object[] sub = (Object[]) array[i];
+if (sub == null || sub.length < 2) {
+throw new IllegalArgumentException(""Invalid array element: "" + i);
+}
+map.put((K) sub[0], (V) sub[1]);
+}
+} else {
+for (int i = 0; i < array.length - 1; ) {
+map.put((K) array[i++], (V) array[i++]);
+}
+}
+return map;
+}"
+BAD_PRACTICE,NP_BOOLEAN_RETURN_NULL,FP,2,14,collections,242,"return null;
+","public static <K> Boolean getBoolean(final Map<? super K, ?> map, final K key) {
+if (map != null) {
+final Object answer = map.get(key);
+if (answer != null) {
+if (answer instanceof Boolean) {
+return (Boolean) answer;
+}
+if (answer instanceof String) {
+return Boolean.valueOf((String) answer);
+}
+if (answer instanceof Number) {
+final Number n = (Number) answer;
+return n.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE;
+}
+}
+}
+return null;
+}"
+DODGY_CODE,DMI_NONSERIALIZABLE_OBJECT_WRITTEN,FP,3,20,collections,244,"out.writeObject(comparator());
+","private void writeObject(final ObjectOutputStream out) throws IOException {
+out.defaultWriteObject();
+out.writeObject(comparator());
+super.doWriteObject(out);
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,245,"return this.doEquals(obj, KEY);
+","@Override
+public boolean equals(final Object obj) {
+return this.doEquals(obj, KEY);
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,246,"return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+","@Override
+public boolean equals(final Object obj) {
+return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+}"
+Multithreaded correctness,IS2_INCONSISTENT_SYNC,FP,2,17,collections,247,"private UnmodifiableBidiMap<V, K> inverse;","private UnmodifiableBidiMap<V, K> inverse;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,248,"private final Transformer<C, K> keyTransformer;","private final Transformer<C, K> keyTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,249,"protected final Transformer<? super E, ? extends E> transformer;","protected final Transformer<? super E, ? extends E> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,250,private final List<Comparator<E>> comparatorChain;,private final List<Comparator<E>> comparatorChain;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,251,private final Comparator<? super E> nonNullComparator;,private final Comparator<? super E> nonNullComparator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,252,private final Comparator<E> comparator;,private final Comparator<E> comparator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,253,private final Comparator<O> decorated;,private final Comparator<O> decorated;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,254,"private final Transformer<? super T, ? extends T>[] iTransformers;","private final Transformer<? super T, ? extends T>[] iTransformers;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,255,private final Comparator<T> comparator;,private final Comparator<T> comparator;
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,256,"return null;
+","@SuppressWarnings(""unchecked"")
+static <E> Closure<E>[] copy(final Closure<? super E>... closures) {
+if (closures == null) {
+return null;
+}
+return (Closure<E>[]) closures.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,257,"return null;
+","@SuppressWarnings(""unchecked"")
+static <T> Predicate<T>[] copy(final Predicate<? super T>... predicates) {
+if (predicates == null) {
+return null;
+}
+return (Predicate<T>[]) predicates.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,258,"return null;
+","@SuppressWarnings(""unchecked"")
+static <I, O> Transformer<I, O>[] copy(final Transformer<? super I, ? extends O>... transformers) {
+if (transformers == null) {
+return null;
+}
+return (Transformer<I, O>[]) transformers.clone();
+}"
+BAD_PRACTICE,SE_TRANSIENT_FIELD_NOT_RESTORED,FP,3,19,collections,259,private transient Method iCloneMethod;,private transient Method iCloneMethod;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,260,"private final Transformer<? super I, ? extends O> iDefault;","private final Transformer<? super I, ? extends O> iDefault;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,261,"private final Transformer<? super T, ? extends T> iTransformer;","private final Transformer<? super T, ? extends T> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,262,"private final Transformer<? super E, ?> iTransformer;","private final Transformer<? super E, ?> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,263,"private final Transformer<? super T, Boolean> iTransformer;","private final Transformer<? super T, Boolean> iTransformer;"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,264,"this.array = array;
+","public ObjectArrayIterator(final E[] array, final int start, final int end) {
+super();
+if (start < 0) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be less than zero"");
+}
+if (end > array.length) {
+throw new ArrayIndexOutOfBoundsException(""End index must not be greater than the array length"");
+}
+if (start > array.length) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be greater than the array length"");
+}
+if (end < start) {
+throw new IllegalArgumentException(""End index must not be less than start index"");
+}
+this.array = array;
+this.startIndex = start;
+this.endIndex = end;
+this.index = start;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP,FP,2,18,collections,265,"return this.array;
+","public E[] getArray() {
+return this.array;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,266,"this.keys = keys;
+","public MultiKey(final K[] keys, final boolean makeClone) {
+super();
+if (keys == null) {
+throw new IllegalArgumentException(""The array of keys must not be null"");
+}
+if (makeClone) {
+this.keys = keys.clone();
+} else {
+this.keys = keys;
+}
+calculateHashCode(keys);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,267,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,268,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,269,"return (List<E>) decorated();
+","protected List<E> getList() {
+return (List<E>) decorated();
+}"
+DODGY_CODE,UC_USELESS_CONDITION,FP,1,14,collections,270,"left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+","private AVLNode<E> removeSelf() {
+if (getRightSubTree() == null && getLeftSubTree() == null) {
+return null;
+}
+if (getRightSubTree() == null) {
+if (relativePosition > 0) {
+left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+}
+left.max().setRight(null, right);
+return left;
+}
+if (getLeftSubTree() == null) {
+right.relativePosition += relativePosition - (relativePosition < 0 ? 0 : 1);
+right.min().setLeft(null, left);
+return right;
+}
+if (heightRightMinusLeft() > 0) {
+final AVLNode<E> rightMin = right.min();
+value = rightMin.value;
+if (leftIsPrevious) {
+left = rightMin.left;
+}
+right = right.removeMin();
+if (relativePosition < 0) {
+relativePosition++;
+}
+} else {
+final AVLNode<E> leftMax = left.max();
+value = leftMax.value;
+if (rightIsNext) {
+right = leftMax.right;
+}
+final AVLNode<E> leftPrevious = left.left;
+left = left.removeMax();
+if (left == null) {
+left = leftPrevious;
+leftIsPrevious = true;
+}
+if (relativePosition > 0) {
+relativePosition--;
+}
+}
+recalcHeight();
+return this;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,272,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void addEntry(final HashEntry<K, V> entry, final int hashIndex) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.after = header;
+link.before = header.before;
+header.before.after = link;
+header.before = link;
+data[hashIndex] = link;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,273,"return (LinkEntry<K, V>) super.getEntry(key);
+","@Override
+protected LinkEntry<K, V> getEntry(final Object key) {
+return (LinkEntry<K, V>) super.getEntry(key);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,275,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void removeEntry(final HashEntry<K, V> entry, final int hashIndex, final HashEntry<K, V> previous) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.before.after = link.after;
+link.after.before = link.before;
+link.after = null;
+link.before = null;
+super.removeEntry(entry, hashIndex, previous);
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,276,"entry = entry.next();
+","protected ReferenceEntry<K, V> nextEntry() {
+checkMod();
+if (nextNull() && !hasNext()) {
+throw new NoSuchElementException();
+}
+previous = entry;
+entry = entry.next();
+currentKey = nextKey;
+currentValue = nextValue;
+nextKey = null;
+nextValue = null;
+return previous;
+}"
+PERFORMANCE,URF_UNREAD_FIELD,FP,2,18,collections,277,"V currentValue, nextValue;","V currentValue, nextValue;"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,278,"if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+","protected void purge(final Reference<?> ref) {
+final int hash = ref.hashCode();
+final int index = hashIndex(hash, data.length);
+HashEntry<K, V> previous = null;
+HashEntry<K, V> entry = data[index];
+while (entry != null) {
+if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+if (previous == null) {
+data[index] = entry.next;
+} else {
+previous.next = entry.next;
+}
+this.size--;
+return;
+}
+previous = entry;
+entry = entry.next;
+}
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,279,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,280,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,281,"buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+","@Override
+public String toString() {
+if (delegateMap != null) {
+return delegateMap.toString();
+}
+if (size == 0) {
+return ""{}"";
+}
+final StringBuilder buf = new StringBuilder(128);
+buf.append('{');
+switch(size) {
+case 3:
+buf.append(key3 == this ? ""(this Map)"" : key3);
+buf.append('=');
+buf.append(value3 == this ? ""(this Map)"" : value3);
+buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+buf.append('=');
+buf.append(value2 == this ? ""(this Map)"" : value2);
+buf.append(',');
+case 1:
+buf.append(key1 == this ? ""(this Map)"" : key1);
+buf.append('=');
+buf.append(value1 == this ? ""(this Map)"" : value1);
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+buf.append('}');
+return buf.toString();
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,282,"delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+","private void convertToMap() {
+delegateMap = createDelegateMap();
+switch(size) {
+case 3:
+delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+case 1:
+delegateMap.put(key1, value1);
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+size = 0;
+hash1 = hash2 = hash3 = 0;
+key1 = key2 = key3 = null;
+value1 = value2 = value3 = null;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,283,"total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+","@Override
+public int hashCode() {
+if (delegateMap != null) {
+return delegateMap.hashCode();
+}
+int total = 0;
+switch(size) {
+case 3:
+total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+case 1:
+total += hash1 ^ (value1 == null ? 0 : value1.hashCode());
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+return total;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,284,"moveToMRU((LinkEntry<K, V>) entry);  
+","@Override
+protected void updateEntry(final HashEntry<K, V> entry, final V newValue) {
+moveToMRU((LinkEntry<K, V>) entry);
+entry.setValue(newValue);
+}"
+DODGY_CODE,CI_CONFUSED_INHERITANCE,FP,3,20,collections,285,"protected Node<K, V> next;","protected Node<K, V> next;"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,286,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,287,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,288,"return (SortedSet<E>) decorated();
+","protected SortedSet<E> getSortedSet() {
+return (SortedSet<E>) decorated();
+}"
+CORRECTNESS,INT_BAD_COMPARISON_WITH_NONNEGATIVE_VALUE,FP,2,7,collections,289,"if (listSize < 0) {
+","@Override
+public List<T> get(final int index) {
+final int listSize = size();
+if (listSize < 0) {
+throw new IllegalArgumentException(""negative size: "" + listSize);
+}
+if (index < 0) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must not be negative"");
+}
+if (index >= listSize) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must be less than size "" + listSize);
+}
+final int start = index * size;
+final int end = Math.min(start + size, list.size());
+return list.subList(start, end);
+}"
+BAD_PRACTICE,NP_BOOLEAN_RETURN_NULL,FP,2,14,collections,290,"return null;
+","public static <K> Boolean getBoolean(final Map<? super K, ?> map, final K key) {
+if (map != null) {
+final Object answer = map.get(key);
+if (answer != null) {
+if (answer instanceof Boolean) {
+return (Boolean) answer;
+}
+if (answer instanceof String) {
+return Boolean.valueOf((String) answer);
+}
+if (answer instanceof Number) {
+final Number n = (Number) answer;
+return n.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE;
+}
+}
+}
+return null;
+}"
+BAD_PRACTICE,SE_INNER_CLASS,FP,3,19,collections,291,"SynchronizedBagSet(final Set<E> set, final Object lock) {
+super(set, lock);
+}
+","@Override
+public boolean equals(final Object object) {
+if (object == this) {
+return true;
+}
+synchronized (lock) {
+return getBag().equals(object);
+}
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,292,"return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+","@Override
+public boolean equals(final Object obj) {
+return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,293,"return this.doEquals(obj, KEY);
+","@Override
+public boolean equals(final Object obj) {
+return this.doEquals(obj, KEY);
+}"
+Multithreaded correctness,IS2_INCONSISTENT_SYNC,FP,2,17,collections,294,"private UnmodifiableBidiMap<V, K> inverse;","private UnmodifiableBidiMap<V, K> inverse;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,295,"private final Transformer<C, K> keyTransformer;","private final Transformer<C, K> keyTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,296,private final Predicate<? super E> predicate;,private final Predicate<? super E> predicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,297,"protected final Transformer<? super E, ? extends E> transformer;","protected final Transformer<? super E, ? extends E> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,298,"private final Transformer<? super I, ? extends O> transformer;","private final Transformer<? super I, ? extends O> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,299,private final Predicate<? super T> iPredicate2;,private final Predicate<? super T> iPredicate2;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,300,private final Closure<? super E>[] iClosures;,private final Closure<? super E>[] iClosures;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,301,"private final Transformer<? super T, ? extends T>[] iTransformers;","private final Transformer<? super T, ? extends T>[] iTransformers;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,302,private final Closure<? super T> iClosure;,private final Closure<? super T> iClosure;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,303,private final Factory<? extends O> iFactory;,private final Factory<? extends O> iFactory;
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,304,"return null;
+","@SuppressWarnings(""unchecked"")
+static <E> Closure<E>[] copy(final Closure<? super E>... closures) {
+if (closures == null) {
+return null;
+}
+return (Closure<E>[]) closures.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,305,"return null;
+","@SuppressWarnings(""unchecked"")
+static <T> Predicate<T>[] copy(final Predicate<? super T>... predicates) {
+if (predicates == null) {
+return null;
+}
+return (Predicate<T>[]) predicates.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,306,"return null;
+","@SuppressWarnings(""unchecked"")
+static <I, O> Transformer<I, O>[] copy(final Transformer<? super I, ? extends O>... transformers) {
+if (transformers == null) {
+return null;
+}
+return (Transformer<I, O>[]) transformers.clone();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,307,private final Closure<? super E> iFalseClosure;,private final Closure<? super E> iFalseClosure;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,308,private final Predicate<? super I> iPredicate;,private final Predicate<? super I> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,309,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,310,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,311,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,312,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,313,private final Predicate<? super T> iPredicate2;,private final Predicate<? super T> iPredicate2;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,314,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,315,private final Closure<? super E> iDefault;,private final Closure<? super E> iDefault;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,316,private final Predicate<? super I>[] iPredicates;,private final Predicate<? super I>[] iPredicates;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,317,"private final Transformer<? super T, ? extends T> iTransformer;","private final Transformer<? super T, ? extends T> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,318,"private final Transformer<? super E, ?> iTransformer;","private final Transformer<? super E, ?> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,319,"private final Transformer<? super T, Boolean> iTransformer;","private final Transformer<? super T, Boolean> iTransformer;"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,320,"this.array = array;
+","public ObjectArrayIterator(final E[] array, final int start, final int end) {
+super();
+if (start < 0) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be less than zero"");
+}
+if (end > array.length) {
+throw new ArrayIndexOutOfBoundsException(""End index must not be greater than the array length"");
+}
+if (start > array.length) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be greater than the array length"");
+}
+if (end < start) {
+throw new IllegalArgumentException(""End index must not be less than start index"");
+}
+this.array = array;
+this.startIndex = start;
+this.endIndex = end;
+this.index = start;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP,FP,2,18,collections,321,"return this.array;
+","public E[] getArray() {
+return this.array;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,322,"this.keys = keys;
+","public MultiKey(final K[] keys, final boolean makeClone) {
+super();
+if (keys == null) {
+throw new IllegalArgumentException(""The array of keys must not be null"");
+}
+if (makeClone) {
+this.keys = keys.clone();
+} else {
+this.keys = keys;
+}
+calculateHashCode(keys);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,323,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,324,private final Factory<? extends E> factory;,private final Factory<? extends E> factory;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,325,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,326,"return (List<E>) decorated();
+","protected List<E> getList() {
+return (List<E>) decorated();
+}"
+DODGY_CODE,UC_USELESS_CONDITION,FP,1,14,collections,327,"left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+","private AVLNode<E> removeSelf() {
+if (getRightSubTree() == null && getLeftSubTree() == null) {
+return null;
+}
+if (getRightSubTree() == null) {
+if (relativePosition > 0) {
+left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+}
+left.max().setRight(null, right);
+return left;
+}
+if (getLeftSubTree() == null) {
+right.relativePosition += relativePosition - (relativePosition < 0 ? 0 : 1);
+right.min().setLeft(null, left);
+return right;
+}
+if (heightRightMinusLeft() > 0) {
+final AVLNode<E> rightMin = right.min();
+value = rightMin.value;
+if (leftIsPrevious) {
+left = rightMin.left;
+}
+right = right.removeMin();
+if (relativePosition < 0) {
+relativePosition++;
+}
+} else {
+final AVLNode<E> leftMax = left.max();
+value = leftMax.value;
+if (rightIsNext) {
+right = leftMax.right;
+}
+final AVLNode<E> leftPrevious = left.left;
+left = left.removeMax();
+if (left == null) {
+left = leftPrevious;
+leftIsPrevious = true;
+}
+if (relativePosition > 0) {
+relativePosition--;
+}
+}
+recalcHeight();
+return this;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,329,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void removeEntry(final HashEntry<K, V> entry, final int hashIndex, final HashEntry<K, V> previous) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.before.after = link.after;
+link.after.before = link.before;
+link.after = null;
+link.before = null;
+super.removeEntry(entry, hashIndex, previous);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,330,"return (LinkEntry<K, V>) super.getEntry(key);
+","@Override
+protected LinkEntry<K, V> getEntry(final Object key) {
+return (LinkEntry<K, V>) super.getEntry(key);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,332,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void addEntry(final HashEntry<K, V> entry, final int hashIndex) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.after = header;
+link.before = header.before;
+header.before.after = link;
+header.before = link;
+data[hashIndex] = link;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,333,"if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+","protected void purge(final Reference<?> ref) {
+final int hash = ref.hashCode();
+final int index = hashIndex(hash, data.length);
+HashEntry<K, V> previous = null;
+HashEntry<K, V> entry = data[index];
+while (entry != null) {
+if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+if (previous == null) {
+data[index] = entry.next;
+} else {
+previous.next = entry.next;
+}
+this.size--;
+return;
+}
+previous = entry;
+entry = entry.next;
+}
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,334,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,335,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,336,"entry = entry.next();
+","protected ReferenceEntry<K, V> nextEntry() {
+checkMod();
+if (nextNull() && !hasNext()) {
+throw new NoSuchElementException();
+}
+previous = entry;
+entry = entry.next();
+currentKey = nextKey;
+currentValue = nextValue;
+nextKey = null;
+nextValue = null;
+return previous;
+}"
+PERFORMANCE,URF_UNREAD_FIELD,FP,2,18,collections,337,"V currentValue, nextValue;","V currentValue, nextValue;"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,338,"total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+","@Override
+public int hashCode() {
+if (delegateMap != null) {
+return delegateMap.hashCode();
+}
+int total = 0;
+switch(size) {
+case 3:
+total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+case 1:
+total += hash1 ^ (value1 == null ? 0 : value1.hashCode());
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+return total;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,339,"buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+","@Override
+public String toString() {
+if (delegateMap != null) {
+return delegateMap.toString();
+}
+if (size == 0) {
+return ""{}"";
+}
+final StringBuilder buf = new StringBuilder(128);
+buf.append('{');
+switch(size) {
+case 3:
+buf.append(key3 == this ? ""(this Map)"" : key3);
+buf.append('=');
+buf.append(value3 == this ? ""(this Map)"" : value3);
+buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+buf.append('=');
+buf.append(value2 == this ? ""(this Map)"" : value2);
+buf.append(',');
+case 1:
+buf.append(key1 == this ? ""(this Map)"" : key1);
+buf.append('=');
+buf.append(value1 == this ? ""(this Map)"" : value1);
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+buf.append('}');
+return buf.toString();
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,340,"delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+","private void convertToMap() {
+delegateMap = createDelegateMap();
+switch(size) {
+case 3:
+delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+case 1:
+delegateMap.put(key1, value1);
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+size = 0;
+hash1 = hash2 = hash3 = 0;
+key1 = key2 = key3 = null;
+value1 = value2 = value3 = null;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,341,"moveToMRU((LinkEntry<K, V>) entry);  
+","@Override
+protected void updateEntry(final HashEntry<K, V> entry, final V newValue) {
+moveToMRU((LinkEntry<K, V>) entry);
+entry.setValue(newValue);
+}"
+DODGY_CODE,CI_CONFUSED_INHERITANCE,FP,3,20,collections,342,"protected Node<K, V> next;","protected Node<K, V> next;"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,343,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public boolean equals(Object other) {
+final Set<V> set = (Set<V>) getMapping();
+if (set == null) {
+return Collections.emptySet().equals(other);
+}
+if (!(other instanceof Set)) {
+return false;
+}
+Set<?> otherSet = (Set<?>) other;
+return SetUtils.isEqualSet(set, otherSet);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,344,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public int hashCode() {
+final Set<V> set = (Set<V>) getMapping();
+return SetUtils.hashCodeForSet(set);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,345,"final ArrayList<V> list = (ArrayList<V>) coll;
+","public void trimToSize() {
+for (Collection<V> coll : getMap().values()) {
+final ArrayList<V> list = (ArrayList<V>) coll;
+list.trimToSize();
+}
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,346,"private final Transformer<? super K, ? extends K> keyTransformer;","private final Transformer<? super K, ? extends K> keyTransformer;"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,347,"return (UnmodifiableMultiValuedMap<K, V>) map;
+","@SuppressWarnings(""unchecked"")
+public static <K, V> UnmodifiableMultiValuedMap<K, V> unmodifiableMultiValuedMap(MultiValuedMap<? extends K, ? extends V> map) {
+if (map instanceof Unmodifiable) {
+return (UnmodifiableMultiValuedMap<K, V>) map;
+}
+return new UnmodifiableMultiValuedMap<K, V>(map);
+}"
+DODGY_CODE,URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD,FP,3,20,collections,348,protected final AbstractMapMultiSet<E> parent;,protected final AbstractMapMultiSet<E> parent;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,349,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,350,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,351,"return (SortedSet<E>) decorated();
+","protected SortedSet<E> getSortedSet() {
+return (SortedSet<E>) decorated();
+}"
+CORRECTNESS,INT_BAD_COMPARISON_WITH_NONNEGATIVE_VALUE,FP,2,7,collections,357,"if (listSize < 0) {
+","@Override
+public List<T> get(final int index) {
+final int listSize = size();
+if (listSize < 0) {
+throw new IllegalArgumentException(""negative size: "" + listSize);
+}
+if (index < 0) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must not be negative"");
+}
+if (index >= listSize) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must be less than size "" + listSize);
+}
+final int start = index * size;
+final int end = Math.min(start + size, list.size());
+return list.subList(start, end);
+}"
+BAD_PRACTICE,NP_BOOLEAN_RETURN_NULL,FP,2,14,collections,358,"return null;
+","public static <K> Boolean getBoolean(final Map<? super K, ?> map, final K key) {
+if (map != null) {
+final Object answer = map.get(key);
+if (answer != null) {
+if (answer instanceof Boolean) {
+return (Boolean) answer;
+}
+if (answer instanceof String) {
+return Boolean.valueOf((String) answer);
+}
+if (answer instanceof Number) {
+final Number n = (Number) answer;
+return n.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE;
+}
+}
+}
+return null;
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,360,"return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+","@Override
+public boolean equals(final Object obj) {
+return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,361,"return this.doEquals(obj, KEY);
+","@Override
+public boolean equals(final Object obj) {
+return this.doEquals(obj, KEY);
+}"
+Multithreaded correctness,IS2_INCONSISTENT_SYNC,FP,2,17,collections,362,"private UnmodifiableBidiMap<V, K> inverse;","private UnmodifiableBidiMap<V, K> inverse;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,363,"private final Transformer<C, K> keyTransformer;","private final Transformer<C, K> keyTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,364,"protected final Transformer<? super E, ? extends E> transformer;","protected final Transformer<? super E, ? extends E> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,365,"private final Transformer<? super I, ? extends O> transformer;","private final Transformer<? super I, ? extends O> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,366,"private final Transformer<? super T, ? extends T>[] iTransformers;","private final Transformer<? super T, ? extends T>[] iTransformers;"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,367,"return null;
+","@SuppressWarnings(""unchecked"")
+static <T> Predicate<T>[] copy(final Predicate<? super T>... predicates) {
+if (predicates == null) {
+return null;
+}
+return (Predicate<T>[]) predicates.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,368,"return null;
+","@SuppressWarnings(""unchecked"")
+static <E> Closure<E>[] copy(final Closure<? super E>... closures) {
+if (closures == null) {
+return null;
+}
+return (Closure<E>[]) closures.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,369,"return null;
+","@SuppressWarnings(""unchecked"")
+static <I, O> Transformer<I, O>[] copy(final Transformer<? super I, ? extends O>... transformers) {
+if (transformers == null) {
+return null;
+}
+return (Transformer<I, O>[]) transformers.clone();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,370,"private final Transformer<? super I, ? extends O> iFalseTransformer;","private final Transformer<? super I, ? extends O> iFalseTransformer;"
+BAD_PRACTICE,SE_TRANSIENT_FIELD_NOT_RESTORED,FP,3,19,collections,371,private transient Method iCloneMethod;,private transient Method iCloneMethod;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,372,"private final Transformer<? super I, ? extends O> iDefault;","private final Transformer<? super I, ? extends O> iDefault;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,373,"private final Transformer<? super T, ? extends T> iTransformer;","private final Transformer<? super T, ? extends T> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,374,"private final Transformer<? super E, ?> iTransformer;","private final Transformer<? super E, ?> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,375,"private final Transformer<? super T, Boolean> iTransformer;","private final Transformer<? super T, Boolean> iTransformer;"
+MALICIOUS_CODE,EI_EXPOSE_REP,FP,2,18,collections,376,"return this.array;
+","public E[] getArray() {
+return this.array;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,377,"this.array = array;
+","public ObjectArrayIterator(final E[] array, final int start, final int end) {
+super();
+if (start < 0) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be less than zero"");
+}
+if (end > array.length) {
+throw new ArrayIndexOutOfBoundsException(""End index must not be greater than the array length"");
+}
+if (start > array.length) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be greater than the array length"");
+}
+if (end < start) {
+throw new IllegalArgumentException(""End index must not be less than start index"");
+}
+this.array = array;
+this.startIndex = start;
+this.endIndex = end;
+this.index = start;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,378,"this.keys = keys;
+","public MultiKey(final K[] keys, final boolean makeClone) {
+super();
+if (keys == null) {
+throw new IllegalArgumentException(""The array of keys must not be null"");
+}
+if (makeClone) {
+this.keys = keys.clone();
+} else {
+this.keys = keys;
+}
+calculateHashCode(keys);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,379,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,380,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,381,"return (List<E>) decorated();
+","protected List<E> getList() {
+return (List<E>) decorated();
+}"
+DODGY_CODE,UC_USELESS_CONDITION,FP,1,14,collections,382,"left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+","private AVLNode<E> removeSelf() {
+if (getRightSubTree() == null && getLeftSubTree() == null) {
+return null;
+}
+if (getRightSubTree() == null) {
+if (relativePosition > 0) {
+left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+}
+left.max().setRight(null, right);
+return left;
+}
+if (getLeftSubTree() == null) {
+right.relativePosition += relativePosition - (relativePosition < 0 ? 0 : 1);
+right.min().setLeft(null, left);
+return right;
+}
+if (heightRightMinusLeft() > 0) {
+final AVLNode<E> rightMin = right.min();
+value = rightMin.value;
+if (leftIsPrevious) {
+left = rightMin.left;
+}
+right = right.removeMin();
+if (relativePosition < 0) {
+relativePosition++;
+}
+} else {
+final AVLNode<E> leftMax = left.max();
+value = leftMax.value;
+if (rightIsNext) {
+right = leftMax.right;
+}
+final AVLNode<E> leftPrevious = left.left;
+left = left.removeMax();
+if (left == null) {
+left = leftPrevious;
+leftIsPrevious = true;
+}
+if (relativePosition > 0) {
+relativePosition--;
+}
+}
+recalcHeight();
+return this;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,384,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void removeEntry(final HashEntry<K, V> entry, final int hashIndex, final HashEntry<K, V> previous) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.before.after = link.after;
+link.after.before = link.before;
+link.after = null;
+link.before = null;
+super.removeEntry(entry, hashIndex, previous);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,386,"return (LinkEntry<K, V>) super.getEntry(key);
+","@Override
+protected LinkEntry<K, V> getEntry(final Object key) {
+return (LinkEntry<K, V>) super.getEntry(key);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,387,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void addEntry(final HashEntry<K, V> entry, final int hashIndex) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.after = header;
+link.before = header.before;
+header.before.after = link;
+header.before = link;
+data[hashIndex] = link;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,388,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,389,"entry = entry.next();
+","protected ReferenceEntry<K, V> nextEntry() {
+checkMod();
+if (nextNull() && !hasNext()) {
+throw new NoSuchElementException();
+}
+previous = entry;
+entry = entry.next();
+currentKey = nextKey;
+currentValue = nextValue;
+nextKey = null;
+nextValue = null;
+return previous;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,390,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+PERFORMANCE,URF_UNREAD_FIELD,FP,2,18,collections,391,"V currentValue, nextValue;","V currentValue, nextValue;"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,392,"if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+","protected void purge(final Reference<?> ref) {
+final int hash = ref.hashCode();
+final int index = hashIndex(hash, data.length);
+HashEntry<K, V> previous = null;
+HashEntry<K, V> entry = data[index];
+while (entry != null) {
+if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+if (previous == null) {
+data[index] = entry.next;
+} else {
+previous.next = entry.next;
+}
+this.size--;
+return;
+}
+previous = entry;
+entry = entry.next;
+}
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,393,"buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+","@Override
+public String toString() {
+if (delegateMap != null) {
+return delegateMap.toString();
+}
+if (size == 0) {
+return ""{}"";
+}
+final StringBuilder buf = new StringBuilder(128);
+buf.append('{');
+switch(size) {
+case 3:
+buf.append(key3 == this ? ""(this Map)"" : key3);
+buf.append('=');
+buf.append(value3 == this ? ""(this Map)"" : value3);
+buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+buf.append('=');
+buf.append(value2 == this ? ""(this Map)"" : value2);
+buf.append(',');
+case 1:
+buf.append(key1 == this ? ""(this Map)"" : key1);
+buf.append('=');
+buf.append(value1 == this ? ""(this Map)"" : value1);
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+buf.append('}');
+return buf.toString();
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,394,"total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+","@Override
+public int hashCode() {
+if (delegateMap != null) {
+return delegateMap.hashCode();
+}
+int total = 0;
+switch(size) {
+case 3:
+total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+case 1:
+total += hash1 ^ (value1 == null ? 0 : value1.hashCode());
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+return total;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,395,"delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+","private void convertToMap() {
+delegateMap = createDelegateMap();
+switch(size) {
+case 3:
+delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+case 1:
+delegateMap.put(key1, value1);
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+size = 0;
+hash1 = hash2 = hash3 = 0;
+key1 = key2 = key3 = null;
+value1 = value2 = value3 = null;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,396,"moveToMRU((LinkEntry<K, V>) entry);  
+","@Override
+protected void updateEntry(final HashEntry<K, V> entry, final V newValue) {
+moveToMRU((LinkEntry<K, V>) entry);
+entry.setValue(newValue);
+}"
+DODGY_CODE,CI_CONFUSED_INHERITANCE,FP,3,20,collections,397,protected K key;,protected K key;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,399,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public V remove(int index) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+V value = list.remove(index);
+if (list.isEmpty()) {
+AbstractListValuedMap.this.remove(key);
+}
+return value;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,400,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public int indexOf(Object o) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.indexOf(o);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,401,"final List<V> list = (List<V>) getMapping();
+","@Override
+public boolean equals(Object other) {
+final List<V> list = (List<V>) getMapping();
+if (list == null) {
+return Collections.emptyList().equals(other);
+}
+if (other == null) {
+return false;
+}
+if (!(other instanceof List)) {
+return false;
+}
+List<?> otherList = (List<?>) other;
+if (ListUtils.isEqualList(list, otherList) == false) {
+return false;
+}
+return true;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,402,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public List<V> subList(int fromIndex, int toIndex) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.subList(fromIndex, toIndex);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,403,"List<V> list = (List<V>) getMapping();
+","@SuppressWarnings(""unchecked"")
+public boolean addAll(int index, Collection<? extends V> c) {
+List<V> list = (List<V>) getMapping();
+if (list == null) {
+list = (List<V>) createCollection();
+boolean result = list.addAll(index, c);
+if (result) {
+getMap().put((K) key, list);
+}
+return result;
+}
+return list.addAll(index, c);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,404,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public int lastIndexOf(Object o) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.indexOf(o);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,405,"List<V> valueList = (List<V>) entry.getValue();
+","@Override
+public int hashCode() {
+int h = 0;
+Iterator<Entry<K, Collection<V>>> it = getMap().entrySet().iterator();
+while (it.hasNext()) {
+Entry<K, Collection<V>> entry = it.next();
+K key = entry.getKey();
+List<V> valueList = (List<V>) entry.getValue();
+h += (key == null ? 0 : key.hashCode()) ^ ListUtils.hashCodeForList(valueList);
+}
+return h;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,406,"List<V> list = (List<V>) getMapping();
+","@SuppressWarnings(""unchecked"")
+public void add(int index, V value) {
+List<V> list = (List<V>) getMapping();
+if (list == null) {
+list = (List<V>) AbstractListValuedMap.this.createCollection();
+list.add(index, value);
+getMap().put((K) key, list);
+}
+list.add(index, value);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,407,"List<V> list = (List<V>) createCollection();
+","@SuppressWarnings(""unchecked"")
+public void add(V value) {
+if (getMap().get(key) == null) {
+List<V> list = (List<V>) createCollection();
+getMap().put((K) key, list);
+this.values = list;
+this.iterator = list.listIterator();
+}
+this.iterator.add(value);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,408,"final List<V> list = (List<V>) getMapping();
+","@Override
+public int hashCode() {
+final List<V> list = (List<V>) getMapping();
+if (list == null) {
+return Collections.emptyList().hashCode();
+}
+return ListUtils.hashCodeForList(list);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,409,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public V get(int index) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.get(index);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,411,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public V set(int index, V value) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.set(index, value);
+}"
+BAD_PRACTICE,SE_TRANSIENT_FIELD_NOT_RESTORED,FP,3,19,collections,412,private transient Collection<V> valuesView;,private transient Collection<V> valuesView;
+PERFORMANCE,DM_NUMBER_CTOR,FP,2,18,collections,413,"this.collectionFactory = new InstantiateFactory<C>(collectionClazz, new Class[] { Integer.TYPE },
+","@SuppressWarnings(""unchecked"")
+protected <C extends Collection<V>> AbstractMultiValuedMap(final Map<K, ? super C> map, final Class<C> collectionClazz, final int initialCollectionCapacity) {
+if (map == null) {
+throw new IllegalArgumentException(""Map must not be null"");
+}
+if (initialCollectionCapacity < 0) {
+throw new IllegalArgumentException(""Illegal Capacity: "" + initialCollectionCapacity);
+}
+this.map = (Map<K, Collection<V>>) map;
+this.collectionFactory = new InstantiateFactory<C>(collectionClazz, new Class[] { Integer.TYPE }, new Object[] { new Integer(initialCollectionCapacity) });
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,414,"Set<V> valueSet = (Set<V>) entry.getValue();
+","@Override
+public int hashCode() {
+int h = 0;
+Iterator<Entry<K, Collection<V>>> it = getMap().entrySet().iterator();
+while (it.hasNext()) {
+Entry<K, Collection<V>> entry = it.next();
+K key = entry.getKey();
+Set<V> valueSet = (Set<V>) entry.getValue();
+h += (key == null ? 0 : key.hashCode()) ^ SetUtils.hashCodeForSet(valueSet);
+}
+return h;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,415,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public boolean equals(Object other) {
+final Set<V> set = (Set<V>) getMapping();
+if (set == null) {
+return Collections.emptySet().equals(other);
+}
+if (other == null) {
+return false;
+}
+if (!(other instanceof Set)) {
+return false;
+}
+Set<?> otherSet = (Set<?>) other;
+if (SetUtils.isEqualSet(set, otherSet) == false) {
+return false;
+}
+return true;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,416,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public int hashCode() {
+final Set<V> set = (Set<V>) getMapping();
+if (set == null) {
+return Collections.emptySet().hashCode();
+}
+return SetUtils.hashCodeForSet(set);
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,417,"private final Transformer<? super K, ? extends K> keyTransformer;","private final Transformer<? super K, ? extends K> keyTransformer;"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,418,"return (UnmodifiableMultiValuedMap<K, V>) map;
+","@SuppressWarnings(""unchecked"")
+public static <K, V> UnmodifiableMultiValuedMap<K, V> unmodifiableMultiValuedMap(MultiValuedMap<? extends K, ? extends V> map) {
+if (map instanceof Unmodifiable) {
+return (UnmodifiableMultiValuedMap<K, V>) map;
+}
+return new UnmodifiableMultiValuedMap<K, V>(map);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,419,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,420,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,421,"return (SortedSet<E>) decorated();
+","protected SortedSet<E> getSortedSet() {
+return (SortedSet<E>) decorated();
+}"
+BAD_PRACTICE,NP_BOOLEAN_RETURN_NULL,FP,2,14,collections,422,"return null;
+","public static <K> Boolean getBoolean(final Map<? super K, ?> map, final K key) {
+if (map != null) {
+final Object answer = map.get(key);
+if (answer != null) {
+if (answer instanceof Boolean) {
+return (Boolean) answer;
+}
+if (answer instanceof String) {
+return Boolean.valueOf((String) answer);
+}
+if (answer instanceof Number) {
+final Number n = (Number) answer;
+return n.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE;
+}
+}
+}
+return null;
+}"
+DODGY_CODE,DMI_NONSERIALIZABLE_OBJECT_WRITTEN,FP,3,20,collections,423,"out.writeObject(comparator());
+","private void writeObject(final ObjectOutputStream out) throws IOException {
+out.defaultWriteObject();
+out.writeObject(comparator());
+super.doWriteObject(out);
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,424,"private final Transformer<C, K> keyTransformer;","private final Transformer<C, K> keyTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,425,private final List<Comparator<E>> comparatorChain;,private final List<Comparator<E>> comparatorChain;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,426,private final Comparator<? super E> comparator;,private final Comparator<? super E> comparator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,427,private final Comparator<O> decorated;,private final Comparator<O> decorated;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,428,private final Predicate<? super T> iPredicate1;,private final Predicate<? super T> iPredicate1;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,429,"private final Transformer<? super T, ? extends T>[] iTransformers;","private final Transformer<? super T, ? extends T>[] iTransformers;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,430,private final Equator<T> equator;,private final Equator<T> equator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,431,private final Factory<? extends O> iFactory;,private final Factory<? extends O> iFactory;
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,432,"return null;
+","@SuppressWarnings(""unchecked"")
+static <I, O> Transformer<I, O>[] copy(final Transformer<? super I, ? extends O>... transformers) {
+if (transformers == null) {
+return null;
+}
+return (Transformer<I, O>[]) transformers.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,433,"return null;
+","@SuppressWarnings(""unchecked"")
+static <E> Closure<E>[] copy(final Closure<? super E>... closures) {
+if (closures == null) {
+return null;
+}
+return (Closure<E>[]) closures.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,434,"return null;
+","@SuppressWarnings(""unchecked"")
+static <T> Predicate<T>[] copy(final Predicate<? super T>... predicates) {
+if (predicates == null) {
+return null;
+}
+return (Predicate<T>[]) predicates.clone();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,435,private final Closure<? super E> iFalseClosure;,private final Closure<? super E> iFalseClosure;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,436,private final Predicate<? super I> iPredicate;,private final Predicate<? super I> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,437,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,438,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,439,private final Predicate<? super T> iPredicate2;,private final Predicate<? super T> iPredicate2;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,440,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,441,private final Closure<? super E> iDefault;,private final Closure<? super E> iDefault;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,442,"private final Transformer<? super I, ? extends O>[] iTransformers;","private final Transformer<? super I, ? extends O>[] iTransformers;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,443,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,444,"private final Transformer<? super E, ?> iTransformer;","private final Transformer<? super E, ?> iTransformer;"
+MALICIOUS_CODE,EI_EXPOSE_REP,FP,2,18,collections,445,"return this.array;
+","public E[] getArray() {
+return this.array;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,446,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,447,"private final Transformer<Integer, ? extends E> transformer;","private final Transformer<Integer, ? extends E> transformer;"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,448,"return (List<E>) decorated();
+","protected List<E> getList() {
+return (List<E>) decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,450,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void addEntry(final HashEntry<K, V> entry, final int hashIndex) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.after = header;
+link.before = header.before;
+header.before.after = link;
+header.before = link;
+data[hashIndex] = link;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,451,"return (LinkEntry<K, V>) super.getEntry(key);
+","@Override
+protected LinkEntry<K, V> getEntry(final Object key) {
+return (LinkEntry<K, V>) super.getEntry(key);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,453,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void removeEntry(final HashEntry<K, V> entry, final int hashIndex, final HashEntry<K, V> previous) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.before.after = link.after;
+link.after.before = link.before;
+link.after = null;
+link.before = null;
+super.removeEntry(entry, hashIndex, previous);
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,454,"entry = entry.next();
+","protected ReferenceEntry<K, V> nextEntry() {
+checkMod();
+if (nextNull() && !hasNext()) {
+throw new NoSuchElementException();
+}
+previous = entry;
+entry = entry.next();
+currentKey = nextKey;
+currentValue = nextValue;
+nextKey = null;
+nextValue = null;
+return previous;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,455,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,456,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,457,"buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+","@Override
+public String toString() {
+if (delegateMap != null) {
+return delegateMap.toString();
+}
+if (size == 0) {
+return ""{}"";
+}
+final StringBuilder buf = new StringBuilder(128);
+buf.append('{');
+switch(size) {
+case 3:
+buf.append(key3 == this ? ""(this Map)"" : key3);
+buf.append('=');
+buf.append(value3 == this ? ""(this Map)"" : value3);
+buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+buf.append('=');
+buf.append(value2 == this ? ""(this Map)"" : value2);
+buf.append(',');
+case 1:
+buf.append(key1 == this ? ""(this Map)"" : key1);
+buf.append('=');
+buf.append(value1 == this ? ""(this Map)"" : value1);
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+buf.append('}');
+return buf.toString();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,458,"moveToMRU((LinkEntry<K, V>) entry);  
+","@Override
+protected void updateEntry(final HashEntry<K, V> entry, final V newValue) {
+moveToMRU((LinkEntry<K, V>) entry);
+entry.setValue(newValue);
+}"
+DODGY_CODE,CI_CONFUSED_INHERITANCE,FP,3,20,collections,459,protected V value;,protected V value;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,460,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public int hashCode() {
+final Set<V> set = (Set<V>) getMapping();
+return SetUtils.hashCodeForSet(set);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,461,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public boolean equals(final Object other) {
+final Set<V> set = (Set<V>) getMapping();
+if (set == null) {
+return Collections.emptySet().equals(other);
+}
+if (!(other instanceof Set)) {
+return false;
+}
+final Set<?> otherSet = (Set<?>) other;
+return SetUtils.isEqualSet(set, otherSet);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,462,"final ArrayList<V> list = (ArrayList<V>) coll;
+","public void trimToSize() {
+for (final Collection<V> coll : getMap().values()) {
+final ArrayList<V> list = (ArrayList<V>) coll;
+list.trimToSize();
+}
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,463,"private final Transformer<? super K, ? extends K> keyTransformer;","private final Transformer<? super K, ? extends K> keyTransformer;"
+Multithreaded correctness,UG_SYNC_SET_UNSYNC_GET,FP,2,14,collections,464,"return defaultValue;
+","@Override
+public String getProperty(final String key, final String defaultValue) {
+return defaultValue;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,465,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,466,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+BAD_PRACTICE,NP_BOOLEAN_RETURN_NULL,FP,2,14,collections,541,"return null;
+","public static <K> Boolean getBoolean(final Map<? super K, ?> map, final K key) {
+if (map != null) {
+final Object answer = map.get(key);
+if (answer != null) {
+if (answer instanceof Boolean) {
+return (Boolean) answer;
+}
+if (answer instanceof String) {
+return Boolean.valueOf((String) answer);
+}
+if (answer instanceof Number) {
+final Number n = (Number) answer;
+return n.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE;
+}
+}
+}
+return null;
+}"
+BAD_PRACTICE,SE_INNER_CLASS,FP,3,19,collections,542,"SynchronizedBagSet(final Set<E> set, final Object lock) {
+super(set, lock);
+}
+","@Override
+public Set<E> uniqueSet() {
+synchronized (lock) {
+final Set<E> set = getBag().uniqueSet();
+return new SynchronizedBagSet(set, lock);
+}
+}"
+DODGY_CODE,DMI_NONSERIALIZABLE_OBJECT_WRITTEN,FP,3,20,collections,543,"out.writeObject(comparator());
+","private void writeObject(final ObjectOutputStream out) throws IOException {
+out.defaultWriteObject();
+out.writeObject(comparator());
+super.doWriteObject(out);
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,544,"final V value = last.getValue();
+","@Override
+public void remove() {
+if (canRemove == false) {
+throw new IllegalStateException(""Iterator remove() can only be called once after next()"");
+}
+final V value = last.getValue();
+iterator.remove();
+parent.reverseMap.remove(value);
+last = null;
+canRemove = false;
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,545,"final Object value = last.getValue();
+","@Override
+public void remove() {
+if (canRemove == false) {
+throw new IllegalStateException(""Iterator remove() can only be called once after next()"");
+}
+final Object value = last.getValue();
+super.remove();
+parent.reverseMap.remove(value);
+last = null;
+canRemove = false;
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,546,"parent.remove(last.getKey());
+","@Override
+public void remove() {
+iterator.remove();
+parent.remove(last.getKey());
+last = null;
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,547,"return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+","@Override
+public boolean equals(final Object obj) {
+return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,548,"return this.doEquals(obj, KEY);
+","@Override
+public boolean equals(final Object obj) {
+return this.doEquals(obj, KEY);
+}"
+Multithreaded correctness,IS2_INCONSISTENT_SYNC,FP,2,17,collections,549,"private UnmodifiableBidiMap<V, K> inverse;","private UnmodifiableBidiMap<V, K> inverse;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,550,"private final Transformer<C, K> keyTransformer;","private final Transformer<C, K> keyTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,551,private final Predicate<? super E> predicate;,private final Predicate<? super E> predicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,552,"protected final Transformer<? super E, ? extends E> transformer;","protected final Transformer<? super E, ? extends E> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,553,private final List<Comparator<E>> comparatorChain;,private final List<Comparator<E>> comparatorChain;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,554,private final Comparator<? super E> nonNullComparator;,private final Comparator<? super E> nonNullComparator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,555,private final Comparator<? super E> comparator;,private final Comparator<? super E> comparator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,556,"private final Transformer<? super I, ? extends O> transformer;","private final Transformer<? super I, ? extends O> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,557,private final Predicate<? super T> iPredicate2;,private final Predicate<? super T> iPredicate2;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,558,private final Closure<? super E>[] iClosures;,private final Closure<? super E>[] iClosures;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,559,"private final Transformer<? super T, ? extends T>[] iTransformers;","private final Transformer<? super T, ? extends T>[] iTransformers;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,560,private final Closure<? super T> iClosure;,private final Closure<? super T> iClosure;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,561,private final Comparator<T> comparator;,private final Comparator<T> comparator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,562,private final Equator<T> equator;,private final Equator<T> equator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,563,private final Factory<? extends O> iFactory;,private final Factory<? extends O> iFactory;
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,564,"return null;
+","@SuppressWarnings(""unchecked"")
+static <T> Predicate<T>[] copy(final Predicate<? super T>... predicates) {
+if (predicates == null) {
+return null;
+}
+return (Predicate<T>[]) predicates.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,565,"return null;
+","@SuppressWarnings(""unchecked"")
+static <E> Closure<E>[] copy(final Closure<? super E>... closures) {
+if (closures == null) {
+return null;
+}
+return (Closure<E>[]) closures.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,566,"return null;
+","@SuppressWarnings(""unchecked"")
+static <I, O> Transformer<I, O>[] copy(final Transformer<? super I, ? extends O>... transformers) {
+if (transformers == null) {
+return null;
+}
+return (Transformer<I, O>[]) transformers.clone();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,567,private final Predicate<? super E> iPredicate;,private final Predicate<? super E> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,568,"private final Transformer<? super I, ? extends O> iTrueTransformer;","private final Transformer<? super I, ? extends O> iTrueTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,569,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,570,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,571,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,572,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,573,private final Predicate<? super T> iPredicate2;,private final Predicate<? super T> iPredicate2;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,574,private final Predicate<? super T> iPredicate;,private final Predicate<? super T> iPredicate;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,575,private final Closure<? super E>[] iClosures;,private final Closure<? super E>[] iClosures;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,576,private final Predicate<? super I>[] iPredicates;,private final Predicate<? super I>[] iPredicates;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,577,"private final Transformer<? super T, ? extends T> iTransformer;","private final Transformer<? super T, ? extends T> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,578,"private final Transformer<? super E, ?> iTransformer;","private final Transformer<? super E, ?> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,579,"private final Transformer<? super T, Boolean> iTransformer;","private final Transformer<? super T, Boolean> iTransformer;"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,580,"this.array = array;
+","public ObjectArrayIterator(final E[] array, final int start, final int end) {
+if (start < 0) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be less than zero"");
+}
+if (end > array.length) {
+throw new ArrayIndexOutOfBoundsException(""End index must not be greater than the array length"");
+}
+if (start > array.length) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be greater than the array length"");
+}
+if (end < start) {
+throw new IllegalArgumentException(""End index must not be less than start index"");
+}
+this.array = array;
+this.startIndex = start;
+this.endIndex = end;
+this.index = start;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP,FP,2,18,collections,581,"return this.array;
+","public E[] getArray() {
+return this.array;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,582,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,583,private final Factory<? extends E> factory;,private final Factory<? extends E> factory;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,584,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,585,"return (List<E>) decorated();
+","protected List<E> getList() {
+return (List<E>) decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,587,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void removeEntry(final HashEntry<K, V> entry, final int hashIndex, final HashEntry<K, V> previous) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.before.after = link.after;
+link.after.before = link.before;
+link.after = null;
+link.before = null;
+super.removeEntry(entry, hashIndex, previous);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,588,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void addEntry(final HashEntry<K, V> entry, final int hashIndex) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.after = header;
+link.before = header.before;
+header.before.after = link;
+header.before = link;
+data[hashIndex] = link;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,589,"return (LinkEntry<K, V>) super.getEntry(key);
+","@Override
+protected LinkEntry<K, V> getEntry(final Object key) {
+return (LinkEntry<K, V>) super.getEntry(key);
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,591,"entry = entry.next();
+","protected ReferenceEntry<K, V> nextEntry() {
+checkMod();
+if (nextNull() && !hasNext()) {
+throw new NoSuchElementException();
+}
+previous = entry;
+entry = entry.next();
+currentKey = nextKey;
+currentValue = nextValue;
+nextKey = null;
+nextValue = null;
+return previous;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,592,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,593,"final ReferenceEntry<K, V> refEntry = (ReferenceEntry<K, V>) entry;
+","protected void purge(final Reference<?> ref) {
+final int hash = ref.hashCode();
+final int index = hashIndex(hash, data.length);
+HashEntry<K, V> previous = null;
+HashEntry<K, V> entry = data[index];
+while (entry != null) {
+final ReferenceEntry<K, V> refEntry = (ReferenceEntry<K, V>) entry;
+if (refEntry.purge(ref)) {
+if (previous == null) {
+data[index] = entry.next;
+} else {
+previous.next = entry.next;
+}
+this.size--;
+refEntry.onPurge();
+return;
+}
+previous = entry;
+entry = entry.next;
+}
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,594,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+PERFORMANCE,URF_UNREAD_FIELD,FP,2,18,collections,595,"V currentValue, nextValue;","V currentValue, nextValue;"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,596,"buf.append(CollectionUtils.COMMA);
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+","@Override
+public String toString() {
+if (delegateMap != null) {
+return delegateMap.toString();
+}
+if (size == 0) {
+return ""{}"";
+}
+final StringBuilder buf = new StringBuilder(128);
+buf.append('{');
+switch(size) {
+case 3:
+buf.append(key3 == this ? ""(this Map)"" : key3);
+buf.append('=');
+buf.append(value3 == this ? ""(this Map)"" : value3);
+buf.append(CollectionUtils.COMMA);
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+buf.append('=');
+buf.append(value2 == this ? ""(this Map)"" : value2);
+buf.append(CollectionUtils.COMMA);
+case 1:
+buf.append(key1 == this ? ""(this Map)"" : key1);
+buf.append('=');
+buf.append(value1 == this ? ""(this Map)"" : value1);
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+buf.append('}');
+return buf.toString();
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,597,"delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+","private void convertToMap() {
+delegateMap = createDelegateMap();
+switch(size) {
+case 3:
+delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+case 1:
+delegateMap.put(key1, value1);
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+size = 0;
+hash1 = hash2 = hash3 = 0;
+key1 = key2 = key3 = null;
+value1 = value2 = value3 = null;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,598,"total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+","@Override
+public int hashCode() {
+if (delegateMap != null) {
+return delegateMap.hashCode();
+}
+int total = 0;
+switch(size) {
+case 3:
+total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+case 1:
+total += hash1 ^ (value1 == null ? 0 : value1.hashCode());
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+return total;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,599,"moveToMRU((LinkEntry<K, V>) entry);  
+","@Override
+protected void updateEntry(final HashEntry<K, V> entry, final V newValue) {
+moveToMRU((LinkEntry<K, V>) entry);
+entry.setValue(newValue);
+}"
+DODGY_CODE,CI_CONFUSED_INHERITANCE,FP,3,20,collections,600,protected K key;,protected K key;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,601,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public int hashCode() {
+final Set<V> set = (Set<V>) getMapping();
+return SetUtils.hashCodeForSet(set);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,602,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public boolean equals(final Object other) {
+final Set<V> set = (Set<V>) getMapping();
+if (set == null) {
+return Collections.emptySet().equals(other);
+}
+if (!(other instanceof Set)) {
+return false;
+}
+final Set<?> otherSet = (Set<?>) other;
+return SetUtils.isEqualSet(set, otherSet);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,603,"final ArrayList<V> list = (ArrayList<V>) coll;
+","public void trimToSize() {
+for (final Collection<V> coll : getMap().values()) {
+final ArrayList<V> list = (ArrayList<V>) coll;
+list.trimToSize();
+}
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,604,"private final Transformer<? super K, ? extends K> keyTransformer;","private final Transformer<? super K, ? extends K> keyTransformer;"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,605,"return (UnmodifiableMultiValuedMap<K, V>) map;
+","@SuppressWarnings(""unchecked"")
+public static <K, V> UnmodifiableMultiValuedMap<K, V> unmodifiableMultiValuedMap(final MultiValuedMap<? extends K, ? extends V> map) {
+if (map instanceof Unmodifiable) {
+return (UnmodifiableMultiValuedMap<K, V>) map;
+}
+return new UnmodifiableMultiValuedMap<>(map);
+}"
+DODGY_CODE,URF_UNREAD_PUBLIC_OR_PROTECTED_FIELD,FP,3,20,collections,606,protected final AbstractMapMultiSet<E> parent;,protected final AbstractMapMultiSet<E> parent;
+Multithreaded correctness,UG_SYNC_SET_UNSYNC_GET,FP,2,14,collections,607,"return defaultValue;
+","@Override
+public String getProperty(final String key, final String defaultValue) {
+return defaultValue;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,608,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,609,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,610,"return (SortedSet<E>) decorated();
+","protected SortedSet<E> getSortedSet() {
+return (SortedSet<E>) decorated();
+}"
+DODGY_CODE,IA_AMBIGUOUS_INVOCATION_OF_INHERITED_OR_OUTER_METHOD,FP,1,18,collections,611,"final Set<K> currentKeys = keySet();
+","@Override
+public void clear() {
+final Iterator<Map.Entry<K, V>> it = AbstractPatriciaTrie.this.entrySet().iterator();
+final Set<K> currentKeys = keySet();
+while (it.hasNext()) {
+if (currentKeys.contains(it.next().getKey())) {
+it.remove();
+}
+}
+}"
+CORRECTNESS,INT_BAD_COMPARISON_WITH_NONNEGATIVE_VALUE,FP,2,7,collections,612,"if (listSize < 0) {
+","@Override
+public List<T> get(final int index) {
+final int listSize = size();
+if (listSize < 0) {
+throw new IllegalArgumentException(""negative size: "" + listSize);
+}
+if (index < 0) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must not be negative"");
+}
+if (index >= listSize) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must be less than size "" + listSize);
+}
+final int start = index * size;
+final int end = Math.min(start + size, list.size());
+return list.subList(start, end);
+}"
+BAD_PRACTICE,NP_BOOLEAN_RETURN_NULL,FP,2,14,collections,613,"return null;
+","public static <K> Boolean getBoolean(final Map<? super K, ?> map, final K key) {
+if (map != null) {
+final Object answer = map.get(key);
+if (answer != null) {
+if (answer instanceof Boolean) {
+return (Boolean) answer;
+}
+if (answer instanceof String) {
+return Boolean.valueOf((String) answer);
+}
+if (answer instanceof Number) {
+final Number n = (Number) answer;
+return n.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE;
+}
+}
+}
+return null;
+}"
+BAD_PRACTICE,SE_INNER_CLASS,FP,3,19,collections,614,"SynchronizedBagSet(final Set<E> set, final Object lock) {
+super(set, lock);
+}
+","@Override
+public boolean equals(final Object object) {
+if (object == this) {
+return true;
+}
+synchronized (lock) {
+return getBag().equals(object);
+}
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,615,"return this.doEquals(obj, KEY);
+","@Override
+public boolean equals(final Object obj) {
+return this.doEquals(obj, KEY);
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,616,"return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+","@Override
+public boolean equals(final Object obj) {
+return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+}"
+Multithreaded correctness,IS2_INCONSISTENT_SYNC,FP,2,17,collections,617,"private UnmodifiableBidiMap<V, K> inverse;","private UnmodifiableBidiMap<V, K> inverse;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,618,"private final Transformer<C, K> keyTransformer;","private final Transformer<C, K> keyTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,619,"protected final Transformer<? super E, ? extends E> transformer;","protected final Transformer<? super E, ? extends E> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,620,"private final Transformer<? super I, ? extends O> transformer;","private final Transformer<? super I, ? extends O> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,621,"private final Transformer<? super T, ? extends T>[] iTransformers;","private final Transformer<? super T, ? extends T>[] iTransformers;"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,622,"return null;
+","@SuppressWarnings(""unchecked"")
+static <T> Predicate<T>[] copy(final Predicate<? super T>... predicates) {
+if (predicates == null) {
+return null;
+}
+return (Predicate<T>[]) predicates.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,623,"return null;
+","@SuppressWarnings(""unchecked"")
+static <I, O> Transformer<I, O>[] copy(final Transformer<? super I, ? extends O>... transformers) {
+if (transformers == null) {
+return null;
+}
+return (Transformer<I, O>[]) transformers.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,624,"return null;
+","@SuppressWarnings(""unchecked"")
+static <E> Closure<E>[] copy(final Closure<? super E>... closures) {
+if (closures == null) {
+return null;
+}
+return (Closure<E>[]) closures.clone();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,625,"private final Transformer<? super I, ? extends O> iFalseTransformer;","private final Transformer<? super I, ? extends O> iFalseTransformer;"
+BAD_PRACTICE,SE_TRANSIENT_FIELD_NOT_RESTORED,FP,3,19,collections,626,private transient Method iCloneMethod;,private transient Method iCloneMethod;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,627,"private final Transformer<? super I, ? extends O>[] iTransformers;","private final Transformer<? super I, ? extends O>[] iTransformers;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,628,"private final Transformer<? super T, ? extends T> iTransformer;","private final Transformer<? super T, ? extends T> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,629,"private final Transformer<? super E, ?> iTransformer;","private final Transformer<? super E, ?> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,630,"private final Transformer<? super T, Boolean> iTransformer;","private final Transformer<? super T, Boolean> iTransformer;"
+MALICIOUS_CODE,EI_EXPOSE_REP,FP,2,18,collections,631,"return this.array;
+","public E[] getArray() {
+return this.array;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,632,"this.array = array;
+","public ObjectArrayIterator(final E[] array, final int start, final int end) {
+super();
+if (start < 0) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be less than zero"");
+}
+if (end > array.length) {
+throw new ArrayIndexOutOfBoundsException(""End index must not be greater than the array length"");
+}
+if (start > array.length) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be greater than the array length"");
+}
+if (end < start) {
+throw new IllegalArgumentException(""End index must not be less than start index"");
+}
+this.array = array;
+this.startIndex = start;
+this.endIndex = end;
+this.index = start;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,633,"this.keys = keys;
+","public MultiKey(final K[] keys, final boolean makeClone) {
+super();
+if (keys == null) {
+throw new IllegalArgumentException(""The array of keys must not be null"");
+}
+if (makeClone) {
+this.keys = keys.clone();
+} else {
+this.keys = keys;
+}
+calculateHashCode(keys);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,634,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,635,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,636,"return (List<E>) decorated();
+","protected List<E> getList() {
+return (List<E>) decorated();
+}"
+DODGY_CODE,UC_USELESS_CONDITION,FP,1,14,collections,637,"left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+","private AVLNode<E> removeSelf() {
+if (getRightSubTree() == null && getLeftSubTree() == null) {
+return null;
+}
+if (getRightSubTree() == null) {
+if (relativePosition > 0) {
+left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+}
+left.max().setRight(null, right);
+return left;
+}
+if (getLeftSubTree() == null) {
+right.relativePosition += relativePosition - (relativePosition < 0 ? 0 : 1);
+right.min().setLeft(null, left);
+return right;
+}
+if (heightRightMinusLeft() > 0) {
+final AVLNode<E> rightMin = right.min();
+value = rightMin.value;
+if (leftIsPrevious) {
+left = rightMin.left;
+}
+right = right.removeMin();
+if (relativePosition < 0) {
+relativePosition++;
+}
+} else {
+final AVLNode<E> leftMax = left.max();
+value = leftMax.value;
+if (rightIsNext) {
+right = leftMax.right;
+}
+final AVLNode<E> leftPrevious = left.left;
+left = left.removeMax();
+if (left == null) {
+left = leftPrevious;
+leftIsPrevious = true;
+}
+if (relativePosition > 0) {
+relativePosition--;
+}
+}
+recalcHeight();
+return this;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,639,"return (LinkEntry<K, V>) super.getEntry(key);
+","@Override
+protected LinkEntry<K, V> getEntry(final Object key) {
+return (LinkEntry<K, V>) super.getEntry(key);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,640,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void removeEntry(final HashEntry<K, V> entry, final int hashIndex, final HashEntry<K, V> previous) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.before.after = link.after;
+link.after.before = link.before;
+link.after = null;
+link.before = null;
+super.removeEntry(entry, hashIndex, previous);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,641,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void addEntry(final HashEntry<K, V> entry, final int hashIndex) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.after = header;
+link.before = header.before;
+header.before.after = link;
+header.before = link;
+data[hashIndex] = link;
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,643,"entry = entry.next();
+","protected ReferenceEntry<K, V> nextEntry() {
+checkMod();
+if (nextNull() && !hasNext()) {
+throw new NoSuchElementException();
+}
+previous = entry;
+entry = entry.next();
+currentKey = nextKey;
+currentValue = nextValue;
+nextKey = null;
+nextValue = null;
+return previous;
+}"
+PERFORMANCE,URF_UNREAD_FIELD,FP,2,18,collections,644,"V currentValue, nextValue;","V currentValue, nextValue;"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,645,"if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+","protected void purge(final Reference<?> ref) {
+final int hash = ref.hashCode();
+final int index = hashIndex(hash, data.length);
+HashEntry<K, V> previous = null;
+HashEntry<K, V> entry = data[index];
+while (entry != null) {
+if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+if (previous == null) {
+data[index] = entry.next;
+} else {
+previous.next = entry.next;
+}
+this.size--;
+return;
+}
+previous = entry;
+entry = entry.next;
+}
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,646,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,647,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,648,"buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+","@Override
+public String toString() {
+if (delegateMap != null) {
+return delegateMap.toString();
+}
+if (size == 0) {
+return ""{}"";
+}
+final StringBuilder buf = new StringBuilder(128);
+buf.append('{');
+switch(size) {
+case 3:
+buf.append(key3 == this ? ""(this Map)"" : key3);
+buf.append('=');
+buf.append(value3 == this ? ""(this Map)"" : value3);
+buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+buf.append('=');
+buf.append(value2 == this ? ""(this Map)"" : value2);
+buf.append(',');
+case 1:
+buf.append(key1 == this ? ""(this Map)"" : key1);
+buf.append('=');
+buf.append(value1 == this ? ""(this Map)"" : value1);
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+buf.append('}');
+return buf.toString();
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,649,"total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+","@Override
+public int hashCode() {
+if (delegateMap != null) {
+return delegateMap.hashCode();
+}
+int total = 0;
+switch(size) {
+case 3:
+total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+case 1:
+total += hash1 ^ (value1 == null ? 0 : value1.hashCode());
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+return total;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,650,"delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+","private void convertToMap() {
+delegateMap = createDelegateMap();
+switch(size) {
+case 3:
+delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+case 1:
+delegateMap.put(key1, value1);
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+size = 0;
+hash1 = hash2 = hash3 = 0;
+key1 = key2 = key3 = null;
+value1 = value2 = value3 = null;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,651,"moveToMRU((LinkEntry<K, V>) entry);  
+","@Override
+protected void updateEntry(final HashEntry<K, V> entry, final V newValue) {
+moveToMRU((LinkEntry<K, V>) entry);
+entry.setValue(newValue);
+}"
+DODGY_CODE,CI_CONFUSED_INHERITANCE,FP,3,20,collections,652,protected K key;,protected K key;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,653,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public int indexOf(Object o) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.indexOf(o);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,654,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public V set(int index, V value) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.set(index, value);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,656,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public List<V> subList(int fromIndex, int toIndex) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.subList(fromIndex, toIndex);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,658,"List<V> list = (List<V>) getMapping();
+","@SuppressWarnings(""unchecked"")
+public void add(int index, V value) {
+List<V> list = (List<V>) getMapping();
+if (list == null) {
+list = (List<V>) AbstractListValuedMap.this.createCollection();
+list.add(index, value);
+getMap().put((K) key, list);
+}
+list.add(index, value);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,659,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public int lastIndexOf(Object o) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.indexOf(o);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,660,"final List<V> list = (List<V>) getMapping();
+","@Override
+public boolean equals(Object other) {
+final List<V> list = (List<V>) getMapping();
+if (list == null) {
+return Collections.emptyList().equals(other);
+}
+if (other == null) {
+return false;
+}
+if (!(other instanceof List)) {
+return false;
+}
+List<?> otherList = (List<?>) other;
+if (ListUtils.isEqualList(list, otherList) == false) {
+return false;
+}
+return true;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,661,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public V get(int index) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.get(index);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,662,"List<V> list = (List<V>) getMapping();
+","@SuppressWarnings(""unchecked"")
+public boolean addAll(int index, Collection<? extends V> c) {
+List<V> list = (List<V>) getMapping();
+if (list == null) {
+list = (List<V>) createCollection();
+boolean result = list.addAll(index, c);
+if (result) {
+getMap().put((K) key, list);
+}
+return result;
+}
+return list.addAll(index, c);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,663,"List<V> list = (List<V>) createCollection();
+","@SuppressWarnings(""unchecked"")
+public void add(V value) {
+if (getMap().get(key) == null) {
+List<V> list = (List<V>) createCollection();
+getMap().put((K) key, list);
+this.values = list;
+this.iterator = list.listIterator();
+}
+this.iterator.add(value);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,664,"final List<V> list = (List<V>) getMapping();
+","@Override
+public int hashCode() {
+final List<V> list = (List<V>) getMapping();
+if (list == null) {
+return Collections.emptyList().hashCode();
+}
+return ListUtils.hashCodeForList(list);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,665,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public V remove(int index) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+V value = list.remove(index);
+if (list.isEmpty()) {
+AbstractListValuedMap.this.remove(key);
+}
+return value;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,666,"List<V> valueList = (List<V>) entry.getValue();
+","@Override
+public int hashCode() {
+int h = 0;
+Iterator<Entry<K, Collection<V>>> it = getMap().entrySet().iterator();
+while (it.hasNext()) {
+Entry<K, Collection<V>> entry = it.next();
+K key = entry.getKey();
+List<V> valueList = (List<V>) entry.getValue();
+h += (key == null ? 0 : key.hashCode()) ^ ListUtils.hashCodeForList(valueList);
+}
+return h;
+}"
+BAD_PRACTICE,SE_TRANSIENT_FIELD_NOT_RESTORED,FP,3,19,collections,667,private transient KeysBag keysBagView;,private transient KeysBag keysBagView;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,668,"Set<V> valueSet = (Set<V>) entry.getValue();
+","@Override
+public int hashCode() {
+int h = 0;
+Iterator<Entry<K, Collection<V>>> it = getMap().entrySet().iterator();
+while (it.hasNext()) {
+Entry<K, Collection<V>> entry = it.next();
+K key = entry.getKey();
+Set<V> valueSet = (Set<V>) entry.getValue();
+h += (key == null ? 0 : key.hashCode()) ^ SetUtils.hashCodeForSet(valueSet);
+}
+return h;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,669,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public boolean equals(Object other) {
+final Set<V> set = (Set<V>) getMapping();
+if (set == null) {
+return Collections.emptySet().equals(other);
+}
+if (other == null) {
+return false;
+}
+if (!(other instanceof Set)) {
+return false;
+}
+Set<?> otherSet = (Set<?>) other;
+if (SetUtils.isEqualSet(set, otherSet) == false) {
+return false;
+}
+return true;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,670,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public int hashCode() {
+final Set<V> set = (Set<V>) getMapping();
+if (set == null) {
+return Collections.emptySet().hashCode();
+}
+return SetUtils.hashCodeForSet(set);
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,671,"private final Transformer<? super K, ? extends K> keyTransformer;","private final Transformer<? super K, ? extends K> keyTransformer;"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,672,"return (UnmodifiableMultiValuedMap<K, V>) map;
+","@SuppressWarnings(""unchecked"")
+public static <K, V> UnmodifiableMultiValuedMap<K, V> unmodifiableMultiValuedMap(MultiValuedMap<? extends K, ? extends V> map) {
+if (map instanceof Unmodifiable) {
+return (UnmodifiableMultiValuedMap<K, V>) map;
+}
+return new UnmodifiableMultiValuedMap<K, V>(map);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,673,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,674,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,675,"return (SortedSet<E>) decorated();
+","protected SortedSet<E> getSortedSet() {
+return (SortedSet<E>) decorated();
+}"
+CORRECTNESS,INT_BAD_COMPARISON_WITH_NONNEGATIVE_VALUE,FP,2,7,collections,676,"if (listSize < 0) {
+","@Override
+public List<T> get(final int index) {
+final int listSize = size();
+if (listSize < 0) {
+throw new IllegalArgumentException(""negative size: "" + listSize);
+}
+if (index < 0) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must not be negative"");
+}
+if (index >= listSize) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must be less than size "" + listSize);
+}
+final int start = index * size;
+final int end = Math.min(start + size, list.size());
+return list.subList(start, end);
+}"
+BAD_PRACTICE,NP_BOOLEAN_RETURN_NULL,FP,2,14,collections,677,"return null;
+","public static <K> Boolean getBoolean(final Map<? super K, ?> map, final K key) {
+if (map != null) {
+final Object answer = map.get(key);
+if (answer != null) {
+if (answer instanceof Boolean) {
+return (Boolean) answer;
+}
+if (answer instanceof String) {
+return Boolean.valueOf((String) answer);
+}
+if (answer instanceof Number) {
+final Number n = (Number) answer;
+return n.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE;
+}
+}
+}
+return null;
+}"
+BAD_PRACTICE,SE_INNER_CLASS,FP,3,19,collections,678,"SynchronizedBagSet(final Set<E> set, final Object lock) {
+super(set, lock);
+}
+","@Override
+public boolean equals(final Object object) {
+if (object == this) {
+return true;
+}
+synchronized (lock) {
+return getBag().equals(object);
+}
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,679,"return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+","@Override
+public boolean equals(final Object obj) {
+return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,680,"return this.doEquals(obj, KEY);
+","@Override
+public boolean equals(final Object obj) {
+return this.doEquals(obj, KEY);
+}"
+Multithreaded correctness,IS2_INCONSISTENT_SYNC,FP,2,17,collections,681,"private UnmodifiableBidiMap<V, K> inverse;","private UnmodifiableBidiMap<V, K> inverse;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,682,"private final Transformer<C, K> keyTransformer;","private final Transformer<C, K> keyTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,683,"protected final Transformer<? super E, ? extends E> transformer;","protected final Transformer<? super E, ? extends E> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,684,"private final Transformer<? super I, ? extends O> transformer;","private final Transformer<? super I, ? extends O> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,685,"private final Transformer<? super T, ? extends T>[] iTransformers;","private final Transformer<? super T, ? extends T>[] iTransformers;"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,686,"return null;
+","@SuppressWarnings(""unchecked"")
+static <T> Predicate<T>[] copy(final Predicate<? super T>... predicates) {
+if (predicates == null) {
+return null;
+}
+return (Predicate<T>[]) predicates.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,687,"return null;
+","@SuppressWarnings(""unchecked"")
+static <E> Closure<E>[] copy(final Closure<? super E>... closures) {
+if (closures == null) {
+return null;
+}
+return (Closure<E>[]) closures.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,688,"return null;
+","@SuppressWarnings(""unchecked"")
+static <I, O> Transformer<I, O>[] copy(final Transformer<? super I, ? extends O>... transformers) {
+if (transformers == null) {
+return null;
+}
+return (Transformer<I, O>[]) transformers.clone();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,689,"private final Transformer<? super I, ? extends O> iFalseTransformer;","private final Transformer<? super I, ? extends O> iFalseTransformer;"
+BAD_PRACTICE,SE_TRANSIENT_FIELD_NOT_RESTORED,FP,3,19,collections,690,private transient Method iCloneMethod;,private transient Method iCloneMethod;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,691,"private final Transformer<? super I, ? extends O> iDefault;","private final Transformer<? super I, ? extends O> iDefault;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,692,"private final Transformer<? super T, ? extends T> iTransformer;","private final Transformer<? super T, ? extends T> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,693,"private final Transformer<? super E, ?> iTransformer;","private final Transformer<? super E, ?> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,694,"private final Transformer<? super T, Boolean> iTransformer;","private final Transformer<? super T, Boolean> iTransformer;"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,695,"this.array = array;
+","public ObjectArrayIterator(final E[] array, final int start, final int end) {
+super();
+if (start < 0) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be less than zero"");
+}
+if (end > array.length) {
+throw new ArrayIndexOutOfBoundsException(""End index must not be greater than the array length"");
+}
+if (start > array.length) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be greater than the array length"");
+}
+if (end < start) {
+throw new IllegalArgumentException(""End index must not be less than start index"");
+}
+this.array = array;
+this.startIndex = start;
+this.endIndex = end;
+this.index = start;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP,FP,2,18,collections,696,"return this.array;
+","public E[] getArray() {
+return this.array;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,697,"this.keys = keys;
+","public MultiKey(final K[] keys, final boolean makeClone) {
+super();
+if (keys == null) {
+throw new IllegalArgumentException(""The array of keys must not be null"");
+}
+if (makeClone) {
+this.keys = keys.clone();
+} else {
+this.keys = keys;
+}
+calculateHashCode(keys);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,698,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,699,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,700,"return (List<E>) decorated();
+","protected List<E> getList() {
+return (List<E>) decorated();
+}"
+DODGY_CODE,UC_USELESS_CONDITION,FP,1,14,collections,701,"left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+","private AVLNode<E> removeSelf() {
+if (getRightSubTree() == null && getLeftSubTree() == null) {
+return null;
+}
+if (getRightSubTree() == null) {
+if (relativePosition > 0) {
+left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+}
+left.max().setRight(null, right);
+return left;
+}
+if (getLeftSubTree() == null) {
+right.relativePosition += relativePosition - (relativePosition < 0 ? 0 : 1);
+right.min().setLeft(null, left);
+return right;
+}
+if (heightRightMinusLeft() > 0) {
+final AVLNode<E> rightMin = right.min();
+value = rightMin.value;
+if (leftIsPrevious) {
+left = rightMin.left;
+}
+right = right.removeMin();
+if (relativePosition < 0) {
+relativePosition++;
+}
+} else {
+final AVLNode<E> leftMax = left.max();
+value = leftMax.value;
+if (rightIsNext) {
+right = leftMax.right;
+}
+final AVLNode<E> leftPrevious = left.left;
+left = left.removeMax();
+if (left == null) {
+left = leftPrevious;
+leftIsPrevious = true;
+}
+if (relativePosition > 0) {
+relativePosition--;
+}
+}
+recalcHeight();
+return this;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,703,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void removeEntry(final HashEntry<K, V> entry, final int hashIndex, final HashEntry<K, V> previous) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.before.after = link.after;
+link.after.before = link.before;
+link.after = null;
+link.before = null;
+super.removeEntry(entry, hashIndex, previous);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,704,"return (LinkEntry<K, V>) super.getEntry(key);
+","@Override
+protected LinkEntry<K, V> getEntry(final Object key) {
+return (LinkEntry<K, V>) super.getEntry(key);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,706,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void addEntry(final HashEntry<K, V> entry, final int hashIndex) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.after = header;
+link.before = header.before;
+header.before.after = link;
+header.before = link;
+data[hashIndex] = link;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,707,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+PERFORMANCE,URF_UNREAD_FIELD,FP,2,18,collections,708,"V currentValue, nextValue;","V currentValue, nextValue;"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,709,"if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+","protected void purge(final Reference<?> ref) {
+final int hash = ref.hashCode();
+final int index = hashIndex(hash, data.length);
+HashEntry<K, V> previous = null;
+HashEntry<K, V> entry = data[index];
+while (entry != null) {
+if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+if (previous == null) {
+data[index] = entry.next;
+} else {
+previous.next = entry.next;
+}
+this.size--;
+return;
+}
+previous = entry;
+entry = entry.next;
+}
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,710,"entry = entry.next();
+","protected ReferenceEntry<K, V> nextEntry() {
+checkMod();
+if (nextNull() && !hasNext()) {
+throw new NoSuchElementException();
+}
+previous = entry;
+entry = entry.next();
+currentKey = nextKey;
+currentValue = nextValue;
+nextKey = null;
+nextValue = null;
+return previous;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,711,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,712,"delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+","private void convertToMap() {
+delegateMap = createDelegateMap();
+switch(size) {
+case 3:
+delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+case 1:
+delegateMap.put(key1, value1);
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+size = 0;
+hash1 = hash2 = hash3 = 0;
+key1 = key2 = key3 = null;
+value1 = value2 = value3 = null;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,713,"buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+","@Override
+public String toString() {
+if (delegateMap != null) {
+return delegateMap.toString();
+}
+if (size == 0) {
+return ""{}"";
+}
+final StringBuilder buf = new StringBuilder(128);
+buf.append('{');
+switch(size) {
+case 3:
+buf.append(key3 == this ? ""(this Map)"" : key3);
+buf.append('=');
+buf.append(value3 == this ? ""(this Map)"" : value3);
+buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+buf.append('=');
+buf.append(value2 == this ? ""(this Map)"" : value2);
+buf.append(',');
+case 1:
+buf.append(key1 == this ? ""(this Map)"" : key1);
+buf.append('=');
+buf.append(value1 == this ? ""(this Map)"" : value1);
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+buf.append('}');
+return buf.toString();
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,714,"total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+","@Override
+public int hashCode() {
+if (delegateMap != null) {
+return delegateMap.hashCode();
+}
+int total = 0;
+switch(size) {
+case 3:
+total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+case 1:
+total += hash1 ^ (value1 == null ? 0 : value1.hashCode());
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+return total;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,715,"moveToMRU((LinkEntry<K, V>) entry);  
+","@Override
+protected void updateEntry(final HashEntry<K, V> entry, final V newValue) {
+moveToMRU((LinkEntry<K, V>) entry);
+entry.setValue(newValue);
+}"
+DODGY_CODE,CI_CONFUSED_INHERITANCE,FP,3,20,collections,716,protected K key;,protected K key;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,717,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public List<V> subList(int fromIndex, int toIndex) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.subList(fromIndex, toIndex);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,718,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public int indexOf(Object o) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.indexOf(o);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,719,"List<V> list = (List<V>) getMapping();
+","@SuppressWarnings(""unchecked"")
+public boolean addAll(int index, Collection<? extends V> c) {
+List<V> list = (List<V>) getMapping();
+if (list == null) {
+list = (List<V>) createCollection();
+boolean result = list.addAll(index, c);
+if (result) {
+getMap().put((K) key, list);
+}
+return result;
+}
+return list.addAll(index, c);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,721,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public V set(int index, V value) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.set(index, value);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,722,"final List<V> list = (List<V>) getMapping();
+","@Override
+public boolean equals(Object other) {
+final List<V> list = (List<V>) getMapping();
+if (list == null) {
+return Collections.emptyList().equals(other);
+}
+if (other == null) {
+return false;
+}
+if (!(other instanceof List)) {
+return false;
+}
+List<?> otherList = (List<?>) other;
+if (ListUtils.isEqualList(list, otherList) == false) {
+return false;
+}
+return true;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,724,"List<V> list = (List<V>) createCollection();
+","@SuppressWarnings(""unchecked"")
+public void add(V value) {
+if (getMap().get(key) == null) {
+List<V> list = (List<V>) createCollection();
+getMap().put((K) key, list);
+this.values = list;
+this.iterator = list.listIterator();
+}
+this.iterator.add(value);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,725,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public V remove(int index) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+V value = list.remove(index);
+if (list.isEmpty()) {
+AbstractListValuedMap.this.remove(key);
+}
+return value;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,726,"final List<V> list = (List<V>) getMapping();
+","@Override
+public int hashCode() {
+final List<V> list = (List<V>) getMapping();
+if (list == null) {
+return Collections.emptyList().hashCode();
+}
+return ListUtils.hashCodeForList(list);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,727,"List<V> list = (List<V>) getMapping();
+","@SuppressWarnings(""unchecked"")
+public void add(int index, V value) {
+List<V> list = (List<V>) getMapping();
+if (list == null) {
+list = (List<V>) AbstractListValuedMap.this.createCollection();
+list.add(index, value);
+getMap().put((K) key, list);
+}
+list.add(index, value);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,728,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public int lastIndexOf(Object o) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.indexOf(o);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,729,"List<V> valueList = (List<V>) entry.getValue();
+","@Override
+public int hashCode() {
+int h = 0;
+Iterator<Entry<K, Collection<V>>> it = getMap().entrySet().iterator();
+while (it.hasNext()) {
+Entry<K, Collection<V>> entry = it.next();
+K key = entry.getKey();
+List<V> valueList = (List<V>) entry.getValue();
+h += (key == null ? 0 : key.hashCode()) ^ ListUtils.hashCodeForList(valueList);
+}
+return h;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,730,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public V get(int index) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.get(index);
+}"
+BAD_PRACTICE,SE_TRANSIENT_FIELD_NOT_RESTORED,FP,3,19,collections,731,private transient KeysBag keysBagView;,private transient KeysBag keysBagView;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,732,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public int hashCode() {
+final Set<V> set = (Set<V>) getMapping();
+if (set == null) {
+return Collections.emptySet().hashCode();
+}
+return SetUtils.hashCodeForSet(set);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,733,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public boolean equals(Object other) {
+final Set<V> set = (Set<V>) getMapping();
+if (set == null) {
+return Collections.emptySet().equals(other);
+}
+if (other == null) {
+return false;
+}
+if (!(other instanceof Set)) {
+return false;
+}
+Set<?> otherSet = (Set<?>) other;
+if (SetUtils.isEqualSet(set, otherSet) == false) {
+return false;
+}
+return true;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,734,"Set<V> valueSet = (Set<V>) entry.getValue();
+","@Override
+public int hashCode() {
+int h = 0;
+Iterator<Entry<K, Collection<V>>> it = getMap().entrySet().iterator();
+while (it.hasNext()) {
+Entry<K, Collection<V>> entry = it.next();
+K key = entry.getKey();
+Set<V> valueSet = (Set<V>) entry.getValue();
+h += (key == null ? 0 : key.hashCode()) ^ SetUtils.hashCodeForSet(valueSet);
+}
+return h;
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,735,"private final Transformer<? super K, ? extends K> keyTransformer;","private final Transformer<? super K, ? extends K> keyTransformer;"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,736,"return (UnmodifiableMultiValuedMap<K, V>) map;
+","@SuppressWarnings(""unchecked"")
+public static <K, V> UnmodifiableMultiValuedMap<K, V> unmodifiableMultiValuedMap(MultiValuedMap<? extends K, ? extends V> map) {
+if (map instanceof Unmodifiable) {
+return (UnmodifiableMultiValuedMap<K, V>) map;
+}
+return new UnmodifiableMultiValuedMap<K, V>(map);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,737,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,738,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,739,"return (SortedSet<E>) decorated();
+","protected SortedSet<E> getSortedSet() {
+return (SortedSet<E>) decorated();
+}"
+CORRECTNESS,INT_BAD_COMPARISON_WITH_NONNEGATIVE_VALUE,FP,2,7,collections,740,"if (listSize < 0) {
+","@Override
+public List<T> get(final int index) {
+final int listSize = size();
+if (listSize < 0) {
+throw new IllegalArgumentException(""negative size: "" + listSize);
+}
+if (index < 0) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must not be negative"");
+}
+if (index >= listSize) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must be less than size "" + listSize);
+}
+final int start = index * size;
+final int end = Math.min(start + size, list.size());
+return list.subList(start, end);
+}"
+BAD_PRACTICE,NP_BOOLEAN_RETURN_NULL,FP,2,14,collections,741,"return null;
+","public static <K> Boolean getBoolean(final Map<? super K, ?> map, final K key) {
+if (map != null) {
+final Object answer = map.get(key);
+if (answer != null) {
+if (answer instanceof Boolean) {
+return (Boolean) answer;
+}
+if (answer instanceof String) {
+return Boolean.valueOf((String) answer);
+}
+if (answer instanceof Number) {
+final Number n = (Number) answer;
+return n.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE;
+}
+}
+}
+return null;
+}"
+BAD_PRACTICE,SE_INNER_CLASS,FP,3,19,collections,742,"SynchronizedBagSet(final Set<E> set, final Object lock) {
+super(set, lock);
+}
+","@Override
+public boolean equals(final Object object) {
+if (object == this) {
+return true;
+}
+synchronized (lock) {
+return getBag().equals(object);
+}
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,743,"return this.doEquals(obj, KEY);
+","@Override
+public boolean equals(final Object obj) {
+return this.doEquals(obj, KEY);
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,744,"return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+","@Override
+public boolean equals(final Object obj) {
+return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+}"
+Multithreaded correctness,IS2_INCONSISTENT_SYNC,FP,2,17,collections,745,"private UnmodifiableBidiMap<V, K> inverse;","private UnmodifiableBidiMap<V, K> inverse;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,746,"private final Transformer<C, K> keyTransformer;","private final Transformer<C, K> keyTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,747,"protected final Transformer<? super E, ? extends E> transformer;","protected final Transformer<? super E, ? extends E> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,748,"private final Transformer<? super I, ? extends O> transformer;","private final Transformer<? super I, ? extends O> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,749,"private final Transformer<? super T, ? extends T>[] iTransformers;","private final Transformer<? super T, ? extends T>[] iTransformers;"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,750,"return null;
+","@SuppressWarnings(""unchecked"")
+static <I, O> Transformer<I, O>[] copy(final Transformer<? super I, ? extends O>... transformers) {
+if (transformers == null) {
+return null;
+}
+return (Transformer<I, O>[]) transformers.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,751,"return null;
+","@SuppressWarnings(""unchecked"")
+static <T> Predicate<T>[] copy(final Predicate<? super T>... predicates) {
+if (predicates == null) {
+return null;
+}
+return (Predicate<T>[]) predicates.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,752,"return null;
+","@SuppressWarnings(""unchecked"")
+static <E> Closure<E>[] copy(final Closure<? super E>... closures) {
+if (closures == null) {
+return null;
+}
+return (Closure<E>[]) closures.clone();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,753,"private final Transformer<? super I, ? extends O> iFalseTransformer;","private final Transformer<? super I, ? extends O> iFalseTransformer;"
+BAD_PRACTICE,SE_TRANSIENT_FIELD_NOT_RESTORED,FP,3,19,collections,754,private transient Method iCloneMethod;,private transient Method iCloneMethod;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,755,"private final Transformer<? super I, ? extends O> iDefault;","private final Transformer<? super I, ? extends O> iDefault;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,756,"private final Transformer<? super T, ? extends T> iTransformer;","private final Transformer<? super T, ? extends T> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,757,"private final Transformer<? super E, ?> iTransformer;","private final Transformer<? super E, ?> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,758,"private final Transformer<? super T, Boolean> iTransformer;","private final Transformer<? super T, Boolean> iTransformer;"
+MALICIOUS_CODE,EI_EXPOSE_REP,FP,2,18,collections,759,"return this.array;
+","public E[] getArray() {
+return this.array;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,760,"this.array = array;
+","public ObjectArrayIterator(final E[] array, final int start, final int end) {
+super();
+if (start < 0) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be less than zero"");
+}
+if (end > array.length) {
+throw new ArrayIndexOutOfBoundsException(""End index must not be greater than the array length"");
+}
+if (start > array.length) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be greater than the array length"");
+}
+if (end < start) {
+throw new IllegalArgumentException(""End index must not be less than start index"");
+}
+this.array = array;
+this.startIndex = start;
+this.endIndex = end;
+this.index = start;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,761,"this.keys = keys;
+","public MultiKey(final K[] keys, final boolean makeClone) {
+super();
+if (keys == null) {
+throw new IllegalArgumentException(""The array of keys must not be null"");
+}
+if (makeClone) {
+this.keys = keys.clone();
+} else {
+this.keys = keys;
+}
+calculateHashCode(keys);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,762,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,763,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,764,"return (List<E>) decorated();
+","protected List<E> getList() {
+return (List<E>) decorated();
+}"
+DODGY_CODE,UC_USELESS_CONDITION,FP,1,14,collections,765,"left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+","private AVLNode<E> removeSelf() {
+if (getRightSubTree() == null && getLeftSubTree() == null) {
+return null;
+}
+if (getRightSubTree() == null) {
+if (relativePosition > 0) {
+left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+}
+left.max().setRight(null, right);
+return left;
+}
+if (getLeftSubTree() == null) {
+right.relativePosition += relativePosition - (relativePosition < 0 ? 0 : 1);
+right.min().setLeft(null, left);
+return right;
+}
+if (heightRightMinusLeft() > 0) {
+final AVLNode<E> rightMin = right.min();
+value = rightMin.value;
+if (leftIsPrevious) {
+left = rightMin.left;
+}
+right = right.removeMin();
+if (relativePosition < 0) {
+relativePosition++;
+}
+} else {
+final AVLNode<E> leftMax = left.max();
+value = leftMax.value;
+if (rightIsNext) {
+right = leftMax.right;
+}
+final AVLNode<E> leftPrevious = left.left;
+left = left.removeMax();
+if (left == null) {
+left = leftPrevious;
+leftIsPrevious = true;
+}
+if (relativePosition > 0) {
+relativePosition--;
+}
+}
+recalcHeight();
+return this;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,768,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void addEntry(final HashEntry<K, V> entry, final int hashIndex) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.after = header;
+link.before = header.before;
+header.before.after = link;
+header.before = link;
+data[hashIndex] = link;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,769,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void removeEntry(final HashEntry<K, V> entry, final int hashIndex, final HashEntry<K, V> previous) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.before.after = link.after;
+link.after.before = link.before;
+link.after = null;
+link.before = null;
+super.removeEntry(entry, hashIndex, previous);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,770,"return (LinkEntry<K, V>) super.getEntry(key);
+","@Override
+protected LinkEntry<K, V> getEntry(final Object key) {
+return (LinkEntry<K, V>) super.getEntry(key);
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,771,"entry = entry.next();
+","protected ReferenceEntry<K, V> nextEntry() {
+checkMod();
+if (nextNull() && !hasNext()) {
+throw new NoSuchElementException();
+}
+previous = entry;
+entry = entry.next();
+currentKey = nextKey;
+currentValue = nextValue;
+nextKey = null;
+nextValue = null;
+return previous;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,772,"if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+","protected void purge(final Reference<?> ref) {
+final int hash = ref.hashCode();
+final int index = hashIndex(hash, data.length);
+HashEntry<K, V> previous = null;
+HashEntry<K, V> entry = data[index];
+while (entry != null) {
+if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+if (previous == null) {
+data[index] = entry.next;
+} else {
+previous.next = entry.next;
+}
+this.size--;
+return;
+}
+previous = entry;
+entry = entry.next;
+}
+}"
+PERFORMANCE,URF_UNREAD_FIELD,FP,2,18,collections,773,"V currentValue, nextValue;","V currentValue, nextValue;"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,774,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,775,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,776,"delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+","private void convertToMap() {
+delegateMap = createDelegateMap();
+switch(size) {
+case 3:
+delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+case 1:
+delegateMap.put(key1, value1);
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+size = 0;
+hash1 = hash2 = hash3 = 0;
+key1 = key2 = key3 = null;
+value1 = value2 = value3 = null;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,777,"buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+","@Override
+public String toString() {
+if (delegateMap != null) {
+return delegateMap.toString();
+}
+if (size == 0) {
+return ""{}"";
+}
+final StringBuilder buf = new StringBuilder(128);
+buf.append('{');
+switch(size) {
+case 3:
+buf.append(key3 == this ? ""(this Map)"" : key3);
+buf.append('=');
+buf.append(value3 == this ? ""(this Map)"" : value3);
+buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+buf.append('=');
+buf.append(value2 == this ? ""(this Map)"" : value2);
+buf.append(',');
+case 1:
+buf.append(key1 == this ? ""(this Map)"" : key1);
+buf.append('=');
+buf.append(value1 == this ? ""(this Map)"" : value1);
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+buf.append('}');
+return buf.toString();
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,778,"total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+","@Override
+public int hashCode() {
+if (delegateMap != null) {
+return delegateMap.hashCode();
+}
+int total = 0;
+switch(size) {
+case 3:
+total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+case 1:
+total += hash1 ^ (value1 == null ? 0 : value1.hashCode());
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+return total;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,779,"moveToMRU((LinkEntry<K, V>) entry);  
+","@Override
+protected void updateEntry(final HashEntry<K, V> entry, final V newValue) {
+moveToMRU((LinkEntry<K, V>) entry);
+entry.setValue(newValue);
+}"
+DODGY_CODE,CI_CONFUSED_INHERITANCE,FP,3,20,collections,780,"protected Node<K, V> next;","protected Node<K, V> next;"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,781,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public int indexOf(Object o) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.indexOf(o);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,782,"List<V> list = (List<V>) createCollection();
+","@SuppressWarnings(""unchecked"")
+public void add(V value) {
+if (getMap().get(key) == null) {
+List<V> list = (List<V>) createCollection();
+getMap().put((K) key, list);
+this.values = list;
+this.iterator = list.listIterator();
+}
+this.iterator.add(value);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,784,"List<V> list = (List<V>) getMapping();
+","@SuppressWarnings(""unchecked"")
+public boolean addAll(int index, Collection<? extends V> c) {
+List<V> list = (List<V>) getMapping();
+if (list == null) {
+list = (List<V>) createCollection();
+boolean result = list.addAll(index, c);
+if (result) {
+getMap().put((K) key, list);
+}
+return result;
+}
+return list.addAll(index, c);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,785,"final List<V> list = (List<V>) getMapping();
+","@Override
+public boolean equals(Object other) {
+final List<V> list = (List<V>) getMapping();
+if (list == null) {
+return Collections.emptyList().equals(other);
+}
+if (other == null) {
+return false;
+}
+if (!(other instanceof List)) {
+return false;
+}
+List<?> otherList = (List<?>) other;
+if (ListUtils.isEqualList(list, otherList) == false) {
+return false;
+}
+return true;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,786,"List<V> list = (List<V>) getMapping();
+","@SuppressWarnings(""unchecked"")
+public void add(int index, V value) {
+List<V> list = (List<V>) getMapping();
+if (list == null) {
+list = (List<V>) AbstractListValuedMap.this.createCollection();
+list.add(index, value);
+getMap().put((K) key, list);
+}
+list.add(index, value);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,787,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public int lastIndexOf(Object o) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.indexOf(o);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,788,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public List<V> subList(int fromIndex, int toIndex) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.subList(fromIndex, toIndex);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,789,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public V remove(int index) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+V value = list.remove(index);
+if (list.isEmpty()) {
+AbstractListValuedMap.this.remove(key);
+}
+return value;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,790,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public V set(int index, V value) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.set(index, value);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,791,"final List<V> list = (List<V>) getMapping();
+","@Override
+public int hashCode() {
+final List<V> list = (List<V>) getMapping();
+if (list == null) {
+return Collections.emptyList().hashCode();
+}
+return ListUtils.hashCodeForList(list);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,793,"final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+","public V get(int index) {
+final List<V> list = ListUtils.emptyIfNull((List<V>) getMapping());
+return list.get(index);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,794,"List<V> valueList = (List<V>) entry.getValue();
+","@Override
+public int hashCode() {
+int h = 0;
+Iterator<Entry<K, Collection<V>>> it = getMap().entrySet().iterator();
+while (it.hasNext()) {
+Entry<K, Collection<V>> entry = it.next();
+K key = entry.getKey();
+List<V> valueList = (List<V>) entry.getValue();
+h += (key == null ? 0 : key.hashCode()) ^ ListUtils.hashCodeForList(valueList);
+}
+return h;
+}"
+BAD_PRACTICE,SE_TRANSIENT_FIELD_NOT_RESTORED,FP,3,19,collections,795,private transient KeysBag keysBagView;,private transient KeysBag keysBagView;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,796,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public int hashCode() {
+final Set<V> set = (Set<V>) getMapping();
+if (set == null) {
+return Collections.emptySet().hashCode();
+}
+return SetUtils.hashCodeForSet(set);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,797,"Set<V> valueSet = (Set<V>) entry.getValue();
+","@Override
+public int hashCode() {
+int h = 0;
+Iterator<Entry<K, Collection<V>>> it = getMap().entrySet().iterator();
+while (it.hasNext()) {
+Entry<K, Collection<V>> entry = it.next();
+K key = entry.getKey();
+Set<V> valueSet = (Set<V>) entry.getValue();
+h += (key == null ? 0 : key.hashCode()) ^ SetUtils.hashCodeForSet(valueSet);
+}
+return h;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,798,"final Set<V> set = (Set<V>) getMapping();
+","@Override
+public boolean equals(Object other) {
+final Set<V> set = (Set<V>) getMapping();
+if (set == null) {
+return Collections.emptySet().equals(other);
+}
+if (other == null) {
+return false;
+}
+if (!(other instanceof Set)) {
+return false;
+}
+Set<?> otherSet = (Set<?>) other;
+if (SetUtils.isEqualSet(set, otherSet) == false) {
+return false;
+}
+return true;
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,799,"private final Transformer<? super V, ? extends V> valueTransformer;","private final Transformer<? super V, ? extends V> valueTransformer;"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,800,"return (UnmodifiableMultiValuedMap<K, V>) map;
+","@SuppressWarnings(""unchecked"")
+public static <K, V> UnmodifiableMultiValuedMap<K, V> unmodifiableMultiValuedMap(MultiValuedMap<? extends K, ? extends V> map) {
+if (map instanceof Unmodifiable) {
+return (UnmodifiableMultiValuedMap<K, V>) map;
+}
+return new UnmodifiableMultiValuedMap<K, V>(map);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,801,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,802,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,803,"return (SortedSet<E>) decorated();
+","protected SortedSet<E> getSortedSet() {
+return (SortedSet<E>) decorated();
+}"
+CORRECTNESS,INT_BAD_COMPARISON_WITH_NONNEGATIVE_VALUE,FP,2,7,collections,804,"if (listSize < 0) {
+","@Override
+public List<T> get(final int index) {
+final int listSize = size();
+if (listSize < 0) {
+throw new IllegalArgumentException(""negative size: "" + listSize);
+}
+if (index < 0) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must not be negative"");
+}
+if (index >= listSize) {
+throw new IndexOutOfBoundsException(""Index "" + index + "" must be less than size "" + listSize);
+}
+final int start = index * size;
+final int end = Math.min(start + size, list.size());
+return list.subList(start, end);
+}"
+DODGY_CODE,RV_RETURN_VALUE_IGNORED_NO_SIDE_EFFECT,FP,2,17,collections,805,"map.size();  
+","@SuppressWarnings(""unchecked"")
+public static <K, V> Map<K, V> putAll(final Map<K, V> map, final Object[] array) {
+map.size();
+if (array == null || array.length == 0) {
+return map;
+}
+final Object obj = array[0];
+if (obj instanceof Map.Entry) {
+for (final Object element : array) {
+final Map.Entry<K, V> entry = (Map.Entry<K, V>) element;
+map.put(entry.getKey(), entry.getValue());
+}
+} else if (obj instanceof KeyValue) {
+for (final Object element : array) {
+final KeyValue<K, V> keyval = (KeyValue<K, V>) element;
+map.put(keyval.getKey(), keyval.getValue());
+}
+} else if (obj instanceof Object[]) {
+for (int i = 0; i < array.length; i++) {
+final Object[] sub = (Object[]) array[i];
+if (sub == null || sub.length < 2) {
+throw new IllegalArgumentException(""Invalid array element: "" + i);
+}
+map.put((K) sub[0], (V) sub[1]);
+}
+} else {
+for (int i = 0; i < array.length - 1; ) {
+map.put((K) array[i++], (V) array[i++]);
+}
+}
+return map;
+}"
+BAD_PRACTICE,NP_BOOLEAN_RETURN_NULL,FP,2,14,collections,806,"return null;
+","public static <K> Boolean getBoolean(final Map<? super K, ?> map, final K key) {
+if (map != null) {
+final Object answer = map.get(key);
+if (answer != null) {
+if (answer instanceof Boolean) {
+return (Boolean) answer;
+}
+if (answer instanceof String) {
+return Boolean.valueOf((String) answer);
+}
+if (answer instanceof Number) {
+final Number n = (Number) answer;
+return n.intValue() != 0 ? Boolean.TRUE : Boolean.FALSE;
+}
+}
+}
+return null;
+}"
+DODGY_CODE,DMI_NONSERIALIZABLE_OBJECT_WRITTEN,FP,3,20,collections,808,"out.writeObject(comparator());
+","private void writeObject(final ObjectOutputStream out) throws IOException {
+out.defaultWriteObject();
+out.writeObject(comparator());
+super.doWriteObject(out);
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,809,"return this.doEquals(obj, KEY);
+","@Override
+public boolean equals(final Object obj) {
+return this.doEquals(obj, KEY);
+}"
+DODGY_CODE,EQ_UNUSUAL,FP,2,17,collections,810,"return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+","@Override
+public boolean equals(final Object obj) {
+return TreeBidiMap.this.doEquals(obj, DataElement.VALUE);
+}"
+Multithreaded correctness,IS2_INCONSISTENT_SYNC,FP,2,17,collections,811,"private UnmodifiableBidiMap<V, K> inverse;","private UnmodifiableBidiMap<V, K> inverse;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,812,"private final Transformer<C, K> keyTransformer;","private final Transformer<C, K> keyTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,813,"protected final Transformer<? super E, ? extends E> transformer;","protected final Transformer<? super E, ? extends E> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,814,private final List<Comparator<E>> comparatorChain;,private final List<Comparator<E>> comparatorChain;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,815,private final Comparator<? super E> nonNullComparator;,private final Comparator<? super E> nonNullComparator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,816,private final Comparator<E> comparator;,private final Comparator<E> comparator;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,817,"private final Transformer<? super I, ? extends O> transformer;","private final Transformer<? super I, ? extends O> transformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,818,"private final Transformer<? super T, ? extends T>[] iTransformers;","private final Transformer<? super T, ? extends T>[] iTransformers;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,819,private final Comparator<T> comparator;,private final Comparator<T> comparator;
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,820,"return null;
+","@SuppressWarnings(""unchecked"")
+static <T> Predicate<T>[] copy(final Predicate<? super T>... predicates) {
+if (predicates == null) {
+return null;
+}
+return (Predicate<T>[]) predicates.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,821,"return null;
+","@SuppressWarnings(""unchecked"")
+static <I, O> Transformer<I, O>[] copy(final Transformer<? super I, ? extends O>... transformers) {
+if (transformers == null) {
+return null;
+}
+return (Transformer<I, O>[]) transformers.clone();
+}"
+DODGY_CODE,PZLA_PREFER_ZERO_LENGTH_ARRAYS,FP,3,20,collections,822,"return null;
+","@SuppressWarnings(""unchecked"")
+static <E> Closure<E>[] copy(final Closure<? super E>... closures) {
+if (closures == null) {
+return null;
+}
+return (Closure<E>[]) closures.clone();
+}"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,823,"private final Transformer<? super I, ? extends O> iTrueTransformer;","private final Transformer<? super I, ? extends O> iTrueTransformer;"
+BAD_PRACTICE,SE_TRANSIENT_FIELD_NOT_RESTORED,FP,3,19,collections,824,private transient Method iCloneMethod;,private transient Method iCloneMethod;
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,825,"private final Transformer<? super I, ? extends O> iDefault;","private final Transformer<? super I, ? extends O> iDefault;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,826,"private final Transformer<? super T, ? extends T> iTransformer;","private final Transformer<? super T, ? extends T> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,827,"private final Transformer<? super E, ?> iTransformer;","private final Transformer<? super E, ?> iTransformer;"
+BAD_PRACTICE,SE_BAD_FIELD,FP,3,19,collections,828,"private final Transformer<? super T, Boolean> iTransformer;","private final Transformer<? super T, Boolean> iTransformer;"
+MALICIOUS_CODE,EI_EXPOSE_REP,FP,2,18,collections,829,"return this.array;
+","public E[] getArray() {
+return this.array;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,830,"this.array = array;
+","public ObjectArrayIterator(final E[] array, final int start, final int end) {
+super();
+if (start < 0) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be less than zero"");
+}
+if (end > array.length) {
+throw new ArrayIndexOutOfBoundsException(""End index must not be greater than the array length"");
+}
+if (start > array.length) {
+throw new ArrayIndexOutOfBoundsException(""Start index must not be greater than the array length"");
+}
+if (end < start) {
+throw new IllegalArgumentException(""End index must not be less than start index"");
+}
+this.array = array;
+this.startIndex = start;
+this.endIndex = end;
+this.index = start;
+}"
+MALICIOUS_CODE,EI_EXPOSE_REP2,FP,2,18,collections,831,"this.keys = keys;
+","public MultiKey(final K[] keys, final boolean makeClone) {
+super();
+if (keys == null) {
+throw new IllegalArgumentException(""The array of keys must not be null"");
+}
+if (makeClone) {
+this.keys = keys.clone();
+} else {
+this.keys = keys;
+}
+calculateHashCode(keys);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,832,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,833,"return (List<E>) super.decorated();
+","@Override
+protected List<E> decorated() {
+return (List<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,834,"return (List<E>) decorated();
+","protected List<E> getList() {
+return (List<E>) decorated();
+}"
+DODGY_CODE,UC_USELESS_CONDITION,FP,1,14,collections,835,"left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+","private AVLNode<E> removeSelf() {
+if (getRightSubTree() == null && getLeftSubTree() == null) {
+return null;
+}
+if (getRightSubTree() == null) {
+if (relativePosition > 0) {
+left.relativePosition += relativePosition + (relativePosition > 0 ? 0 : 1);
+}
+left.max().setRight(null, right);
+return left;
+}
+if (getLeftSubTree() == null) {
+right.relativePosition += relativePosition - (relativePosition < 0 ? 0 : 1);
+right.min().setLeft(null, left);
+return right;
+}
+if (heightRightMinusLeft() > 0) {
+final AVLNode<E> rightMin = right.min();
+value = rightMin.value;
+if (leftIsPrevious) {
+left = rightMin.left;
+}
+right = right.removeMin();
+if (relativePosition < 0) {
+relativePosition++;
+}
+} else {
+final AVLNode<E> leftMax = left.max();
+value = leftMax.value;
+if (rightIsNext) {
+right = leftMax.right;
+}
+final AVLNode<E> leftPrevious = left.left;
+left = left.removeMax();
+if (left == null) {
+left = leftPrevious;
+leftIsPrevious = true;
+}
+if (relativePosition > 0) {
+relativePosition--;
+}
+}
+recalcHeight();
+return this;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,838,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void addEntry(final HashEntry<K, V> entry, final int hashIndex) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.after = header;
+link.before = header.before;
+header.before.after = link;
+header.before = link;
+data[hashIndex] = link;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,839,"final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+","@Override
+protected void removeEntry(final HashEntry<K, V> entry, final int hashIndex, final HashEntry<K, V> previous) {
+final LinkEntry<K, V> link = (LinkEntry<K, V>) entry;
+link.before.after = link.after;
+link.after.before = link.before;
+link.after = null;
+link.before = null;
+super.removeEntry(entry, hashIndex, previous);
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,840,"return (LinkEntry<K, V>) super.getEntry(key);
+","@Override
+protected LinkEntry<K, V> getEntry(final Object key) {
+return (LinkEntry<K, V>) super.getEntry(key);
+}"
+DODGY_CODE,UWF_FIELD_NOT_INITIALIZED_IN_CONSTRUCTOR,FP,3,20,collections,841,"entry = entry.next();
+","protected ReferenceEntry<K, V> nextEntry() {
+checkMod();
+if (nextNull() && !hasNext()) {
+throw new NoSuchElementException();
+}
+previous = entry;
+entry = entry.next();
+currentKey = nextKey;
+currentValue = nextValue;
+nextKey = null;
+nextValue = null;
+return previous;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,842,"if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+","protected void purge(final Reference<?> ref) {
+final int hash = ref.hashCode();
+final int index = hashIndex(hash, data.length);
+HashEntry<K, V> previous = null;
+HashEntry<K, V> entry = data[index];
+while (entry != null) {
+if (((ReferenceEntry<K, V>) entry).purge(ref)) {
+if (previous == null) {
+data[index] = entry.next;
+} else {
+previous.next = entry.next;
+}
+this.size--;
+return;
+}
+previous = entry;
+entry = entry.next;
+}
+}"
+PERFORMANCE,URF_UNREAD_FIELD,FP,2,18,collections,843,"V currentValue, nextValue;","V currentValue, nextValue;"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,844,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+BAD_PRACTICE,HE_HASHCODE_USE_OBJECT_EQUALS,FP,3,19,collections,845,"return hash;
+","@Override
+public int hashCode() {
+return hash;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,846,"buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+","@Override
+public String toString() {
+if (delegateMap != null) {
+return delegateMap.toString();
+}
+if (size == 0) {
+return ""{}"";
+}
+final StringBuilder buf = new StringBuilder(128);
+buf.append('{');
+switch(size) {
+case 3:
+buf.append(key3 == this ? ""(this Map)"" : key3);
+buf.append('=');
+buf.append(value3 == this ? ""(this Map)"" : value3);
+buf.append(',');
+case 2:
+buf.append(key2 == this ? ""(this Map)"" : key2);
+buf.append('=');
+buf.append(value2 == this ? ""(this Map)"" : value2);
+buf.append(',');
+case 1:
+buf.append(key1 == this ? ""(this Map)"" : key1);
+buf.append('=');
+buf.append(value1 == this ? ""(this Map)"" : value1);
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+buf.append('}');
+return buf.toString();
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,847,"delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+","private void convertToMap() {
+delegateMap = createDelegateMap();
+switch(size) {
+case 3:
+delegateMap.put(key3, value3);
+case 2:
+delegateMap.put(key2, value2);
+case 1:
+delegateMap.put(key1, value1);
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+size = 0;
+hash1 = hash2 = hash3 = 0;
+key1 = key2 = key3 = null;
+value1 = value2 = value3 = null;
+}"
+DODGY_CODE,SF_SWITCH_FALLTHROUGH,FP,2,17,collections,848,"total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+","@Override
+public int hashCode() {
+if (delegateMap != null) {
+return delegateMap.hashCode();
+}
+int total = 0;
+switch(size) {
+case 3:
+total += hash3 ^ (value3 == null ? 0 : value3.hashCode());
+case 2:
+total += hash2 ^ (value2 == null ? 0 : value2.hashCode());
+case 1:
+total += hash1 ^ (value1 == null ? 0 : value1.hashCode());
+case 0:
+break;
+default:
+throw new IllegalStateException(""Invalid map index: "" + size);
+}
+return total;
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST,FP,3,20,collections,849,"moveToMRU((LinkEntry<K, V>) entry);  
+","@Override
+protected void updateEntry(final HashEntry<K, V> entry, final V newValue) {
+moveToMRU((LinkEntry<K, V>) entry);
+entry.setValue(newValue);
+}"
+DODGY_CODE,CI_CONFUSED_INHERITANCE,FP,3,20,collections,850,protected V value;,protected V value;
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,851,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,3,20,collections,852,"return (Set<E>) super.decorated();
+","@Override
+protected Set<E> decorated() {
+return (Set<E>) super.decorated();
+}"
+DODGY_CODE,BC_UNCONFIRMED_CAST_OF_RETURN_VALUE,FP,,,collections,853,"return (SortedSet<E>) decorated();
+","protected SortedSet<E> getSortedSet() {
+return (SortedSet<E>) decorated();
+}"

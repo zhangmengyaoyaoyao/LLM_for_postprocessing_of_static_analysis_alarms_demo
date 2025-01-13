@@ -1,0 +1,9 @@
+The warning is actionable.
+
+The warning is about the use of `__queue.notify()` without `__queue.notifyAll()`. In a multithreaded environment, if one thread is waiting on a lock and the lock is released, it is important to notify all waiting threads to ensure that the correct thread can proceed. Using `notify()` instead of `notifyAll()` can lead to deadlocks or incorrect behavior if the waiting threads are not the ones that need to be woken up.
+
+The code snippet shows that `__queue.notify()` is called when `__bytesAvailable == 0` and `__hasReachedEOF` is false. This is likely intended to wake up a waiting thread that is waiting for more bytes to be available. However, if there are multiple threads waiting, only one will be woken up by `notify()`, potentially leaving others waiting indefinitely.
+
+To fix this issue, `__queue.notifyAll()` should be used instead of `__queue.notify()` to ensure that all waiting threads are notified.
+
+@@ actionable @@

@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "PZLA_PREFER_ZERO_LENGTH_ARRAYS",
+  "priority": "3",
+  "rank": "20",
+  "project": "codec",
+  "warning_line": "return null;\n",
+  "warning_method": "protected byte[] doDecoding(byte[] bytes) throws DecoderException {\nif (bytes == null) {\nreturn null;\n}\nboolean hasUnderscores = false;\nfor (int i = 0; i < bytes.length; i++) {\nif (bytes[i] == UNDERSCORE) {\nhasUnderscores = true;\nbreak;\n}\n}\nif (hasUnderscores) {\nbyte[] tmp = new byte[bytes.length];\nfor (int i = 0; i < bytes.length; i++) {\nbyte b = bytes[i];\nif (b != UNDERSCORE) {\ntmp[i] = b;\n} else {\ntmp[i] = BLANK;\n}\n}\nreturn QuotedPrintableCodec.decodeQuotedPrintable(tmp);\n}\nreturn QuotedPrintableCodec.decodeQuotedPrintable(bytes);\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning suggests that the code should prefer returning a zero-length array instead of `null` when the input array is `null`. This is a best practice in Java to avoid null pointer exceptions. The code in question does return `null` when the input array is `null`, which is consistent with the warning. However, the warning is actionable because the code could be modified to return an empty array instead, which is a more idiomatic way to handle this situation in Java. This change would make the code safer and more readable.
+
+@@ actionable @@

@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "PZLA_PREFER_ZERO_LENGTH_ARRAYS",
+  "priority": "3",
+  "rank": "20",
+  "project": "codec",
+  "warning_line": "return null;\n",
+  "warning_method": "public static final byte[] encodeUrl(BitSet urlsafe, byte[] bytes) {\nif (bytes == null) {\nreturn null;\n}\nif (urlsafe == null) {\nurlsafe = WWW_FORM_URL;\n}\nByteArrayOutputStream buffer = new ByteArrayOutputStream();\nfor (int i = 0; i < bytes.length; i++) {\nint b = bytes[i];\nif (b < 0) {\nb = 256 + b;\n}\nif (urlsafe.get(b)) {\nif (b == ' ') {\nb = '+';\n}\nbuffer.write(b);\n} else {\nbuffer.write('%');\nchar hex1 = Character.toUpperCase(Character.forDigit((b >> 4) & 0xF, 16));\nchar hex2 = Character.toUpperCase(Character.forDigit(b & 0xF, 16));\nbuffer.write(hex1);\nbuffer.write(hex2);\n}\n}\nreturn buffer.toByteArray();\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning suggests that the method `encodeUrl` returns `null` when the input `bytes` is `null`. This is a common practice and not necessarily a problem unless the calling code expects a non-null result and does not handle the `null` case properly. The warning is actionable if the method is being used in a way that relies on the non-null behavior, and the calling code needs to be reviewed and updated to handle the `null` case. However, if the calling code is already handling the `null` case appropriately, then the warning is not actionable.
+
+@@ actionable @@

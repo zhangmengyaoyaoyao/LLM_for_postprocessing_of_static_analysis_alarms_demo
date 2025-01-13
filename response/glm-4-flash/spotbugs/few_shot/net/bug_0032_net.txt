@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "DLS_DEAD_LOCAL_STORE",
+  "priority": "2",
+  "rank": "17",
+  "project": "net",
+  "warning_line": "id = \"<Bogus-id:\" + (bogusIdCount++) + \">\";\n",
+  "warning_method": "private void buildContainer(Threadable threadable, HashMap<String, ThreadContainer> idTable) {\nString id = threadable.messageThreadId();\nThreadContainer container = idTable.get(id);\nint bogusIdCount = 0;\nif (container != null) {\nif (container.threadable != null) {\nid = \"<Bogus-id:\" + (bogusIdCount++) + \">\";\ncontainer = null;\n} else {\ncontainer.threadable = threadable;\n}\n}\nif (container == null) {\ncontainer = new ThreadContainer();\ncontainer.threadable = threadable;\nidTable.put(id, container);\n}\nThreadContainer parentRef = null;\n{\nString[] references = threadable.messageThreadReferences();\nfor (String refString : references) {\nThreadContainer ref = idTable.get(refString);\nif (ref == null) {\nref = new ThreadContainer();\nidTable.put(refString, ref);\n}\n// Link references together in the order they appear in the References: header,\nif ((parentRef != null) && (ref.parent == null) && (parentRef != ref) && !(ref.findChild(parentRef))) {\nref.parent = parentRef;\nref.next = parentRef.child;\nparentRef.child = ref;\n}\nparentRef = ref;\n}\n}\nif (parentRef != null && (parentRef == container || container.findChild(parentRef))) {\nparentRef = null;\n}\n// if it has a parent already, its because we saw this message in a References: field, and presumed\nif (container.parent != null) {\nThreadContainer rest, prev;\nfor (prev = null, rest = container.parent.child; rest != null; prev = rest, rest = rest.next) {\nif (rest == container) {\nbreak;\n}\n}\nif (rest == null) {\nthrow new RuntimeException(\"Didnt find \" + container + \" in parent\" + container.parent);\n}\nif (prev == null) {\ncontainer.parent.child = container.next;\n} else {\nprev.next = container.next;\n}\ncontainer.next = null;\ncontainer.parent = null;\n}\nif (parentRef != null) {\ncontainer.parent = parentRef;\ncontainer.next = parentRef.child;\nparentRef.child = container;\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates a "Dead Local Store" (DLS), which means that the local variable `id` is assigned a value but is never used after that. This could be a mistake or an oversight in the code. Since the variable `id` is used immediately after its assignment, it seems like the warning might be a false positive. However, if the variable is not used elsewhere in the method, it could indicate unnecessary code that could be removed for clarity or optimization. Therefore, it is worth investigating to ensure that the variable is indeed not used elsewhere.
+
+@@ actionable @@

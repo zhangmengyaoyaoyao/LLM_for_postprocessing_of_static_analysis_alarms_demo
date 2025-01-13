@@ -15,15 +15,10 @@ test  | 临时测试，暂时没有用处
 src/construct_prompts.py  | 根据采用的提示词技术合成提示词
 src/find_function.py  | 目前采用的学长写的提取C函数的代码
 src/toexcel_and_comp  | 将LLM的回答存储到excel中,并判断LLM的结论与手工标记结果的一致性
-report/csv2json_java.py  | 将Java项目警告转换为json格式
-report/csv2json_c.py  | 将C/C++项目警告转为json格式
-
-其它（后被src/toexcel_and_comp代替）
-文件       | 说明
------------ | -----
 src/response2excel.py  | 将LLM的回答存储到excel中
 src/judge_consistent.py  | 判断LLM的结论与手工标记结果的一致性
-
+report/csv2json_java.py  | 将Java项目警告转换为json格式
+report/csv2json_c.py  | 将C/C++项目警告转为json格式
 
 # 2 如何上手（调用LLM分类警告）
 ## 2.1 获取API-KEY
@@ -116,10 +111,18 @@ bug
 模型/项目 | bcel  |  collections  |  dbcp  |  mavendp
 Llama3.1-70B-Instruct | √ | √ | √ | √ 
 GLM-4-flash | √ | √ | √ | √ 
+gpt-3.5-turbo-0125 | √ | √ | √ | √
 
 **C项目**
 
 所有（10个项目）
+
+Llama3.1-70B-Instruct
+
+GLM-4-flash
+
+gpt-3.5-turbo-0125
+
 
 # TODO
 已解决 1、提示词的example以md形式改写

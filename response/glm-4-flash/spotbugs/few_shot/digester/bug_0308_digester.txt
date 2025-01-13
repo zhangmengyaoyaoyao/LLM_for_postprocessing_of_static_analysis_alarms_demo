@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "PERFORMANCE",
+  "vtype": "SIC_INNER_SHOULD_BE_STATIC",
+  "priority": "2",
+  "rank": "18",
+  "project": "digester",
+  "warning_line": "private String matchPrefix = null;\nprivate Rules decoratedRules = null;\nprivate List<Rule> rules = new ArrayList<Rule>(1);\nprivate AnyChildRule rule;\npublic AnyChildRules(AnyChildRule rule) {\nthis.rule = rule;\nrules.add(rule);\n}\npublic Digester getDigester() { return null; }\npublic void setDigester(Digester digester) {}\npublic String getNamespaceURI() { return null; }\npublic void setNamespaceURI(String namespaceURI) {}\npublic void add(String pattern, Rule rule) {}\npublic void clear() {}\npublic List<Rule> match(String namespaceURI, String matchPath) {\nList<Rule> match = decoratedRules.match(namespaceURI, matchPath);\nif ((matchPath.startsWith(matchPrefix))\n&& (matchPath.indexOf('/', matchPrefix.length()) == -1)) {\nif ((match == null || match.size()==0)) {\n// just one rule: the one passed to this object's\nreturn rules;\n} else {\nLinkedList<Rule> newMatch = new LinkedList<Rule>(match);\nnewMatch.addLast(rule);\nreturn newMatch;\n}\n} else {\nreturn match;\n}\n}\npublic List<Rule> rules() {\nif (this.getDigester().getLog().isDebugEnabled()) {\nthis.getDigester().getLog().debug(\"AnyChildRules.rules invoked.\");\n}\nreturn decoratedRules.rules();\n}\npublic void init(String prefix, Rules rules) {\nmatchPrefix = prefix;\ndecoratedRules = rules;\n}\npublic Rules getOldRules() {\nreturn decoratedRules;\n",
+  "warning_method": "private String currChildNamespaceURI = null;"
+}
+```
+
+## Your Answer
+//your reason
+The warning suggests that the inner class `currChildNamespaceURI` should be static because it is not using any instance variables from the outer class. Making it static can potentially improve performance by avoiding the overhead of creating a new instance of the inner class each time it is accessed. This is a common practice in Java to optimize performance for utility classes or classes that do not need to maintain state. Therefore, the warning is actionable.
+
+@@ actionable @@

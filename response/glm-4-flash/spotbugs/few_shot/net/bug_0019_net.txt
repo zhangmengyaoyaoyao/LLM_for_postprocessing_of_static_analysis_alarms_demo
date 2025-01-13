@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "NP_LOAD_OF_KNOWN_NULL_VALUE",
+  "priority": "3",
+  "rank": "19",
+  "project": "net",
+  "warning_line": "file.setGroup(grp);\n",
+  "warning_method": "public FTPFile parseFTPEntry(String entry) {\nFTPFile file = new FTPFile();\nfile.setRawListing(entry);\nint type;\nboolean isDevice = false;\nif (matches(entry)) {\nString typeStr = group(1);\nString hardLinkCount = \"0\";\nString usr = null;\nString grp = null;\nString filesize = group(20);\nString datestr = group(21) + \" \" + group(22);\nString name = group(23);\nString endtoken = group(24);\ntry {\nfile.setTimestamp(super.parseTimestamp(datestr));\n} catch (ParseException e) {\n}\nswitch(typeStr.charAt(0)) {\ncase 'd':\ntype = FTPFile.DIRECTORY_TYPE;\nbreak;\ncase 'e':\ntype = FTPFile.SYMBOLIC_LINK_TYPE;\nbreak;\ncase 'l':\ntype = FTPFile.SYMBOLIC_LINK_TYPE;\nbreak;\ncase 'b':\ncase 'c':\nisDevice = true;\ntype = FTPFile.FILE_TYPE;\nbreak;\ncase 'f':\ncase '-':\ntype = FTPFile.FILE_TYPE;\nbreak;\ndefault:\n// e.g. ? and w = whiteout\ntype = FTPFile.UNKNOWN_TYPE;\n}\nfile.setType(type);\nint g = 4;\nfor (int access = 0; access < 3; access++, g += 4) {\nfile.setPermission(access, FTPFile.READ_PERMISSION, (!group(g).equals(\"-\")));\nfile.setPermission(access, FTPFile.WRITE_PERMISSION, (!group(g + 1).equals(\"-\")));\nString execPerm = group(g + 2);\nif (!execPerm.equals(\"-\") && !Character.isUpperCase(execPerm.charAt(0))) {\nfile.setPermission(access, FTPFile.EXECUTE_PERMISSION, true);\n} else {\nfile.setPermission(access, FTPFile.EXECUTE_PERMISSION, false);\n}\n}\nif (!isDevice) {\ntry {\nfile.setHardLinkCount(Integer.parseInt(hardLinkCount));\n} catch (NumberFormatException e) {\n}\n}\nfile.setUser(usr);\nfile.setGroup(grp);\ntry {\nfile.setSize(Long.parseLong(filesize));\n} catch (NumberFormatException e) {\n}\nif (null == endtoken) {\nfile.setName(name);\n} else {\nname += endtoken;\nif (type == FTPFile.SYMBOLIC_LINK_TYPE) {\nint end = name.indexOf(\" -> \");\nif (end == -1) {\nfile.setName(name);\n} else {\nfile.setName(name.substring(0, end));\nfile.setLink(name.substring(end + 4));\n}\n} else {\nfile.setName(name);\n}\n}\nreturn file;\n}\nreturn null;\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates that there is a potential for a `NullPointerException` because the `grp` variable is being used to set the group of the `FTPFile` object, but it is not guaranteed to be non-null. This is a concern because if `grp` is null, calling `file.setGroup(grp)` will throw a `NullPointerException`. This is a clear issue that should be addressed to prevent runtime exceptions. Therefore, the warning is actionable.
+
+@@ actionable @@

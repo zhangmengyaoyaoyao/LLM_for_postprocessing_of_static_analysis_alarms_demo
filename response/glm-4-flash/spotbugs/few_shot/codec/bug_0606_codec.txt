@@ -1,0 +1,20 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "SA_FIELD_DOUBLE_ASSIGNMENT",
+  "priority": "3",
+  "rank": "20",
+  "project": "codec",
+  "warning_line": "modulus = (++modulus) % BYTES_PER_ENCODED_BLOCK;\n",
+  "warning_method": "void decode(byte[] in, int inPos, int inAvail) {\nif (eof) {\nreturn;\n}\nif (inAvail < 0) {\neof = true;\n}\nfor (int i = 0; i < inAvail; i++) {\nbyte b = in[inPos++];\nif (b == PAD) {\neof = true;\nbreak;\n} else {\nensureBufferSize(decodeSize);\nif (b >= 0 && b < this.decodeTable.length) {\nint result = this.decodeTable[b];\nif (result >= 0) {\nmodulus = (++modulus) % BYTES_PER_ENCODED_BLOCK;\nbitWorkArea = (bitWorkArea << BITS_PER_ENCODED_BYTE) + result;\nif (modulus == 0) {\nbuffer[pos++] = (byte) ((bitWorkArea >> 32) & MASK_8BITS);\nbuffer[pos++] = (byte) ((bitWorkArea >> 24) & MASK_8BITS);\nbuffer[pos++] = (byte) ((bitWorkArea >> 16) & MASK_8BITS);\nbuffer[pos++] = (byte) ((bitWorkArea >> 8) & MASK_8BITS);\nbuffer[pos++] = (byte) (bitWorkArea & MASK_8BITS);\n}\n}\n}\n}\n// Two forms of EOF as far as Base32 decoder is concerned: actual\nif (eof && modulus >= 2) {\nensureBufferSize(decodeSize);\nswitch(modulus) {\ncase 2:\nbuffer[pos++] = (byte) ((bitWorkArea >> 2) & MASK_8BITS);\nbreak;\ncase 3:\nbuffer[pos++] = (byte) ((bitWorkArea >> 7) & MASK_8BITS);\nbreak;\ncase 4:\nbitWorkArea = bitWorkArea >> 4;\nbuffer[pos++] = (byte) ((bitWorkArea >> 8) & MASK_8BITS);\nbuffer[pos++] = (byte) ((bitWorkArea) & MASK_8BITS);\nbreak;\ncase 5:\nbitWorkArea = bitWorkArea >> 1;\nbuffer[pos++] = (byte) ((bitWorkArea >> 16) & MASK_8BITS);\nbuffer[pos++] = (byte) ((bitWorkArea >> 8) & MASK_8BITS);\nbuffer[pos++] = (byte) ((bitWorkArea) & MASK_8BITS);\nbreak;\ncase 6:\nbitWorkArea = bitWorkArea >> 6;\nbuffer[pos++] = (byte) ((bitWorkArea >> 16) & MASK_8BITS);\nbuffer[pos++] = (byte) ((bitWorkArea >> 8) & MASK_8BITS);\nbuffer[pos++] = (byte) ((bitWorkArea) & MASK_8BITS);\nbreak;\ncase 7:\nbitWorkArea = bitWorkArea >> 3;\nbuffer[pos++] = (byte) ((bitWorkArea >> 24) & MASK_8BITS);\nbuffer[pos++] = (byte) ((bitWorkArea >> 16) & MASK_8BITS);\nbuffer[pos++] = (byte) ((bitWorkArea >> 8) & MASK_8BITS);\nbuffer[pos++] = (byte) ((bitWorkArea) & MASK_8BITS);\nbreak;\n}\n}\n}"
+}
+```
+
+## Your Answer
+The warning indicates a potential double assignment to the `modulus` variable. In the provided code snippet, `modulus` is incremented and then used in the modulo operation. If the increment operation is not intended to affect the modulo operation, this could lead to incorrect behavior. The warning suggests that the code may be attempting to use the incremented value of `modulus` for the modulo operation, which is not standard practice and could be a mistake.
+
+Given that the warning is about a potential logical error in the code, it is actionable. The developer should review the code to ensure that the increment operation is intended and necessary for the logic of the program.
+
+//your reason
+@@ actionable @@

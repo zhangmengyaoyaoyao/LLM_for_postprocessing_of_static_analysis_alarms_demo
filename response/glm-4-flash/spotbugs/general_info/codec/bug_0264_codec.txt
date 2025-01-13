@@ -1,0 +1,31 @@
+The warning from SpotBugs is categorized as "DODGY_CODE" with the specific type "SF_SWITCH_NO_DEFAULT". This type of warning is triggered when a switch statement does not have a default case. The warning is on the last line of the method `hash64`, where a switch statement is used to handle the remaining bytes of the data array after processing blocks of 8 bytes.
+
+The switch statement in question is used to process the last few bytes of the data array that do not fit into a full block of 8 bytes. The switch cases handle 1 to 7 bytes, but there is no default case to handle the case where `length - index` is 0, which would mean there are no remaining bytes to process.
+
+Here is the relevant part of the code:
+
+```java
+switch(length - index) {
+    case 7:
+        h ^= ((long) data[index + 6] & 0xff) << 48;
+    case 6:
+        h ^= ((long) data[index + 5] & 0xff) << 40;
+    case 5:
+        h ^= ((long) data[index + 4] & 0xff) << 32;
+    case 4:
+        h ^= ((long) data[index + 3] & 0xff) << 24;
+    case 3:
+        h ^= ((long) data[index + 2] & 0xff) << 16;
+    case 2:
+        h ^= ((long) data[index + 1] & 0xff) << 8;
+    case 1:
+        h ^= ((long) data[index] & 0xff);
+        h *= M64;
+}
+```
+
+Without a default case, if `length - index` is 0, the switch statement will not execute any of the cases, and the variable `h` will not be modified. This could potentially lead to incorrect hash computation if there are indeed no remaining bytes to process.
+
+Given this context, the warning is actionable because it suggests that the code may not handle all possible cases correctly. A default case should be added to ensure that the variable `h` is modified in all cases, including when there are no remaining bytes.
+
+@@ actionable @@

@@ -1,0 +1,13 @@
+The warning provided by SpotBugs is categorized under "Multithreaded correctness" with the type "UW_UNCOND_WAIT," indicating an unconditional wait. This type of warning suggests that there is a wait operation without a corresponding notify or notifyAll, which could potentially lead to deadlocks or other synchronization issues in a multithreaded environment.
+
+The specific line of code that triggers the warning is:
+```java
+__queue.wait(100);
+```
+This wait is inside a catch block that handles `InterruptedIOException` and `RuntimeException`. The warning is actionable because it points to a potential issue where a thread might wait indefinitely if it is not properly notified.
+
+The code does have a `notifyAll()` call within the synchronized block that handles `InterruptedIOException`, but the warning is not resolved by this single `notifyAll()` call because the wait operation is not protected by the same lock (`__queue`) that is used for the `notifyAll()` call.
+
+Therefore, the warning is actionable because it indicates a potential synchronization issue that could be fixed by ensuring that all wait operations are protected by the same lock and that there is a corresponding notify or notifyAll to wake up the waiting thread.
+
+@@ actionable @@

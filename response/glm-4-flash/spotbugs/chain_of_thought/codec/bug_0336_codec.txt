@@ -1,0 +1,27 @@
+To determine whether the warning is actionable, let's analyze the warning details step-by-step:
+
+1. **Category**: The category is "DODGY_CODE", which suggests that there might be a potential issue in the code that needs to be investigated.
+
+2. **vtype**: The `vtype` is "SF_SWITCH_FALLTHROUGH", which indicates that there is a fall-through in a switch statement. This means that control will continue to the next case without a break statement, which can lead to unintended behavior.
+
+3. **Priority and Rank**: The priority is "3" and the rank is "20", which suggests that this is a moderate-severity issue.
+
+4. **Project**: The project is "codec", which indicates that this warning is related to a codec implementation.
+
+5. **Warning Line**: The warning line points to two lines of code within a switch statement. The first line is:
+   ```java
+   k2 ^= ((long) data[index + 14] & 0xff) << 48;
+   ```
+   The second line is:
+   ```java
+   case 14:
+   k2 ^= ((long) data[index + 13] & 0xff) << 40;
+   ```
+
+6. **Warning Method**: The warning method is a private static method `hash128x64` which is part of the codec project. This method is responsible for hashing data.
+
+7. **Analysis**: The fall-through in the switch statement means that if the `offset + length - index` is 14, the code will execute the line `k2 ^= ((long) data[index + 13] & 0xff) << 40;` even though it is not in the `case 14:` block. This could lead to incorrect data manipulation or hash computation.
+
+Given the above analysis, the warning is actionable because it indicates a potential bug in the code that could affect the correctness of the hash computation.
+
+@@ actionable @@

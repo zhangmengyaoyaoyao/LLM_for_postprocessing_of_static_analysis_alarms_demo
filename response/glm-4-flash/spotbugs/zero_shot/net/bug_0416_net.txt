@@ -1,0 +1,5 @@
+The warning indicates a potential issue with a `wait` call that may lead to unbounded waiting if the `notifyAll` is not called appropriately. The `wait` call is inside a `catch` block that catches `InterruptedException` and `InterruptedIOException`. If the `InterruptedException` is caught, the code checks if `__isClosed` is true and breaks out of the loop if it is. However, if `__isClosed` is not true, the loop continues, which means the thread could potentially wait indefinitely if no other thread calls `notifyAll` on the same object.
+
+This is a potential issue that could lead to deadlocks or unresponsive threads, especially in a multithreaded environment.
+
+@@ actionable @@

@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "SA_FIELD_DOUBLE_ASSIGNMENT",
+  "priority": "3",
+  "rank": "20",
+  "project": "codec",
+  "warning_line": "modulus = (++modulus) % 3;\n",
+  "warning_method": "void encode(byte[] in, int inPos, int inAvail) {\nif (eof) {\nreturn;\n}\nif (inAvail < 0) {\neof = true;\nif (buffer == null || buffer.length - pos < encodeSize) {\nresizeBuffer();\n}\nswitch(modulus) {\ncase 1:\nbuffer[pos++] = encodeTable[(x >> 2) & MASK_6BITS];\nbuffer[pos++] = encodeTable[(x << 4) & MASK_6BITS];\nif (encodeTable == STANDARD_ENCODE_TABLE) {\nbuffer[pos++] = PAD;\nbuffer[pos++] = PAD;\n}\nbreak;\ncase 2:\nbuffer[pos++] = encodeTable[(x >> 10) & MASK_6BITS];\nbuffer[pos++] = encodeTable[(x >> 4) & MASK_6BITS];\nbuffer[pos++] = encodeTable[(x << 2) & MASK_6BITS];\nif (encodeTable == STANDARD_ENCODE_TABLE) {\nbuffer[pos++] = PAD;\n}\nbreak;\n}\nif (lineLength > 0 && pos > 0) {\nSystem.arraycopy(lineSeparator, 0, buffer, pos, lineSeparator.length);\npos += lineSeparator.length;\n}\n} else {\nfor (int i = 0; i < inAvail; i++) {\nif (buffer == null || buffer.length - pos < encodeSize) {\nresizeBuffer();\n}\nmodulus = (++modulus) % 3;\nint b = in[inPos++];\nif (b < 0) {\nb += 256;\n}\nx = (x << 8) + b;\nif (0 == modulus) {\nbuffer[pos++] = encodeTable[(x >> 18) & MASK_6BITS];\nbuffer[pos++] = encodeTable[(x >> 12) & MASK_6BITS];\nbuffer[pos++] = encodeTable[(x >> 6) & MASK_6BITS];\nbuffer[pos++] = encodeTable[x & MASK_6BITS];\ncurrentLinePos += 4;\nif (lineLength > 0 && lineLength <= currentLinePos) {\nSystem.arraycopy(lineSeparator, 0, buffer, pos, lineSeparator.length);\npos += lineSeparator.length;\ncurrentLinePos = 0;\n}\n}\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates a potential issue with double assignment of the `modulus` variable. This could lead to undefined behavior, as the variable is being incremented and then used in the modulo operation in the same expression. This is a common source of bugs and should be addressed to ensure the correctness of the code. The warning is actionable because it points to a specific line of code that could be causing a problem, and modifying the code to avoid the double assignment would be a straightforward fix.
+
+@@ actionable @@

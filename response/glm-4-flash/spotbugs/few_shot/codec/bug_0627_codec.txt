@@ -1,0 +1,18 @@
+## Bug Report
+```json
+{
+  "category": "DODGY_CODE",
+  "vtype": "SA_FIELD_DOUBLE_ASSIGNMENT",
+  "priority": "3",
+  "rank": "20",
+  "project": "codec",
+  "warning_line": "modulus = (++modulus) % 4;\n",
+  "warning_method": "void decode(byte[] in, int inPos, int inAvail) {\nif (eof) {\nreturn;\n}\nif (inAvail < 0) {\neof = true;\n}\nfor (int i = 0; i < inAvail; i++) {\nif (buf == null || buf.length - pos < decodeSize) {\nresizeBuf();\n}\nbyte b = in[inPos++];\nif (b == PAD) {\nmodulus = (++modulus) % 4;\nx = x << 6;\nswitch(modulus) {\ncase 3:\nx = x << 6;\ncase 0:\nbuf[pos++] = (byte) ((x >> 16) & MASK_8BITS);\nif (modulus == 0) {\nbuf[pos++] = (byte) ((x >> 8) & MASK_8BITS);\n}\ndefault:\neof = true;\nreturn;\n}\n} else {\nif (b >= 0 && b < base64ToInt.length) {\nint result = base64ToInt[b];\nif (result >= 0) {\nmodulus = (++modulus) % 4;\nx = (x << 6) + result;\nif (modulus == 0) {\nbuf[pos++] = (byte) ((x >> 16) & MASK_8BITS);\nbuf[pos++] = (byte) ((x >> 8) & MASK_8BITS);\nbuf[pos++] = (byte) (x & MASK_8BITS);\n}\n}\n}\n}\n}\n}"
+}
+```
+
+## Your Answer
+//your reason
+The warning indicates a potential issue with double assignment of the `modulus` variable. The expression `modulus = (++modulus) % 4;` increments `modulus` and then assigns the result to itself, which is redundant. This could be a mistake or a deliberate optimization that is not clear from the context. Since the code is part of a decoding process, the impact of this redundancy is not immediately clear, and it might not affect the functionality. However, it is a code smell that could indicate a misunderstanding of the language or a mistake in the code. It is advisable to review the surrounding code to understand the intent and correct the assignment if necessary.
+
+@@ actionable @@
